@@ -1,0 +1,74 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:snippet_manager/app.dart';
+import 'package:snippet_manager/features/settings/application/settings_providers.dart';
+import 'package:snippet_manager/features/snippets/application/snippet_providers.dart';
+import 'package:snippet_manager/features/snippets/domain/snippet.dart';
+import 'package:snippet_manager/features/snippets/domain/snippet_query.dart';
+import 'package:snippet_manager/features/snippets/domain/snippet_repository.dart';
+import 'package:snippet_manager/features/snippets/domain/value_objects.dart';
+
+/// Deterministic in-memory fake — no Drift, so the widget tree has no
+/// rescheduling stream timers to make pumpAndSettle spin forever.
+class _FakeRepo implements SnippetRepository {
+  @override
+  Stream<List<Snippet>> watchSnippets(SnippetQuery query) =>
+      Stream.value(const []);
+  @override
+  Stream<Snippet?> watchSnippet(String id) => Stream.value(null);
+  @override
+  Future<Snippet?> getSnippet(String id) async => null;
+  @override
+  Future<String> create(SnippetDraft draft) async => 'id';
+  @override
+  Future<void> update(String id, SnippetDraft draft) async {}
+  @override
+  Future<void> setFavorite(String id, {required bool value}) async {}
+  @override
+  Future<void> softDelete(String id) async {}
+  @override
+  Stream<List<Label>> watchLabels() => Stream.value(const []);
+  @override
+  Future<String> createLabel(String name, {String? color}) async => 'l';
+  @override
+  Future<void> setLabelColor(String id, String color) async {}
+  @override
+  Future<void> renameLabel(String id, String name) async {}
+  @override
+  Future<void> deleteLabel(String id) async {}
+  @override
+  Stream<List<Collection>> watchCollections() => Stream.value(const []);
+  @override
+  Future<String> createCollection(String name, {String? parentId}) async => 'c';
+  @override
+  Future<void> renameCollection(String id, String name) async {}
+  @override
+  Future<void> deleteCollection(String id) async {}
+  @override
+  Future<List<Language>> getLanguages() async => const [];
+  @override
+  Future<List<Purpose>> getPurposes() async => const [];
+}
+
+void main() {
+  testWidgets('App boots into the library shell with an empty state',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          snippetRepositoryProvider.overrideWithValue(_FakeRepo()),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: const SnippetManagerApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('All Snippets'), findsWidgets);
+    expect(find.text('Starred'), findsWidgets);
+    expect(find.text('No snippets yet'), findsOneWidget);
+  });
+}

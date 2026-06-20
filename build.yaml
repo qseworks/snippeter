@@ -1,0 +1,15 @@
+# Drift code generation options.
+# The fts5 + json1 modules must be enabled here so drift_dev can statically
+# PARSE the `CREATE VIRTUAL TABLE ... USING fts5` DDL in our .drift files
+# (Phase 3 search). Runtime FTS5 comes from the bundled native lib / sqlite3.wasm.
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          sql:
+            dialect: sqlite
+            options:
+              modules:
+                - fts5
+                - json1
