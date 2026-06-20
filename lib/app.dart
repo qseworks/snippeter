@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/settings/application/settings_providers.dart';
+import 'features/sync/application/sync_providers.dart';
 import 'features/snippets/application/snippet_providers.dart';
 import 'features/snippets/presentation/snippet_editor_modal.dart';
 
@@ -17,6 +18,8 @@ class SnippetManagerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(settingsProvider).themeMode;
+    // Start the auth -> sync lifecycle bridge (no-op when offline/signed out).
+    ref.watch(syncBootstrapProvider);
     return MaterialApp.router(
       title: 'Snippet Manager',
       debugShowCheckedModeBanner: false,

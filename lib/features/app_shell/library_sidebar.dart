@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/routing/route_paths.dart';
 import '../../core/theme/app_theme.dart';
+import '../auth/application/auth_providers.dart';
 import '../import/gist_import_dialog.dart';
 import '../snippets/application/snippet_providers.dart';
+import '../sync/application/sync_providers.dart';
 import '../snippets/domain/snippet_query.dart';
 import '../snippets/domain/value_objects.dart';
 import '../snippets/presentation/snippet_editor_modal.dart';
@@ -65,6 +67,7 @@ class LibrarySidebar extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  _SyncIndicator(onCloseDrawer: () => _closeDrawerIfNeeded(context)),
                   IconButton(
                     tooltip: 'Import from GitHub Gist',
                     visualDensity: VisualDensity.compact,
@@ -323,6 +326,64 @@ class LibrarySidebar extends ConsumerWidget {
           );
     }
     nameController.dispose();
+  }
+}
+
+/// Compact auth+sync status chip shown in the sidebar header.
+///
+/// * Supabase unconfigured ([authServiceProvider] null) -> hidden entirely; the
+///   app is running local-only and there's nothing to indicate.
+/// * Signed out -> a subtle "cloud-off" icon, tooltip "Not syncing — sign in",
+///   tapping opens Settings (where sign-in lives).
+/// * Signed in -> a "cloud done" icon, tooltip shows the email, tapping triggers
+///   an immediate [SupabaseSyncService.syncOnce].
+class _SyncIndicator extends ConsumerWidget {
+  const _SyncIndicator({required this.onCloseDrawer});
+
+  final VoidCallback onCloseDrawer;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // No backend configured: keep the header clean, render nothing.
+    if (ref.watch(authServiceProvider) == null) {
+      return const SizedBox.shrink();
+    }
+
+    final user = ref.watch(currentUserProvider);
+    final signedIn = user != null;
+
+    final IconData icon;
+    final Color color;
+    final String tooltip;
+    final VoidCallback onTap;
+
+    if (signedIn) {
+      icon = Icons.cloud_done_outlined;
+      color = AppTheme.accent;
+      tooltip = 'Syncing as ${user.email ?? 'your account'}';
+      onTap = () => ref.read(syncServiceProvider)?.syncOnce();
+    } else {
+      icon = Icons.cloud_off_outlined;
+      color = AppTheme.sidebarSection;
+      tooltip = 'Not syncing — sign in';
+      onTap = () {
+        context.go(RoutePaths.settings);
+        onCloseDrawer();
+      };
+    }
+
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        hoverColor: AppTheme.sidebarHover,
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Icon(icon, size: 18, color: color),
+        ),
+      ),
+    );
   }
 }
 

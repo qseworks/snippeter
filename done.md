@@ -68,6 +68,15 @@ multi-file/markdown/modal), `e711905` (P1 batch).
   `parseNotebook` (unit-tested) + `NotebookView`; the detail view renders
   `.ipynb` files as cells (markdown + code + outputs).
 
+## P2 — Backend / collaboration (in progress)
+
+Supabase backend (project `xxxxxxxxxxxxxxxxxxxx`, see [[supabase-project]] memory). App stays **local-first**; sign-in is optional and only turns on sync.
+
+- **P2.1 Accounts** ✅ — `supabase_flutter` + email/password auth (`lib/features/auth/`), optional sign-in/up/out in Settings; `owner_id` set server-side by RLS default. Config in `lib/core/config/supabase_config.dart` (`--dart-define`-overridable).
+- **P2.3 Real-time sync (core)** ✅ — `lib/features/sync/data/supabase_sync_service.dart`: push dirty rows (incl. tombstones) + pull-since with last-write-wins, Realtime subscriptions, debounced `scheduleSync()` after writes; `snippetRepositoryProvider` now returns `SyncedSnippetRepository` (reads/writes local, triggers sync). Pure mappers in `sync_mappers.dart` (tags↔labels, snippet_tags↔snippet_labels) unit-tested (`test/sync_mapping_test.dart`). **Synced tables:** snippets, snippet_files, collections, labels, snippet_labels, ai_prompt_meta. **Not yet synced:** attachments (BLOBs) + snippet_file_versions.
+- Build note: macOS deployment target raised to **13.5** (the passkeys plugin pulled in by `supabase_flutter`). iOS would need a matching bump (16+) before an iOS build.
+- Still open (P2.2/2.4/2.5/2.6/2.7): team libraries, roles, hosted public share pages, VS Code extension + API, CLI. Live cross-device sync needs a confirmed account (Supabase email-confirmation is on by default).
+
 ## Bonus (beyond Snippet)
 
 - PNG "carbon" image export; AI-prompt snippet type with `{{variable}}` parsing;
@@ -77,6 +86,8 @@ multi-file/markdown/modal), `e711905` (P1 batch).
 
 ## Verification baseline
 
-`flutter analyze` → no issues · `flutter test` → 37 passing · macOS
+`flutter analyze` → no issues · `flutter test` → 45 passing · macOS
 `integration_test` (list→search→view→copy→delete) → pass · `flutter build web`
-→ built · v1→v2, v2→v3, and v3→v4 migrations verified on a real on-disk database.
+→ built · v1→v2, v2→v3, and v3→v4 migrations verified on a real on-disk
+database · macOS app launches with `Supabase init completed` (offline, no
+session). macOS min deployment target: 13.5.

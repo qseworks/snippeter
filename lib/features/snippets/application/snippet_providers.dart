@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/database_provider.dart';
+import '../../sync/application/sync_providers.dart';
+import '../../sync/data/synced_snippet_repository.dart';
 import '../data/local_snippet_repository.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_query.dart';
@@ -9,10 +11,16 @@ import '../domain/snippet_repository.dart';
 import '../domain/snippet_type.dart';
 import '../domain/value_objects.dart';
 
-/// The single seam: swap this for a SyncedSnippetRepository in Phase 7 and the
-/// rest of the app is untouched.
+/// The single seam. Always backed by [LocalSnippetRepository] (offline-first
+/// source of truth), wrapped by [SyncedSnippetRepository] which mirrors mutating
+/// writes to Supabase via a debounced sync. When signed out / unconfigured the
+/// sync trigger is a no-op, so behavior is identical to local-only.
 final snippetRepositoryProvider = Provider<SnippetRepository>((ref) {
-  return LocalSnippetRepository(ref.watch(appDatabaseProvider));
+  final local = LocalSnippetRepository(ref.watch(appDatabaseProvider));
+  return SyncedSnippetRepository(
+    local: local,
+    onMutation: () => ref.read(syncServiceProvider)?.scheduleSync(),
+  );
 });
 
 final languagesProvider = FutureProvider<List<Language>>(

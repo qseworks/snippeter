@@ -6,32 +6,31 @@ import '../../snippets/domain/snippet.dart';
 import '../../snippets/domain/snippet_query.dart';
 import '../../snippets/domain/snippet_repository.dart';
 import '../../snippets/domain/value_objects.dart';
-import '../domain/sync_contracts.dart';
 
-/// FUTURE (Phase 7 — designed, DEFERRED). Proves the seam: this wraps the local
-/// repository and (later) a [RemoteSnippetDataSource] + [SyncEngine]. Today it
-/// simply delegates to local. The ONLY change needed to introduce cloud sync is
-/// pointing `snippetRepositoryProvider` at this class instead of
-/// `LocalSnippetRepository` — the UI and state layers never change because they
-/// depend on the [SnippetRepository] interface, not the implementation.
-///
-/// When sync ships, writes here will additionally enqueue an outbox [SyncOp]
-/// and reads may merge remote changes; the local repository remains the
-/// offline-first source of truth.
+/// Offline-first decorator over [SnippetRepository]. Every read delegates
+/// straight through to the local repository (the source of truth). Every
+/// MUTATING call delegates to local and then fires [_onMutation] — a debounced
+/// sync trigger. When signed out or Supabase isn't configured, [_onMutation] is
+/// a no-op, so local behavior is completely unchanged.
 class SyncedSnippetRepository implements SnippetRepository {
   SyncedSnippetRepository({
     required SnippetRepository local,
-    RemoteSnippetDataSource? remote,
-    SyncEngine? syncEngine,
+    required void Function() onMutation,
   })  : _local = local,
-        _remote = remote,
-        _syncEngine = syncEngine;
+        _onMutation = onMutation;
 
   final SnippetRepository _local;
-  // ignore: unused_field — wired when sync ships.
-  final RemoteSnippetDataSource? _remote;
-  // ignore: unused_field — wired when sync ships.
-  final SyncEngine? _syncEngine;
+  final void Function() _onMutation;
+
+  /// Runs a mutating future, then schedules a sync. The trigger is fired AFTER
+  /// the local write resolves so the dirty rows exist when sync runs.
+  Future<T> _mutate<T>(Future<T> future) async {
+    final result = await future;
+    _onMutation();
+    return result;
+  }
+
+  // --- reads (pass-through) --------------------------------------------------
 
   @override
   Stream<List<Snippet>> watchSnippets(SnippetQuery query) =>
@@ -44,62 +43,75 @@ class SyncedSnippetRepository implements SnippetRepository {
   Future<Snippet?> getSnippet(String id) => _local.getSnippet(id);
 
   @override
-  Future<String> create(SnippetDraft draft) => _local.create(draft);
+  Stream<List<Label>> watchLabels() => _local.watchLabels();
 
   @override
-  Future<void> update(String id, SnippetDraft draft) =>
-      _local.update(id, draft);
+  Stream<List<Collection>> watchCollections() => _local.watchCollections();
 
   @override
-  Future<void> setFavorite(String id, {required bool value}) =>
-      _local.setFavorite(id, value: value);
-
-  @override
-  Future<void> softDelete(String id) => _local.softDelete(id);
+  Stream<List<Attachment>> watchAttachments(String snippetId) =>
+      _local.watchAttachments(snippetId);
 
   @override
   Future<List<SnippetVersion>> getVersions(String snippetId) =>
       _local.getVersions(snippetId);
 
   @override
-  Future<void> restoreVersion(String snippetId, int savedAt) =>
-      _local.restoreVersion(snippetId, savedAt);
+  Future<List<Language>> getLanguages() => _local.getLanguages();
 
   @override
-  Stream<List<Label>> watchLabels() => _local.watchLabels();
+  Future<List<Purpose>> getPurposes() => _local.getPurposes();
+
+  // --- mutations (delegate + schedule sync) ----------------------------------
+
+  @override
+  Future<String> create(SnippetDraft draft) => _mutate(_local.create(draft));
+
+  @override
+  Future<void> update(String id, SnippetDraft draft) =>
+      _mutate(_local.update(id, draft));
+
+  @override
+  Future<void> setFavorite(String id, {required bool value}) =>
+      _mutate(_local.setFavorite(id, value: value));
+
+  @override
+  Future<void> softDelete(String id) => _mutate(_local.softDelete(id));
+
+  @override
+  Future<void> restoreVersion(String snippetId, int savedAt) =>
+      _mutate(_local.restoreVersion(snippetId, savedAt));
 
   @override
   Future<String> createLabel(String name, {String? color, String? parentId}) =>
-      _local.createLabel(name, color: color, parentId: parentId);
+      _mutate(_local.createLabel(name, color: color, parentId: parentId));
 
   @override
   Future<void> setLabelColor(String id, String color) =>
-      _local.setLabelColor(id, color);
+      _mutate(_local.setLabelColor(id, color));
 
   @override
   Future<void> setLabelParent(String id, String? parentId) =>
-      _local.setLabelParent(id, parentId);
+      _mutate(_local.setLabelParent(id, parentId));
 
   @override
   Future<void> renameLabel(String id, String name) =>
-      _local.renameLabel(id, name);
+      _mutate(_local.renameLabel(id, name));
 
   @override
-  Future<void> deleteLabel(String id) => _local.deleteLabel(id);
-
-  @override
-  Stream<List<Collection>> watchCollections() => _local.watchCollections();
+  Future<void> deleteLabel(String id) => _mutate(_local.deleteLabel(id));
 
   @override
   Future<String> createCollection(String name, {String? parentId}) =>
-      _local.createCollection(name, parentId: parentId);
+      _mutate(_local.createCollection(name, parentId: parentId));
 
   @override
   Future<void> renameCollection(String id, String name) =>
-      _local.renameCollection(id, name);
+      _mutate(_local.renameCollection(id, name));
 
   @override
-  Future<void> deleteCollection(String id) => _local.deleteCollection(id);
+  Future<void> deleteCollection(String id) =>
+      _mutate(_local.deleteCollection(id));
 
   @override
   Future<String> addAttachment(
@@ -108,23 +120,14 @@ class SyncedSnippetRepository implements SnippetRepository {
     required String mimeType,
     required Uint8List bytes,
   }) =>
-      _local.addAttachment(
+      _mutate(_local.addAttachment(
         snippetId,
         filename: filename,
         mimeType: mimeType,
         bytes: bytes,
-      );
+      ));
 
   @override
-  Future<void> deleteAttachment(String id) => _local.deleteAttachment(id);
-
-  @override
-  Stream<List<Attachment>> watchAttachments(String snippetId) =>
-      _local.watchAttachments(snippetId);
-
-  @override
-  Future<List<Language>> getLanguages() => _local.getLanguages();
-
-  @override
-  Future<List<Purpose>> getPurposes() => _local.getPurposes();
+  Future<void> deleteAttachment(String id) =>
+      _mutate(_local.deleteAttachment(id));
 }
