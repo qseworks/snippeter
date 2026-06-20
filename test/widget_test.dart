@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +53,18 @@ class _FakeRepo implements SnippetRepository {
   Future<void> renameCollection(String id, String name) async {}
   @override
   Future<void> deleteCollection(String id) async {}
+  @override
+  Future<String> addAttachment(
+    String snippetId, {
+    required String filename,
+    required String mimeType,
+    required Uint8List bytes,
+  }) async => 'a';
+  @override
+  Future<void> deleteAttachment(String id) async {}
+  @override
+  Stream<List<Attachment>> watchAttachments(String snippetId) =>
+      Stream.value(const []);
   @override
   Future<List<Language>> getLanguages() async => const [];
   @override

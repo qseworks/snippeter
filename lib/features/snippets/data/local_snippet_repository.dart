@@ -563,6 +563,55 @@ class LocalSnippetRepository implements SnippetRepository {
     });
   }
 
+  // --- attachments ---------------------------------------------------------
+
+  @override
+  Future<String> addAttachment(
+    String snippetId, {
+    required String filename,
+    required String mimeType,
+    required Uint8List bytes,
+  }) async {
+    final id = newId();
+    final ts = nowMs();
+    await _db.into(_db.attachments).insert(
+          AttachmentsCompanion.insert(
+            id: id,
+            snippetId: snippetId,
+            filename: Value(filename),
+            mimeType: Value(mimeType),
+            bytes: bytes,
+            sizeBytes: Value(bytes.length),
+            createdAt: ts,
+            updatedAt: ts,
+            dirty: const Value(true),
+          ),
+        );
+    return id;
+  }
+
+  @override
+  Future<void> deleteAttachment(String id) async {
+    final ts = nowMs();
+    await (_db.update(_db.attachments)..where((a) => a.id.equals(id))).write(
+      AttachmentsCompanion(
+        deletedAt: Value(ts),
+        updatedAt: Value(ts),
+        dirty: const Value(true),
+      ),
+    );
+  }
+
+  @override
+  Stream<List<Attachment>> watchAttachments(String snippetId) {
+    final select = _db.select(_db.attachments)
+      ..where((a) => a.snippetId.equals(snippetId) & a.deletedAt.isNull())
+      ..orderBy([(a) => OrderingTerm.desc(a.createdAt)]);
+    return select
+        .watch()
+        .map((rows) => [for (final r in rows) _toAttachment(r)]);
+  }
+
   // --- reference data ------------------------------------------------------
 
   @override
@@ -619,6 +668,16 @@ class LocalSnippetRepository implements SnippetRepository {
         languageId: r.languageId,
         content: r.content,
         position: r.position,
+      );
+
+  Attachment _toAttachment(AttachmentRow r) => Attachment(
+        id: r.id,
+        snippetId: r.snippetId,
+        filename: r.filename,
+        mimeType: r.mimeType,
+        sizeBytes: r.sizeBytes,
+        createdAt: r.createdAt,
+        bytes: Uint8List.fromList(r.bytes),
       );
 
   Label _toLabel(TagRow r) => Label(

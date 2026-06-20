@@ -20,6 +20,7 @@ part 'app_database.g.dart';
     SnippetTags,
     AiPromptMeta,
     Purposes,
+    Attachments,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -28,7 +29,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _open());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -46,6 +47,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 3) {
             await m.createTable(snippetFileVersions);
             await m.addColumn(tags, tags.parentId);
+          }
+          if (from < 4) {
+            await m.createTable(attachments);
           }
         },
         beforeOpen: (details) async {

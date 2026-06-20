@@ -43,7 +43,7 @@ multi-file/markdown/modal), `e711905` (P1 batch).
   SNIPPET / Edit open a large (~94%) modal with pinned header/footer so Save is
   always visible; only the form scrolls.
 
-## P1 — Power features ✅ (commit `e711905`)
+## P1 — Power features ✅
 
 - **P1.1 History / versions** — `snippet_file_versions` table (schema **v3**);
   each save snapshots prior files; detail **History** sheet
@@ -58,6 +58,15 @@ multi-file/markdown/modal), `e711905` (P1 batch).
   HTML doubles as the **P1.7** static share page.
 - **P1.5 Keyboard shortcuts** — ⌘/Ctrl+N new, ⌘/Ctrl+F focus search, ⌘/Ctrl+S
   save (in editor), Esc closes the modal.
+- **P1.2 Attachments** — `attachments` table (schema **v4**); ATTACH in the
+  editor (`file_picker`) + a detail Attachments section (image thumbnails, size,
+  delete). Repo: `addAttachment`/`deleteAttachment`/`watchAttachments`.
+- **P1.6 Gist import** — `lib/features/import/` `GistImporter.fetchGists`
+  (public gists by username or URL/ID, optional token; uses `http`) + an import
+  dialog (preview → create). Pure `gistsJsonToDrafts` is unit-tested.
+- **P1.8 Notebook (.ipynb) rendering** — `lib/core/notebook/ipynb.dart`
+  `parseNotebook` (unit-tested) + `NotebookView`; the detail view renders
+  `.ipynb` files as cells (markdown + code + outputs).
 
 ## Bonus (beyond Snippet)
 
@@ -68,6 +77,6 @@ multi-file/markdown/modal), `e711905` (P1 batch).
 
 ## Verification baseline
 
-`flutter analyze` → no issues · `flutter test` → 26 passing · macOS
+`flutter analyze` → no issues · `flutter test` → 37 passing · macOS
 `integration_test` (list→search→view→copy→delete) → pass · `flutter build web`
-→ built · v1→v2 and v2→v3 migrations verified on a real on-disk database.
+→ built · v1→v2, v2→v3, and v3→v4 migrations verified on a real on-disk database.

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/routing/route_paths.dart';
 import '../../core/theme/app_theme.dart';
+import '../import/gist_import_dialog.dart';
 import '../snippets/application/snippet_providers.dart';
 import '../snippets/domain/snippet_query.dart';
 import '../snippets/domain/value_objects.dart';
@@ -63,6 +64,14 @@ class LibrarySidebar extends ConsumerWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                  ),
+                  IconButton(
+                    tooltip: 'Import from GitHub Gist',
+                    visualDensity: VisualDensity.compact,
+                    iconSize: 18,
+                    color: AppTheme.sidebarMuted,
+                    icon: const Icon(Icons.cloud_download_outlined),
+                    onPressed: () => showGistImportDialog(context),
                   ),
                   IconButton(
                     tooltip: 'Refresh',

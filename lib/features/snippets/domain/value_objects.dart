@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 /// A programming language: maps a slug -> display name -> file extension ->
 /// highlight grammar id. Seeded, user-extendable.
@@ -70,6 +71,28 @@ class SnippetFileDraft {
         languageId: f.languageId,
         content: f.content,
       );
+}
+
+/// A binary attachment belonging to a snippet (image, file, etc.). Carries the
+/// raw [bytes] inline so the UI can render/save them without a second fetch.
+class Attachment {
+  const Attachment({
+    required this.id,
+    required this.snippetId,
+    required this.filename,
+    required this.mimeType,
+    required this.sizeBytes,
+    required this.createdAt,
+    required this.bytes,
+  });
+
+  final String id;
+  final String snippetId;
+  final String filename;
+  final String mimeType;
+  final int sizeBytes;
+  final int createdAt;
+  final Uint8List bytes;
 }
 
 /// A categorization "purpose" (orthogonal to language and type).

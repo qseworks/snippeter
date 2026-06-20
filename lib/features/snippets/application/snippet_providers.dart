@@ -111,6 +111,14 @@ final snippetProvider =
   return ref.watch(snippetRepositoryProvider).watchSnippet(id);
 });
 
+/// Live attachments for a snippet (not deleted, newest first), keyed by
+/// snippet id. autoDispose so a snippet's attachment stream is released once no
+/// detail view is observing it.
+final attachmentsProvider =
+    StreamProvider.autoDispose.family<List<Attachment>, String>((ref, id) {
+  return ref.watch(snippetRepositoryProvider).watchAttachments(id);
+});
+
 /// Mutable query state for the Library tab.
 class LibraryQueryController extends Notifier<SnippetQuery> {
   @override

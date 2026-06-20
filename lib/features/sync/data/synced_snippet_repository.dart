@@ -1,5 +1,7 @@
 // Private fields can't be named initializing formals, so assign in the body.
 // ignore_for_file: prefer_initializing_formals
+import 'dart:typed_data';
+
 import '../../snippets/domain/snippet.dart';
 import '../../snippets/domain/snippet_query.dart';
 import '../../snippets/domain/snippet_repository.dart';
@@ -98,6 +100,27 @@ class SyncedSnippetRepository implements SnippetRepository {
 
   @override
   Future<void> deleteCollection(String id) => _local.deleteCollection(id);
+
+  @override
+  Future<String> addAttachment(
+    String snippetId, {
+    required String filename,
+    required String mimeType,
+    required Uint8List bytes,
+  }) =>
+      _local.addAttachment(
+        snippetId,
+        filename: filename,
+        mimeType: mimeType,
+        bytes: bytes,
+      );
+
+  @override
+  Future<void> deleteAttachment(String id) => _local.deleteAttachment(id);
+
+  @override
+  Stream<List<Attachment>> watchAttachments(String snippetId) =>
+      _local.watchAttachments(snippetId);
 
   @override
   Future<List<Language>> getLanguages() => _local.getLanguages();

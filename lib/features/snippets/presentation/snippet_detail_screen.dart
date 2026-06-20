@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/highlight/language_visuals.dart';
+import '../../../core/notebook/ipynb.dart';
 import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/code_view.dart';
@@ -16,6 +17,7 @@ import '../domain/value_objects.dart';
 import 'snippet_editor_modal.dart';
 import 'type_visuals.dart';
 import 'widgets/label_chip.dart';
+import 'widgets/notebook_view.dart';
 import 'widgets/snippet_history_sheet.dart';
 
 /// Routed, full-screen detail view (with a back button on narrow layouts).
@@ -247,11 +249,155 @@ class SnippetDetailBody extends ConsumerWidget {
             if (snippet.type == SnippetType.aiPrompt &&
                 snippet.promptMeta != null)
               _PromptMetaView(snippet: snippet),
+            _AttachmentsSection(snippetId: snippet.id),
           ],
         ),
       ),
     );
   }
+}
+
+/// Watches a snippet's attachments and, when there are any, renders an
+/// "Attachments" section: each row shows a thumbnail (for images) or a file
+/// icon, the filename, a human-readable size, and a delete button. Renders
+/// nothing while loading/empty so the section only appears when relevant.
+class _AttachmentsSection extends ConsumerWidget {
+  const _AttachmentsSection({required this.snippetId});
+
+  final String snippetId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final attachments =
+        ref.watch(attachmentsProvider(snippetId)).value ?? const [];
+    if (attachments.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        Text(
+          'Attachments (${attachments.length})',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        for (final a in attachments)
+          _AttachmentTile(
+            attachment: a,
+            onDelete: () =>
+                ref.read(snippetRepositoryProvider).deleteAttachment(a.id),
+          ),
+      ],
+    );
+  }
+}
+
+/// One attachment row: image thumbnail or file-type icon, filename, size, and
+/// a delete IconButton.
+class _AttachmentTile extends StatelessWidget {
+  const _AttachmentTile({required this.attachment, required this.onDelete});
+
+  final Attachment attachment;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isImage = attachment.mimeType.startsWith('image/');
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            child: SizedBox(
+              width: 40,
+              height: 40,
+              // Image.memory is fine here — the no-raster rule only applies to
+              // the export card. Fall back to a file icon if decoding fails.
+              child: isImage
+                  ? Image.memory(
+                      attachment.bytes,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                      errorBuilder: (context, error, stack) =>
+                          _FileIcon(color: theme.colorScheme.onSurfaceVariant),
+                    )
+                  : _FileIcon(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  attachment.filename,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _humanSize(attachment.sizeBytes),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: 'Delete attachment',
+            visualDensity: VisualDensity.compact,
+            iconSize: 18,
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FileIcon extends StatelessWidget {
+  const _FileIcon({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Icon(Icons.insert_drive_file_outlined, size: 24, color: color),
+    );
+  }
+}
+
+/// Formats a byte count as a short human-readable string (e.g. "12 B",
+/// "3.4 KB", "1.2 MB").
+String _humanSize(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  var size = bytes / 1024;
+  var unit = 0;
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024;
+    unit++;
+  }
+  final value = size >= 100 ? size.toStringAsFixed(0) : size.toStringAsFixed(1);
+  return '$value ${units[unit]}';
 }
 
 /// Renders a snippet's description as Markdown, themed to the app surface.
@@ -284,6 +430,13 @@ class _FileBlock extends StatelessWidget {
     final language =
         file.languageId == null ? null : languageMap[file.languageId];
     final filename = file.filename.trim();
+
+    // Jupyter notebooks (.ipynb) get a rich, cell-by-cell rendering when the
+    // content parses as a notebook; otherwise we fall back to a raw CodeBlock.
+    final Notebook? notebook = filename.toLowerCase().endsWith('.ipynb')
+        ? parseNotebook(file.content)
+        : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -308,12 +461,15 @@ class _FileBlock extends StatelessWidget {
           ),
           const SizedBox(height: 6),
         ],
-        CodeBlock(
-          code: file.content,
-          grammarId: language?.grammarId,
-          languageId: file.languageId,
-          languageName: language?.name,
-        ),
+        if (notebook != null)
+          NotebookView(notebook: notebook)
+        else
+          CodeBlock(
+            code: file.content,
+            grammarId: language?.grammarId,
+            languageId: file.languageId,
+            languageName: language?.name,
+          ),
       ],
     );
   }

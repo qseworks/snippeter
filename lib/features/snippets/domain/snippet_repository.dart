@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'snippet.dart';
 import 'snippet_query.dart';
 import 'value_objects.dart';
@@ -36,6 +38,21 @@ abstract interface class SnippetRepository {
   Future<String> createCollection(String name, {String? parentId});
   Future<void> renameCollection(String id, String name);
   Future<void> deleteCollection(String id);
+
+  // --- attachments ---
+  /// Adds a binary attachment to a snippet and returns its new id.
+  Future<String> addAttachment(
+    String snippetId, {
+    required String filename,
+    required String mimeType,
+    required Uint8List bytes,
+  });
+
+  /// Soft-deletes an attachment by id.
+  Future<void> deleteAttachment(String id);
+
+  /// Live attachments for a snippet (not deleted), newest first.
+  Stream<List<Attachment>> watchAttachments(String snippetId);
 
   // --- reference data ---
   Future<List<Language>> getLanguages();

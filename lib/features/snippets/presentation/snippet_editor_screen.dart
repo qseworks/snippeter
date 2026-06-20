@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -293,6 +294,57 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     }
   }
 
+  /// Pick one or more files and attach them to this (already-saved) snippet.
+  /// Only callable when editing an existing snippet — attachments need a
+  /// snippet id to hang off of.
+  Future<void> _attachFiles() async {
+    final snippetId = widget.snippetId;
+    if (snippetId == null) return;
+
+    final FilePickerResult? result;
+    try {
+      // file_picker 12.x: pickFiles is multi-select by default; load each
+      // file's bytes on demand via readAsBytes() (the withData parameter is
+      // deprecated).
+      result = await FilePicker.pickFiles();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Could not pick files: $error')));
+      }
+      return;
+    }
+    if (result == null || result.files.isEmpty) return; // user cancelled
+
+    final repo = ref.read(snippetRepositoryProvider);
+    var added = 0;
+    for (final file in result.files) {
+      try {
+        final bytes = await file.readAsBytes();
+        await repo.addAttachment(
+          snippetId,
+          filename: file.name,
+          mimeType: _mimeTypeFor(file.name),
+          bytes: bytes,
+        );
+        added++;
+      } catch (error) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not attach ${file.name}: $error')),
+          );
+        }
+      }
+    }
+    if (mounted && added > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(added == 1 ? 'Attached 1 file' : 'Attached $added files'),
+        ),
+      );
+    }
+  }
+
   Future<void> _createCollection() async {
     final controller = TextEditingController();
     final name = await showDialog<String>(
@@ -515,14 +567,37 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         // FILES section: N files, each filename + language + code editor.
         _SectionHeader(
           title: 'FILES',
-          trailing: TextButton.icon(
-            onPressed: _addFile,
-            style: TextButton.styleFrom(
-              visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-            ),
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add file'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ATTACH: pick binary files and attach them to this snippet. Only
+              // meaningful once the snippet exists (needs an id); for a brand
+              // new unsaved snippet we disable it with an explanatory tooltip.
+              Tooltip(
+                message: widget.isEditing
+                    ? 'Attach files'
+                    : 'Save the snippet first, then you can attach files',
+                child: TextButton.icon(
+                  onPressed: widget.isEditing ? _attachFiles : null,
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                  icon: const Icon(Icons.attach_file, size: 18),
+                  label: const Text('Attach'),
+                ),
+              ),
+              const SizedBox(width: 4),
+              TextButton.icon(
+                onPressed: _addFile,
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add file'),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -662,6 +737,31 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       child: child,
     );
   }
+}
+
+/// Best-effort MIME type from a filename extension, used when attaching files.
+/// Falls back to `application/octet-stream` for unknown types. (file_picker
+/// doesn't reliably surface a MIME type cross-platform, so we infer one.)
+String _mimeTypeFor(String filename) {
+  final dot = filename.lastIndexOf('.');
+  final ext = dot == -1 ? '' : filename.substring(dot + 1).toLowerCase();
+  const map = <String, String>{
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+    'bmp': 'image/bmp',
+    'svg': 'image/svg+xml',
+    'heic': 'image/heic',
+    'pdf': 'application/pdf',
+    'txt': 'text/plain',
+    'md': 'text/markdown',
+    'json': 'application/json',
+    'csv': 'text/csv',
+    'zip': 'application/zip',
+  };
+  return map[ext] ?? 'application/octet-stream';
 }
 
 /// A small uppercase, letter-spaced Snippet-style section header with an

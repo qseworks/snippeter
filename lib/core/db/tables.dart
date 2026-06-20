@@ -154,6 +154,28 @@ class SnippetFileVersions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Binary attachments belonging to a snippet (images, files). Bytes are stored
+/// inline as a BLOB. Soft-deletable + sync-ready like other user-data tables.
+@DataClassName('AttachmentRow')
+@TableIndex(name: 'attachments_snippet_idx', columns: {#snippetId})
+@TableIndex(name: 'attachments_deleted_idx', columns: {#deletedAt})
+class Attachments extends Table {
+  TextColumn get id => text()();
+  TextColumn get snippetId => text()();
+  TextColumn get filename => text().withDefault(const Constant(''))();
+  TextColumn get mimeType => text().withDefault(const Constant(''))();
+  BlobColumn get bytes => blob()();
+  IntColumn get sizeBytes => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get deletedAt => integer().nullable()();
+  BoolColumn get dirty => boolean().withDefault(const Constant(false))();
+  TextColumn get ownerId => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Many-to-many join between snippets and tags.
 @DataClassName('SnippetTagRow')
 @TableIndex(name: 'snippet_tags_tag_idx', columns: {#tagId})
