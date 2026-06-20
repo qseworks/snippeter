@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
   const id = url.searchParams.get("id") ??
     url.pathname.split("/").filter(Boolean).pop();
   if (!id || id === "share") {
-    return page("Snippet not found", "<h1>Snippet not found</h1><p>Missing snippet id.</p>", 404);
+    return page("Snippet not found", "<h1>Snippet not found</h1><p>Missing snippet id.</p>", 200);
   }
   const sb = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!snip) {
     return page("Snippet not found",
-      "<h1>Snippet not found</h1><p>This snippet is private or does not exist.</p>", 404);
+      "<h1>Snippet not found</h1><p>This snippet is private or does not exist.</p>", 200);
   }
   const { data: files } = await sb
     .from("snippet_files").select("*")
