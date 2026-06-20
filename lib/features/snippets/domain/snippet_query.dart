@@ -15,6 +15,7 @@ class SnippetQuery {
     this.unlabeled = false,
     this.favoritesOnly = false,
     this.sort = SnippetSort.recent,
+    this.workspaceId,
   });
 
   final String? text;
@@ -26,6 +27,9 @@ class SnippetQuery {
   final bool unlabeled;
   final bool favoritesOnly;
   final SnippetSort sort;
+
+  /// Active team library to scope to. null = personal (workspace_id IS NULL).
+  final String? workspaceId;
 
   bool get hasText => text != null && text!.trim().isNotEmpty;
 
@@ -47,6 +51,7 @@ class SnippetQuery {
     bool? unlabeled,
     bool? favoritesOnly,
     SnippetSort? sort,
+    Object? workspaceId = _sentinel,
   }) {
     return SnippetQuery(
       text: text == _sentinel ? this.text : text as String?,
@@ -61,6 +66,9 @@ class SnippetQuery {
       unlabeled: unlabeled ?? this.unlabeled,
       favoritesOnly: favoritesOnly ?? this.favoritesOnly,
       sort: sort ?? this.sort,
+      workspaceId: workspaceId == _sentinel
+          ? this.workspaceId
+          : workspaceId as String?,
     );
   }
 
@@ -78,7 +86,8 @@ class SnippetQuery {
         other.labelsMatchAll == labelsMatchAll &&
         other.unlabeled == unlabeled &&
         other.favoritesOnly == favoritesOnly &&
-        other.sort == sort;
+        other.sort == sort &&
+        other.workspaceId == workspaceId;
   }
 
   @override
@@ -92,6 +101,7 @@ class SnippetQuery {
         unlabeled,
         favoritesOnly,
         sort,
+        workspaceId,
       );
 
   static bool _listEquals(List<String> a, List<String> b) {

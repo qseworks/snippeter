@@ -68,14 +68,18 @@ multi-file/markdown/modal), `e711905` (P1 batch).
   `parseNotebook` (unit-tested) + `NotebookView`; the detail view renders
   `.ipynb` files as cells (markdown + code + outputs).
 
-## P2 — Backend / collaboration (in progress)
+## P2 — Backend / collaboration
 
 Supabase backend (project `xxxxxxxxxxxxxxxxxxxx`, see [[supabase-project]] memory). App stays **local-first**; sign-in is optional and only turns on sync.
 
 - **P2.1 Accounts** ✅ — `supabase_flutter` + email/password auth (`lib/features/auth/`), optional sign-in/up/out in Settings; `owner_id` set server-side by RLS default. Config in `lib/core/config/supabase_config.dart` (`--dart-define`-overridable).
-- **P2.3 Real-time sync (core)** ✅ — `lib/features/sync/data/supabase_sync_service.dart`: push dirty rows (incl. tombstones) + pull-since with last-write-wins, Realtime subscriptions, debounced `scheduleSync()` after writes; `snippetRepositoryProvider` now returns `SyncedSnippetRepository` (reads/writes local, triggers sync). Pure mappers in `sync_mappers.dart` (tags↔labels, snippet_tags↔snippet_labels) unit-tested (`test/sync_mapping_test.dart`). **Synced tables:** snippets, snippet_files, collections, labels, snippet_labels, ai_prompt_meta. **Not yet synced:** attachments (BLOBs) + snippet_file_versions.
-- Build note: macOS deployment target raised to **13.5** (the passkeys plugin pulled in by `supabase_flutter`). iOS would need a matching bump (16+) before an iOS build.
-- Still open (P2.2/2.4/2.5/2.6/2.7): team libraries, roles, hosted public share pages, VS Code extension + API, CLI. Live cross-device sync needs a confirmed account (Supabase email-confirmation is on by default).
+- **P2.3 Real-time sync (core)** ✅ — `lib/features/sync/data/supabase_sync_service.dart`: push dirty rows (incl. tombstones) + pull-since with last-write-wins, Realtime, debounced `scheduleSync()`; `snippetRepositoryProvider` → `SyncedSnippetRepository`. Pure mappers unit-tested (`test/sync_mapping_test.dart`). Synced: snippets, snippet_files, collections, labels, snippet_labels, ai_prompt_meta (+ workspace_id). **Not synced yet:** attachments (BLOBs) + version history.
+- **P2.2 Team libraries** ✅ — schema v5 adds `workspace_id` to all content tables + local `workspaces`/`workspace_members` cache; remote `workspaces`/`workspace_members`/`workspace_invites` with RLS. `WorkspaceService` (online admin, cached locally), `activeWorkspaceProvider` (Personal vs a team) filters the library + stamps new snippets; workspace switcher rail (`app_shell.dart`); content syncs per-workspace.
+- **P2.4 Roles** ✅ — `WorkspaceRole` owner/manager/member/viewer; RLS enforces write (viewer = read-only) via SECURITY DEFINER helpers; invite-by-email (`workspace_invites`, auto-accepted on sign-in — no admin/email→uid lookup), member list + role change + remove + leave/delete in `team_screen.dart`.
+- **P2.6 VS Code extension** ✅ — `integrations/vscode/` (Sign In / Insert Snippet / Save Selection) on supabase-js; compiles to `out/extension.js`.
+- **P2.7 CLI** ✅ — `integrations/cli/` `snip` (login/logout/whoami/list/get/add) on supabase-js; builds via tsc.
+- **P2.5 Public share pages** 🟡 code-complete, **deploy pending approval** — `supabase/functions/share/index.ts` serves public snippets at `…/functions/v1/share?id=<id>`; deploying an unauthenticated service-role function needs explicit approval (`supabase functions deploy share --no-verify-jwt`). Local HTML export already covers offline sharing.
+- Build note: macOS min deployment target **13.5** (passkeys plugin via `supabase_flutter`); iOS would need 16+ before an iOS build. Live cross-device sync needs a confirmed account (Supabase email-confirmation is on by default). RLS helper functions (`is_member`/`can_write`/`can_manage`) raise a benign advisor WARN (RPC-callable) — they only reveal the caller's own access; revoking would break the policies that use them.
 
 ## Bonus (beyond Snippet)
 
@@ -86,8 +90,8 @@ Supabase backend (project `xxxxxxxxxxxxxxxxxxxx`, see [[supabase-project]] memor
 
 ## Verification baseline
 
-`flutter analyze` → no issues · `flutter test` → 45 passing · macOS
+`flutter analyze` → no issues · `flutter test` → 48 passing · macOS
 `integration_test` (list→search→view→copy→delete) → pass · `flutter build web`
-→ built · v1→v2, v2→v3, and v3→v4 migrations verified on a real on-disk
-database · macOS app launches with `Supabase init completed` (offline, no
-session). macOS min deployment target: 13.5.
+→ built · v1→v2 … v4→v5 migrations verified on a real on-disk database ·
+macOS app launches with `Supabase init completed` (offline, no session) ·
+CLI + VS Code extension compile. macOS min deployment target: 13.5.

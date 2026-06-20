@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/db/database_provider.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../settings/application/settings_providers.dart';
+import '../../workspaces/application/workspace_providers.dart';
 import '../data/supabase_sync_service.dart';
 
 /// The sync engine, or null when Supabase isn't configured/available. keepAlive
@@ -37,7 +40,11 @@ final syncBootstrapProvider = Provider<void>((ref) {
       case AuthChangeEvent.initialSession:
         if (next.value?.session != null) {
           service.start();
-          service.syncOnce();
+          // Pull team membership (accept invites + refresh the workspace cache)
+          // BEFORE content sync so team content has a workspace to land in,
+          // then run the content sync. Workspace admin is online-only; any
+          // failure is swallowed so being offline never blocks content sync.
+          unawaited(_bootstrapTeam(ref).whenComplete(service.syncOnce));
         }
       case AuthChangeEvent.signedOut:
         service.stop();
@@ -46,3 +53,16 @@ final syncBootstrapProvider = Provider<void>((ref) {
     }
   }, fireImmediately: true);
 });
+
+/// Accepts pending invites then refreshes the workspace cache. No-op when the
+/// workspace service is unavailable (signed out / unconfigured).
+Future<void> _bootstrapTeam(Ref ref) async {
+  final ws = ref.read(workspaceServiceProvider);
+  if (ws == null) return;
+  try {
+    await ws.acceptPendingInvites();
+    await ws.refreshWorkspaces();
+  } catch (_) {
+    // Online admin failed (offline/transient); content sync still proceeds.
+  }
+}

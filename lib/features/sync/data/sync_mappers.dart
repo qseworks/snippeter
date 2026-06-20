@@ -38,6 +38,7 @@ Map<String, dynamic> snippetRowToRemote(SnippetRow r) => {
       'created_at': r.createdAt,
       'updated_at': r.updatedAt,
       'deleted_at': r.deletedAt,
+      'workspace_id': r.workspaceId,
       'dirty': false,
     };
 
@@ -58,6 +59,7 @@ SnippetsCompanion remoteToSnippetCompanion(Map<String, dynamic> m) =>
       createdAt: Value(_asInt(m['created_at']) ?? 0),
       updatedAt: Value(_asInt(m['updated_at']) ?? 0),
       deletedAt: Value(_asInt(m['deleted_at'])),
+      workspaceId: Value(m['workspace_id'] as String?),
       dirty: const Value(false),
     );
 
@@ -73,6 +75,7 @@ Map<String, dynamic> snippetFileRowToRemote(SnippetFileRow r) => {
       'created_at': r.createdAt,
       'updated_at': r.updatedAt,
       'deleted_at': r.deletedAt,
+      'workspace_id': r.workspaceId,
       'dirty': false,
     };
 
@@ -87,6 +90,7 @@ SnippetFilesCompanion remoteToSnippetFileCompanion(Map<String, dynamic> m) =>
       createdAt: Value(_asInt(m['created_at']) ?? 0),
       updatedAt: Value(_asInt(m['updated_at']) ?? 0),
       deletedAt: Value(_asInt(m['deleted_at'])),
+      workspaceId: Value(m['workspace_id'] as String?),
       dirty: const Value(false),
     );
 
@@ -101,6 +105,7 @@ Map<String, dynamic> collectionRowToRemote(CollectionRow r) => {
       'created_at': r.createdAt,
       'updated_at': r.updatedAt,
       'deleted_at': r.deletedAt,
+      'workspace_id': r.workspaceId,
       'dirty': false,
     };
 
@@ -114,6 +119,7 @@ CollectionsCompanion remoteToCollectionCompanion(Map<String, dynamic> m) =>
       createdAt: Value(_asInt(m['created_at']) ?? 0),
       updatedAt: Value(_asInt(m['updated_at']) ?? 0),
       deletedAt: Value(_asInt(m['deleted_at'])),
+      workspaceId: Value(m['workspace_id'] as String?),
       dirty: const Value(false),
     );
 
@@ -129,6 +135,7 @@ Map<String, dynamic> tagRowToLabelRemote(TagRow r) => {
       'created_at': r.createdAt,
       'updated_at': r.updatedAt,
       'deleted_at': r.deletedAt,
+      'workspace_id': r.workspaceId,
       'dirty': false,
     };
 
@@ -143,6 +150,7 @@ TagsCompanion remoteLabelToTagCompanion(Map<String, dynamic> m) =>
       createdAt: Value(_asInt(m['created_at']) ?? 0),
       updatedAt: Value(_asInt(m['updated_at']) ?? 0),
       deletedAt: Value(_asInt(m['deleted_at'])),
+      workspaceId: Value(m['workspace_id'] as String?),
       dirty: const Value(false),
     );
 
@@ -153,6 +161,7 @@ Map<String, dynamic> snippetTagRowToLabelRemote(SnippetTagRow r) => {
       'snippet_id': r.snippetId,
       'label_id': r.tagId,
       'created_at': r.createdAt,
+      'workspace_id': r.workspaceId,
     };
 
 /// Remote `snippet_labels` map -> local `snippet_tags` companion
@@ -163,6 +172,7 @@ SnippetTagsCompanion remoteSnippetLabelToTagCompanion(
       snippetId: Value(m['snippet_id'] as String),
       tagId: Value(m['label_id'] as String),
       createdAt: Value(_asInt(m['created_at']) ?? 0),
+      workspaceId: Value(m['workspace_id'] as String?),
     );
 
 // --- ai_prompt_meta --------------------------------------------------------
@@ -176,6 +186,7 @@ Map<String, dynamic> aiPromptMetaRowToRemote(AiPromptMetaRow r) => {
       'max_tokens': r.maxTokens,
       'variables_json': r.variablesJson,
       'updated_at': r.updatedAt,
+      'workspace_id': r.workspaceId,
     };
 
 AiPromptMetaCompanion remoteToAiPromptMetaCompanion(Map<String, dynamic> m) =>
@@ -188,4 +199,5 @@ AiPromptMetaCompanion remoteToAiPromptMetaCompanion(Map<String, dynamic> m) =>
       maxTokens: Value(_asInt(m['max_tokens'])),
       variablesJson: Value(m['variables_json'] as String? ?? '[]'),
       updatedAt: Value(_asInt(m['updated_at']) ?? 0),
+      workspaceId: Value(m['workspace_id'] as String?),
     );

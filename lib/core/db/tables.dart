@@ -55,6 +55,7 @@ class Collections extends Table {
   IntColumn get deletedAt => integer().nullable()();
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -74,6 +75,7 @@ class Tags extends Table {
   IntColumn get deletedAt => integer().nullable()();
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -104,6 +106,7 @@ class Snippets extends Table {
   IntColumn get deletedAt => integer().nullable()();
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -127,6 +130,7 @@ class SnippetFiles extends Table {
   IntColumn get deletedAt => integer().nullable()();
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -149,6 +153,7 @@ class SnippetFileVersions extends Table {
   IntColumn get savedAt => integer()(); // groups rows into one version
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -171,6 +176,7 @@ class Attachments extends Table {
   IntColumn get deletedAt => integer().nullable()();
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -183,6 +189,7 @@ class SnippetTags extends Table {
   TextColumn get snippetId => text()();
   TextColumn get tagId => text()();
   IntColumn get createdAt => integer()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {snippetId, tagId};
@@ -199,7 +206,46 @@ class AiPromptMeta extends Table {
   IntColumn get maxTokens => integer().nullable()();
   TextColumn get variablesJson => text().withDefault(const Constant('[]'))();
   IntColumn get updatedAt => integer()();
+  TextColumn get workspaceId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {snippetId};
+}
+
+// ---------------------------------------------------------------------------
+// Team workspace caches. These are NOT part of the dirty content sync — they
+// are managed (online) by WorkspaceService and mirrored here for offline
+// display. NULL workspace_id on content rows = personal (no account needed).
+// ---------------------------------------------------------------------------
+
+/// Local cache of the workspaces (team libraries) the user belongs to. Mirrored
+/// from Supabase by WorkspaceService; [role] is the current user's role in this
+/// workspace (owner|manager|member|viewer wire strings).
+@DataClassName('WorkspaceRow')
+class Workspaces extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get ownerId => text()();
+  TextColumn get role => text().nullable()(); // my role; null if unknown
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get deletedAt => integer().nullable()();
+  BoolColumn get dirty => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Local cache of the members of each workspace (for the members/roles UI).
+@DataClassName('WorkspaceMemberRow')
+@TableIndex(name: 'workspace_members_ws_idx', columns: {#workspaceId})
+class WorkspaceMembers extends Table {
+  TextColumn get workspaceId => text()();
+  TextColumn get userId => text()();
+  TextColumn get email => text()();
+  TextColumn get role => text()();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {workspaceId, userId};
 }

@@ -49,6 +49,37 @@ void main() {
     expect(list.any((s) => s.id == id), isFalse);
   });
 
+  test('personal query (workspaceId null) excludes team snippets', () async {
+    final personalId = await repo.create(
+        const SnippetDraft(title: 'p', body: '', type: SnippetType.text));
+    final teamId = await repo.create(const SnippetDraft(
+        title: 't', body: '', type: SnippetType.text, workspaceId: 'ws1'));
+
+    final personal = await repo.watchSnippets(const SnippetQuery()).first;
+    expect(personal.map((s) => s.id), contains(personalId));
+    expect(personal.map((s) => s.id), isNot(contains(teamId)));
+  });
+
+  test('team query returns only that workspace, with workspaceId persisted',
+      () async {
+    final teamId = await repo.create(const SnippetDraft(
+      title: 't',
+      body: 'x',
+      type: SnippetType.code,
+      labelNames: ['shared'],
+      workspaceId: 'ws1',
+    ));
+    await repo.create(const SnippetDraft(
+        title: 'other', body: '', type: SnippetType.text, workspaceId: 'ws2'));
+    await repo.create(
+        const SnippetDraft(title: 'p', body: '', type: SnippetType.text));
+
+    final team =
+        await repo.watchSnippets(const SnippetQuery(workspaceId: 'ws1')).first;
+    expect(team.map((s) => s.id), [teamId]);
+    expect(team.single.workspaceId, 'ws1');
+  });
+
   test('favorite toggle surfaces in the favorites query', () async {
     final id = await repo.create(
         const SnippetDraft(title: 'f', body: '', type: SnippetType.text));

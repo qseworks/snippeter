@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/db/database_provider.dart';
 import '../../sync/application/sync_providers.dart';
 import '../../sync/data/synced_snippet_repository.dart';
+import '../../workspaces/application/workspace_providers.dart';
 import '../data/local_snippet_repository.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_query.dart';
@@ -50,12 +51,16 @@ final labelsProvider = StreamProvider<List<Label>>(
   (ref) => ref.watch(snippetRepositoryProvider).watchLabels(),
 );
 
-/// All non-deleted snippets (unfiltered). Backs derived library stats and the
-/// sidebar counts. autoDispose so it's released when nothing observes it.
+/// All non-deleted snippets in the ACTIVE library (Personal or the active team
+/// workspace). Backs derived library stats and the sidebar counts. autoDispose
+/// so it's released when nothing observes it.
 final allSnippetsProvider = StreamProvider.autoDispose<List<Snippet>>(
-  (ref) => ref.watch(snippetRepositoryProvider).watchSnippets(
-        const SnippetQuery(),
-      ),
+  (ref) {
+    final workspaceId = ref.watch(activeWorkspaceProvider);
+    return ref.watch(snippetRepositoryProvider).watchSnippets(
+          SnippetQuery(workspaceId: workspaceId),
+        );
+  },
 );
 
 /// Aggregate counts derived from [allSnippetsProvider] for the sidebar/stats.
@@ -127,10 +132,21 @@ final attachmentsProvider =
   return ref.watch(snippetRepositoryProvider).watchAttachments(id);
 });
 
-/// Mutable query state for the Library tab.
+/// Mutable query state for the Library tab. Always scoped to the active library
+/// (Personal or a team workspace): switching the active workspace re-scopes the
+/// query while preserving the current search text and sort.
 class LibraryQueryController extends Notifier<SnippetQuery> {
   @override
-  SnippetQuery build() => const SnippetQuery();
+  SnippetQuery build() {
+    // Re-scope whenever the active library changes, keeping text + sort.
+    ref.listen(activeWorkspaceProvider, (_, next) {
+      state = state.copyWith(workspaceId: next);
+    });
+    final workspaceId = ref.read(activeWorkspaceProvider);
+    return SnippetQuery(workspaceId: workspaceId);
+  }
+
+  String? get _ws => state.workspaceId;
 
   void setText(String? text) => state = state.copyWith(text: text);
   void setType(SnippetType? type) => state = state.copyWith(type: type);
@@ -142,16 +158,18 @@ class LibraryQueryController extends Notifier<SnippetQuery> {
       state = state.copyWith(labelsMatchAll: all);
   void setSort(SnippetSort sort) => state = state.copyWith(sort: sort);
   void clearFilters() =>
-      state = SnippetQuery(text: state.text, sort: state.sort);
+      state = SnippetQuery(text: state.text, sort: state.sort, workspaceId: _ws);
 
   /// Reset all filters but keep the current search text and sort.
-  void showAll() => state = SnippetQuery(text: state.text, sort: state.sort);
+  void showAll() =>
+      state = SnippetQuery(text: state.text, sort: state.sort, workspaceId: _ws);
 
   /// Show only starred snippets; reset every other filter.
   void showStarred() => state = SnippetQuery(
         text: state.text,
         sort: state.sort,
         favoritesOnly: true,
+        workspaceId: _ws,
       );
 
   /// Show only snippets with no labels; reset every other filter.
@@ -159,6 +177,7 @@ class LibraryQueryController extends Notifier<SnippetQuery> {
         text: state.text,
         sort: state.sort,
         unlabeled: true,
+        workspaceId: _ws,
       );
 
   /// Filter to a single label; reset every other filter.
@@ -166,6 +185,7 @@ class LibraryQueryController extends Notifier<SnippetQuery> {
         text: state.text,
         sort: state.sort,
         labelIds: [id],
+        workspaceId: _ws,
       );
 
   /// Filter to a single language; reset every other filter.
@@ -173,6 +193,7 @@ class LibraryQueryController extends Notifier<SnippetQuery> {
         text: state.text,
         sort: state.sort,
         languageId: id,
+        workspaceId: _ws,
       );
 }
 

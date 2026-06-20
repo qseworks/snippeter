@@ -38,6 +38,45 @@ void main() {
       expect(remote['dirty'], false);
     });
 
+    test('workspace_id round-trips on snippets (push + pull)', () {
+      final row = SnippetRow(
+        id: 's-ws',
+        title: 't',
+        body: 'b',
+        type: 'code',
+        languageId: null,
+        purpose: null,
+        description: null,
+        collectionId: null,
+        visibility: 'private',
+        isFavorite: false,
+        sortIndex: null,
+        createdAt: 1,
+        updatedAt: 2,
+        deletedAt: null,
+        dirty: true,
+        ownerId: null,
+        workspaceId: 'ws1',
+      );
+      final remote = snippetRowToRemote(row);
+      expect(remote['workspace_id'], 'ws1');
+
+      final companion = remoteToSnippetCompanion(remote);
+      expect(companion.workspaceId, const Value('ws1'));
+
+      // Personal rows keep a null workspace_id end-to-end.
+      final personal = remoteToSnippetCompanion({
+        'id': 's-p',
+        'title': 't',
+        'body': 'b',
+        'type': 'text',
+        'updated_at': 1,
+        'created_at': 1,
+        'workspace_id': null,
+      });
+      expect(personal.workspaceId, const Value(null));
+    });
+
     test('remoteToSnippetCompanion round-trips a tombstone (deleted_at)', () {
       final remote = {
         'id': 's2',

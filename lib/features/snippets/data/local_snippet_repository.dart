@@ -30,6 +30,15 @@ class LocalSnippetRepository implements SnippetRepository {
     final vars = <Variable<Object>>[];
     var from = 'FROM snippets s';
 
+    // Scope to the active library: null = personal (workspace_id IS NULL),
+    // otherwise an exact team workspace match.
+    if (query.workspaceId == null) {
+      where.add('s.workspace_id IS NULL');
+    } else {
+      where.add('s.workspace_id = ?');
+      vars.add(Variable<String>(query.workspaceId!));
+    }
+
     if (useFts) {
       from += ' JOIN snippets_fts ON snippets_fts.rowid = s.rowid';
       where.add('snippets_fts MATCH ?');
@@ -168,10 +177,11 @@ class LocalSnippetRepository implements SnippetRepository {
               createdAt: ts,
               updatedAt: ts,
               dirty: const Value(true),
+              workspaceId: Value(draft.workspaceId),
             ),
           );
-      await _writeFiles(id, files, ts);
-      await _writeLabels(id, draft.labelNames, ts);
+      await _writeFiles(id, files, ts, draft.workspaceId);
+      await _writeLabels(id, draft.labelNames, ts, draft.workspaceId);
       await _writePromptMeta(id, draft, ts);
     });
     return id;
@@ -198,10 +208,11 @@ class LocalSnippetRepository implements SnippetRepository {
           isFavorite: Value(draft.isFavorite),
           updatedAt: Value(ts),
           dirty: const Value(true),
+          workspaceId: Value(draft.workspaceId),
         ),
       );
-      await _writeFiles(id, files, ts);
-      await _writeLabels(id, draft.labelNames, ts);
+      await _writeFiles(id, files, ts, draft.workspaceId);
+      await _writeLabels(id, draft.labelNames, ts, draft.workspaceId);
       await _writePromptMeta(id, draft, ts);
     });
   }
@@ -212,6 +223,7 @@ class LocalSnippetRepository implements SnippetRepository {
     String snippetId,
     List<SnippetFileDraft> files,
     int ts,
+    String? workspaceId,
   ) async {
     await (_db.delete(_db.snippetFiles)
           ..where((f) => f.snippetId.equals(snippetId)))
@@ -229,6 +241,7 @@ class LocalSnippetRepository implements SnippetRepository {
               createdAt: ts,
               updatedAt: ts,
               dirty: const Value(true),
+              workspaceId: Value(workspaceId),
             ),
           );
     }
@@ -281,6 +294,8 @@ class LocalSnippetRepository implements SnippetRepository {
             position: Value(f.position),
             savedAt: savedAt,
             dirty: const Value(true),
+            // Inherit the snippet's library from its current files.
+            workspaceId: Value(f.workspaceId),
           ),
         );
       }
@@ -327,6 +342,11 @@ class LocalSnippetRepository implements SnippetRepository {
       if (versionRows.isEmpty) return;
       // Snapshot current files first so the restore itself is undoable.
       await _snapshotCurrentFiles(snippetId, ts);
+      // Preserve the snippet's current library on the restored child rows.
+      final snippetRow = await (_db.select(_db.snippets)
+            ..where((s) => s.id.equals(snippetId)))
+          .getSingleOrNull();
+      final workspaceId = snippetRow?.workspaceId;
       // Replace current files with the chosen version's files (new ids).
       final restored = [
         for (final r in versionRows)
@@ -336,7 +356,7 @@ class LocalSnippetRepository implements SnippetRepository {
             content: r.content,
           ),
       ];
-      await _writeFiles(snippetId, restored, ts);
+      await _writeFiles(snippetId, restored, ts, workspaceId);
       await (_db.update(_db.snippets)..where((t) => t.id.equals(snippetId)))
           .write(
         SnippetsCompanion(
@@ -429,7 +449,7 @@ class LocalSnippetRepository implements SnippetRepository {
   }
 
   Future<void> _writeLabels(
-      String snippetId, List<String> names, int ts) async {
+      String snippetId, List<String> names, int ts, String? workspaceId) async {
     await (_db.delete(_db.snippetTags)
           ..where((j) => j.snippetId.equals(snippetId)))
         .go();
@@ -438,21 +458,30 @@ class LocalSnippetRepository implements SnippetRepository {
       final name = raw.trim();
       if (name.isEmpty) continue;
       if (!seen.add(Label.normalize(name))) continue;
-      final label = await _findOrCreateLabel(name, ts);
+      final label = await _findOrCreateLabel(name, ts, workspaceId);
       await _db.into(_db.snippetTags).insert(
             SnippetTagsCompanion.insert(
               snippetId: snippetId,
               tagId: label.id,
               createdAt: ts,
+              workspaceId: Value(workspaceId),
             ),
           );
     }
   }
 
-  Future<TagRow> _findOrCreateLabel(String name, int ts) async {
+  /// Finds an existing label, scoped to the same workspace (team labels are
+  /// distinct from personal ones), else creates it in that workspace.
+  Future<TagRow> _findOrCreateLabel(
+      String name, int ts, String? workspaceId) async {
     final norm = Label.normalize(name);
     final existing = await (_db.select(_db.tags)
-          ..where((t) => t.normalizedName.equals(norm) & t.deletedAt.isNull())
+          ..where((t) =>
+              t.normalizedName.equals(norm) &
+              t.deletedAt.isNull() &
+              (workspaceId == null
+                  ? t.workspaceId.isNull()
+                  : t.workspaceId.equals(workspaceId)))
           ..limit(1))
         .getSingleOrNull();
     if (existing != null) return existing;
@@ -465,6 +494,7 @@ class LocalSnippetRepository implements SnippetRepository {
             createdAt: ts,
             updatedAt: ts,
             dirty: const Value(true),
+            workspaceId: Value(workspaceId),
           ),
         );
     return (_db.select(_db.tags)..where((t) => t.id.equals(id))).getSingle();
@@ -495,6 +525,7 @@ class LocalSnippetRepository implements SnippetRepository {
             maxTokens: Value(meta.maxTokens),
             variablesJson: Value(AiPromptMeta.encodeVariables(variables)),
             updatedAt: ts,
+            workspaceId: Value(draft.workspaceId),
           ),
         );
   }
@@ -574,6 +605,10 @@ class LocalSnippetRepository implements SnippetRepository {
   }) async {
     final id = newId();
     final ts = nowMs();
+    // Inherit the owning snippet's library so the attachment is scoped too.
+    final snippetRow = await (_db.select(_db.snippets)
+          ..where((s) => s.id.equals(snippetId)))
+        .getSingleOrNull();
     await _db.into(_db.attachments).insert(
           AttachmentsCompanion.insert(
             id: id,
@@ -585,6 +620,7 @@ class LocalSnippetRepository implements SnippetRepository {
             createdAt: ts,
             updatedAt: ts,
             dirty: const Value(true),
+            workspaceId: Value(snippetRow?.workspaceId),
           ),
         );
     return id;
@@ -659,6 +695,7 @@ class LocalSnippetRepository implements SnippetRepository {
       promptMeta: meta,
       files: files,
       visibility: SnippetVisibility.fromWire(r.visibility),
+      workspaceId: r.workspaceId,
     );
   }
 

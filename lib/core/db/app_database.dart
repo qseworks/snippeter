@@ -21,6 +21,8 @@ part 'app_database.g.dart';
     AiPromptMeta,
     Purposes,
     Attachments,
+    Workspaces,
+    WorkspaceMembers,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -29,7 +31,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _open());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -50,6 +52,21 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 4) {
             await m.createTable(attachments);
+          }
+          if (from < 5) {
+            // v4 -> v5: team libraries. Add workspace_id to every content
+            // table (NULL = personal) + create the workspace cache tables.
+            await m.addColumn(snippets, snippets.workspaceId);
+            await m.addColumn(snippetFiles, snippetFiles.workspaceId);
+            await m.addColumn(
+                snippetFileVersions, snippetFileVersions.workspaceId);
+            await m.addColumn(collections, collections.workspaceId);
+            await m.addColumn(tags, tags.workspaceId);
+            await m.addColumn(snippetTags, snippetTags.workspaceId);
+            await m.addColumn(aiPromptMeta, aiPromptMeta.workspaceId);
+            await m.addColumn(attachments, attachments.workspaceId);
+            await m.createTable(workspaces);
+            await m.createTable(workspaceMembers);
           }
         },
         beforeOpen: (details) async {

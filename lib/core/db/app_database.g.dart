@@ -184,6 +184,17 @@ class $SnippetsTable extends Snippets
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -202,6 +213,7 @@ class $SnippetsTable extends Snippets
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -326,6 +338,15 @@ class $SnippetsTable extends Snippets
         ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -399,6 +420,10 @@ class $SnippetsTable extends Snippets
         DriftSqlType.string,
         data['${effectivePrefix}owner_id'],
       ),
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -425,6 +450,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
   final int? deletedAt;
   final bool dirty;
   final String? ownerId;
+  final String? workspaceId;
   const SnippetRow({
     required this.id,
     required this.title,
@@ -442,6 +468,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
     this.deletedAt,
     required this.dirty,
     this.ownerId,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -475,6 +502,9 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
     map['dirty'] = Variable<bool>(dirty);
     if (!nullToAbsent || ownerId != null) {
       map['owner_id'] = Variable<String>(ownerId);
+    }
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
     }
     return map;
   }
@@ -511,6 +541,9 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
       ownerId: ownerId == null && nullToAbsent
           ? const Value.absent()
           : Value(ownerId),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -536,6 +569,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       dirty: serializer.fromJson<bool>(json['dirty']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -558,6 +592,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'dirty': serializer.toJson<bool>(dirty),
       'ownerId': serializer.toJson<String?>(ownerId),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -578,6 +613,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
     Value<int?> deletedAt = const Value.absent(),
     bool? dirty,
     Value<String?> ownerId = const Value.absent(),
+    Value<String?> workspaceId = const Value.absent(),
   }) => SnippetRow(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -595,6 +631,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     dirty: dirty ?? this.dirty,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   SnippetRow copyWithCompanion(SnippetsCompanion data) {
     return SnippetRow(
@@ -624,6 +661,9 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -645,7 +685,8 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
-          ..write('ownerId: $ownerId')
+          ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -668,6 +709,7 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -688,7 +730,8 @@ class SnippetRow extends DataClass implements Insertable<SnippetRow> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.dirty == this.dirty &&
-          other.ownerId == this.ownerId);
+          other.ownerId == this.ownerId &&
+          other.workspaceId == this.workspaceId);
 }
 
 class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
@@ -708,6 +751,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
   final Value<int?> deletedAt;
   final Value<bool> dirty;
   final Value<String?> ownerId;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const SnippetsCompanion({
     this.id = const Value.absent(),
@@ -726,6 +770,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SnippetsCompanion.insert({
@@ -745,6 +790,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        title = Value(title),
@@ -769,6 +815,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
     Expression<int>? deletedAt,
     Expression<bool>? dirty,
     Expression<String>? ownerId,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -788,6 +835,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (dirty != null) 'dirty': dirty,
       if (ownerId != null) 'owner_id': ownerId,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -809,6 +857,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
     Value<int?>? deletedAt,
     Value<bool>? dirty,
     Value<String?>? ownerId,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return SnippetsCompanion(
@@ -828,6 +877,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
       deletedAt: deletedAt ?? this.deletedAt,
       dirty: dirty ?? this.dirty,
       ownerId: ownerId ?? this.ownerId,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -883,6 +933,9 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
     if (ownerId.present) {
       map['owner_id'] = Variable<String>(ownerId.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -908,6 +961,7 @@ class SnippetsCompanion extends UpdateCompanion<SnippetRow> {
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
           ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1044,6 +1098,17 @@ class $SnippetFilesTable extends SnippetFiles
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1057,6 +1122,7 @@ class $SnippetFilesTable extends SnippetFiles
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1141,6 +1207,15 @@ class $SnippetFilesTable extends SnippetFiles
         ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1194,6 +1269,10 @@ class $SnippetFilesTable extends SnippetFiles
         DriftSqlType.string,
         data['${effectivePrefix}owner_id'],
       ),
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -1215,6 +1294,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
   final int? deletedAt;
   final bool dirty;
   final String? ownerId;
+  final String? workspaceId;
   const SnippetFileRow({
     required this.id,
     required this.snippetId,
@@ -1227,6 +1307,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
     this.deletedAt,
     required this.dirty,
     this.ownerId,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1247,6 +1328,9 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
     map['dirty'] = Variable<bool>(dirty);
     if (!nullToAbsent || ownerId != null) {
       map['owner_id'] = Variable<String>(ownerId);
+    }
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
     }
     return map;
   }
@@ -1270,6 +1354,9 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
       ownerId: ownerId == null && nullToAbsent
           ? const Value.absent()
           : Value(ownerId),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -1290,6 +1377,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       dirty: serializer.fromJson<bool>(json['dirty']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -1307,6 +1395,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'dirty': serializer.toJson<bool>(dirty),
       'ownerId': serializer.toJson<String?>(ownerId),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -1322,6 +1411,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
     Value<int?> deletedAt = const Value.absent(),
     bool? dirty,
     Value<String?> ownerId = const Value.absent(),
+    Value<String?> workspaceId = const Value.absent(),
   }) => SnippetFileRow(
     id: id ?? this.id,
     snippetId: snippetId ?? this.snippetId,
@@ -1334,6 +1424,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     dirty: dirty ?? this.dirty,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   SnippetFileRow copyWithCompanion(SnippetFilesCompanion data) {
     return SnippetFileRow(
@@ -1350,6 +1441,9 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -1366,7 +1460,8 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
-          ..write('ownerId: $ownerId')
+          ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -1384,6 +1479,7 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -1399,7 +1495,8 @@ class SnippetFileRow extends DataClass implements Insertable<SnippetFileRow> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.dirty == this.dirty &&
-          other.ownerId == this.ownerId);
+          other.ownerId == this.ownerId &&
+          other.workspaceId == this.workspaceId);
 }
 
 class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
@@ -1414,6 +1511,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
   final Value<int?> deletedAt;
   final Value<bool> dirty;
   final Value<String?> ownerId;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const SnippetFilesCompanion({
     this.id = const Value.absent(),
@@ -1427,6 +1525,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SnippetFilesCompanion.insert({
@@ -1441,6 +1540,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        snippetId = Value(snippetId),
@@ -1458,6 +1558,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
     Expression<int>? deletedAt,
     Expression<bool>? dirty,
     Expression<String>? ownerId,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1472,6 +1573,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (dirty != null) 'dirty': dirty,
       if (ownerId != null) 'owner_id': ownerId,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1488,6 +1590,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
     Value<int?>? deletedAt,
     Value<bool>? dirty,
     Value<String?>? ownerId,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return SnippetFilesCompanion(
@@ -1502,6 +1605,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
       deletedAt: deletedAt ?? this.deletedAt,
       dirty: dirty ?? this.dirty,
       ownerId: ownerId ?? this.ownerId,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1542,6 +1646,9 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
     if (ownerId.present) {
       map['owner_id'] = Variable<String>(ownerId.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1562,6 +1669,7 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
           ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1676,6 +1784,17 @@ class $SnippetFileVersionsTable extends SnippetFileVersions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1687,6 +1806,7 @@ class $SnippetFileVersionsTable extends SnippetFileVersions
     savedAt,
     dirty,
     ownerId,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1757,6 +1877,15 @@ class $SnippetFileVersionsTable extends SnippetFileVersions
         ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1802,6 +1931,10 @@ class $SnippetFileVersionsTable extends SnippetFileVersions
         DriftSqlType.string,
         data['${effectivePrefix}owner_id'],
       ),
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -1822,6 +1955,7 @@ class SnippetFileVersionRow extends DataClass
   final int savedAt;
   final bool dirty;
   final String? ownerId;
+  final String? workspaceId;
   const SnippetFileVersionRow({
     required this.id,
     required this.snippetId,
@@ -1832,6 +1966,7 @@ class SnippetFileVersionRow extends DataClass
     required this.savedAt,
     required this.dirty,
     this.ownerId,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1848,6 +1983,9 @@ class SnippetFileVersionRow extends DataClass
     map['dirty'] = Variable<bool>(dirty);
     if (!nullToAbsent || ownerId != null) {
       map['owner_id'] = Variable<String>(ownerId);
+    }
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
     }
     return map;
   }
@@ -1867,6 +2005,9 @@ class SnippetFileVersionRow extends DataClass
       ownerId: ownerId == null && nullToAbsent
           ? const Value.absent()
           : Value(ownerId),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -1885,6 +2026,7 @@ class SnippetFileVersionRow extends DataClass
       savedAt: serializer.fromJson<int>(json['savedAt']),
       dirty: serializer.fromJson<bool>(json['dirty']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -1900,6 +2042,7 @@ class SnippetFileVersionRow extends DataClass
       'savedAt': serializer.toJson<int>(savedAt),
       'dirty': serializer.toJson<bool>(dirty),
       'ownerId': serializer.toJson<String?>(ownerId),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -1913,6 +2056,7 @@ class SnippetFileVersionRow extends DataClass
     int? savedAt,
     bool? dirty,
     Value<String?> ownerId = const Value.absent(),
+    Value<String?> workspaceId = const Value.absent(),
   }) => SnippetFileVersionRow(
     id: id ?? this.id,
     snippetId: snippetId ?? this.snippetId,
@@ -1923,6 +2067,7 @@ class SnippetFileVersionRow extends DataClass
     savedAt: savedAt ?? this.savedAt,
     dirty: dirty ?? this.dirty,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   SnippetFileVersionRow copyWithCompanion(SnippetFileVersionsCompanion data) {
     return SnippetFileVersionRow(
@@ -1937,6 +2082,9 @@ class SnippetFileVersionRow extends DataClass
       savedAt: data.savedAt.present ? data.savedAt.value : this.savedAt,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -1951,7 +2099,8 @@ class SnippetFileVersionRow extends DataClass
           ..write('position: $position, ')
           ..write('savedAt: $savedAt, ')
           ..write('dirty: $dirty, ')
-          ..write('ownerId: $ownerId')
+          ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -1967,6 +2116,7 @@ class SnippetFileVersionRow extends DataClass
     savedAt,
     dirty,
     ownerId,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -1980,7 +2130,8 @@ class SnippetFileVersionRow extends DataClass
           other.position == this.position &&
           other.savedAt == this.savedAt &&
           other.dirty == this.dirty &&
-          other.ownerId == this.ownerId);
+          other.ownerId == this.ownerId &&
+          other.workspaceId == this.workspaceId);
 }
 
 class SnippetFileVersionsCompanion
@@ -1994,6 +2145,7 @@ class SnippetFileVersionsCompanion
   final Value<int> savedAt;
   final Value<bool> dirty;
   final Value<String?> ownerId;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const SnippetFileVersionsCompanion({
     this.id = const Value.absent(),
@@ -2005,6 +2157,7 @@ class SnippetFileVersionsCompanion
     this.savedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SnippetFileVersionsCompanion.insert({
@@ -2017,6 +2170,7 @@ class SnippetFileVersionsCompanion
     required int savedAt,
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        snippetId = Value(snippetId),
@@ -2031,6 +2185,7 @@ class SnippetFileVersionsCompanion
     Expression<int>? savedAt,
     Expression<bool>? dirty,
     Expression<String>? ownerId,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2043,6 +2198,7 @@ class SnippetFileVersionsCompanion
       if (savedAt != null) 'saved_at': savedAt,
       if (dirty != null) 'dirty': dirty,
       if (ownerId != null) 'owner_id': ownerId,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2057,6 +2213,7 @@ class SnippetFileVersionsCompanion
     Value<int>? savedAt,
     Value<bool>? dirty,
     Value<String?>? ownerId,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return SnippetFileVersionsCompanion(
@@ -2069,6 +2226,7 @@ class SnippetFileVersionsCompanion
       savedAt: savedAt ?? this.savedAt,
       dirty: dirty ?? this.dirty,
       ownerId: ownerId ?? this.ownerId,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2103,6 +2261,9 @@ class SnippetFileVersionsCompanion
     if (ownerId.present) {
       map['owner_id'] = Variable<String>(ownerId.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2121,6 +2282,7 @@ class SnippetFileVersionsCompanion
           ..write('savedAt: $savedAt, ')
           ..write('dirty: $dirty, ')
           ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2606,6 +2768,17 @@ class $CollectionsTable extends Collections
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2618,6 +2791,7 @@ class $CollectionsTable extends Collections
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2696,6 +2870,15 @@ class $CollectionsTable extends Collections
         ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2745,6 +2928,10 @@ class $CollectionsTable extends Collections
         DriftSqlType.string,
         data['${effectivePrefix}owner_id'],
       ),
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -2765,6 +2952,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
   final int? deletedAt;
   final bool dirty;
   final String? ownerId;
+  final String? workspaceId;
   const CollectionRow({
     required this.id,
     required this.name,
@@ -2776,6 +2964,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     this.deletedAt,
     required this.dirty,
     this.ownerId,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2800,6 +2989,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     if (!nullToAbsent || ownerId != null) {
       map['owner_id'] = Variable<String>(ownerId);
     }
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
+    }
     return map;
   }
 
@@ -2823,6 +3015,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       ownerId: ownerId == null && nullToAbsent
           ? const Value.absent()
           : Value(ownerId),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -2842,6 +3037,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       dirty: serializer.fromJson<bool>(json['dirty']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -2858,6 +3054,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'dirty': serializer.toJson<bool>(dirty),
       'ownerId': serializer.toJson<String?>(ownerId),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -2872,6 +3069,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     Value<int?> deletedAt = const Value.absent(),
     bool? dirty,
     Value<String?> ownerId = const Value.absent(),
+    Value<String?> workspaceId = const Value.absent(),
   }) => CollectionRow(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -2883,6 +3081,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     dirty: dirty ?? this.dirty,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   CollectionRow copyWithCompanion(CollectionsCompanion data) {
     return CollectionRow(
@@ -2896,6 +3095,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -2911,7 +3113,8 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
-          ..write('ownerId: $ownerId')
+          ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -2928,6 +3131,7 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -2942,7 +3146,8 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.dirty == this.dirty &&
-          other.ownerId == this.ownerId);
+          other.ownerId == this.ownerId &&
+          other.workspaceId == this.workspaceId);
 }
 
 class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
@@ -2956,6 +3161,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
   final Value<int?> deletedAt;
   final Value<bool> dirty;
   final Value<String?> ownerId;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const CollectionsCompanion({
     this.id = const Value.absent(),
@@ -2968,6 +3174,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CollectionsCompanion.insert({
@@ -2981,6 +3188,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -2997,6 +3205,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     Expression<int>? deletedAt,
     Expression<bool>? dirty,
     Expression<String>? ownerId,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3010,6 +3219,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (dirty != null) 'dirty': dirty,
       if (ownerId != null) 'owner_id': ownerId,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3025,6 +3235,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     Value<int?>? deletedAt,
     Value<bool>? dirty,
     Value<String?>? ownerId,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return CollectionsCompanion(
@@ -3038,6 +3249,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
       deletedAt: deletedAt ?? this.deletedAt,
       dirty: dirty ?? this.dirty,
       ownerId: ownerId ?? this.ownerId,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3075,6 +3287,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     if (ownerId.present) {
       map['owner_id'] = Variable<String>(ownerId.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3094,6 +3309,7 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
           ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3211,6 +3427,17 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3223,6 +3450,7 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3306,6 +3534,15 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
         ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3355,6 +3592,10 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
         DriftSqlType.string,
         data['${effectivePrefix}owner_id'],
       ),
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -3375,6 +3616,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
   final int? deletedAt;
   final bool dirty;
   final String? ownerId;
+  final String? workspaceId;
   const TagRow({
     required this.id,
     required this.name,
@@ -3386,6 +3628,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     this.deletedAt,
     required this.dirty,
     this.ownerId,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3407,6 +3650,9 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     map['dirty'] = Variable<bool>(dirty);
     if (!nullToAbsent || ownerId != null) {
       map['owner_id'] = Variable<String>(ownerId);
+    }
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
     }
     return map;
   }
@@ -3431,6 +3677,9 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       ownerId: ownerId == null && nullToAbsent
           ? const Value.absent()
           : Value(ownerId),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -3450,6 +3699,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       dirty: serializer.fromJson<bool>(json['dirty']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -3466,6 +3716,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'dirty': serializer.toJson<bool>(dirty),
       'ownerId': serializer.toJson<String?>(ownerId),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -3480,6 +3731,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     Value<int?> deletedAt = const Value.absent(),
     bool? dirty,
     Value<String?> ownerId = const Value.absent(),
+    Value<String?> workspaceId = const Value.absent(),
   }) => TagRow(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -3491,6 +3743,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     dirty: dirty ?? this.dirty,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   TagRow copyWithCompanion(TagsCompanion data) {
     return TagRow(
@@ -3506,6 +3759,9 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -3521,7 +3777,8 @@ class TagRow extends DataClass implements Insertable<TagRow> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
-          ..write('ownerId: $ownerId')
+          ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -3538,6 +3795,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -3552,7 +3810,8 @@ class TagRow extends DataClass implements Insertable<TagRow> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.dirty == this.dirty &&
-          other.ownerId == this.ownerId);
+          other.ownerId == this.ownerId &&
+          other.workspaceId == this.workspaceId);
 }
 
 class TagsCompanion extends UpdateCompanion<TagRow> {
@@ -3566,6 +3825,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
   final Value<int?> deletedAt;
   final Value<bool> dirty;
   final Value<String?> ownerId;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const TagsCompanion({
     this.id = const Value.absent(),
@@ -3578,6 +3838,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TagsCompanion.insert({
@@ -3591,6 +3852,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -3608,6 +3870,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     Expression<int>? deletedAt,
     Expression<bool>? dirty,
     Expression<String>? ownerId,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3621,6 +3884,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (dirty != null) 'dirty': dirty,
       if (ownerId != null) 'owner_id': ownerId,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3636,6 +3900,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     Value<int?>? deletedAt,
     Value<bool>? dirty,
     Value<String?>? ownerId,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return TagsCompanion(
@@ -3649,6 +3914,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
       deletedAt: deletedAt ?? this.deletedAt,
       dirty: dirty ?? this.dirty,
       ownerId: ownerId ?? this.ownerId,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3686,6 +3952,9 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     if (ownerId.present) {
       map['owner_id'] = Variable<String>(ownerId.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3705,6 +3974,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
           ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3748,8 +4018,24 @@ class $SnippetTagsTable extends SnippetTags
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
   @override
-  List<GeneratedColumn> get $columns => [snippetId, tagId, createdAt];
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    snippetId,
+    tagId,
+    createdAt,
+    workspaceId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3786,6 +4072,15 @@ class $SnippetTagsTable extends SnippetTags
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3807,6 +4102,10 @@ class $SnippetTagsTable extends SnippetTags
         DriftSqlType.int,
         data['${effectivePrefix}created_at'],
       )!,
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -3820,10 +4119,12 @@ class SnippetTagRow extends DataClass implements Insertable<SnippetTagRow> {
   final String snippetId;
   final String tagId;
   final int createdAt;
+  final String? workspaceId;
   const SnippetTagRow({
     required this.snippetId,
     required this.tagId,
     required this.createdAt,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3831,6 +4132,9 @@ class SnippetTagRow extends DataClass implements Insertable<SnippetTagRow> {
     map['snippet_id'] = Variable<String>(snippetId);
     map['tag_id'] = Variable<String>(tagId);
     map['created_at'] = Variable<int>(createdAt);
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
+    }
     return map;
   }
 
@@ -3839,6 +4143,9 @@ class SnippetTagRow extends DataClass implements Insertable<SnippetTagRow> {
       snippetId: Value(snippetId),
       tagId: Value(tagId),
       createdAt: Value(createdAt),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -3851,6 +4158,7 @@ class SnippetTagRow extends DataClass implements Insertable<SnippetTagRow> {
       snippetId: serializer.fromJson<String>(json['snippetId']),
       tagId: serializer.fromJson<String>(json['tagId']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -3860,20 +4168,29 @@ class SnippetTagRow extends DataClass implements Insertable<SnippetTagRow> {
       'snippetId': serializer.toJson<String>(snippetId),
       'tagId': serializer.toJson<String>(tagId),
       'createdAt': serializer.toJson<int>(createdAt),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
-  SnippetTagRow copyWith({String? snippetId, String? tagId, int? createdAt}) =>
-      SnippetTagRow(
-        snippetId: snippetId ?? this.snippetId,
-        tagId: tagId ?? this.tagId,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  SnippetTagRow copyWith({
+    String? snippetId,
+    String? tagId,
+    int? createdAt,
+    Value<String?> workspaceId = const Value.absent(),
+  }) => SnippetTagRow(
+    snippetId: snippetId ?? this.snippetId,
+    tagId: tagId ?? this.tagId,
+    createdAt: createdAt ?? this.createdAt,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
+  );
   SnippetTagRow copyWithCompanion(SnippetTagsCompanion data) {
     return SnippetTagRow(
       snippetId: data.snippetId.present ? data.snippetId.value : this.snippetId,
       tagId: data.tagId.present ? data.tagId.value : this.tagId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -3882,37 +4199,42 @@ class SnippetTagRow extends DataClass implements Insertable<SnippetTagRow> {
     return (StringBuffer('SnippetTagRow(')
           ..write('snippetId: $snippetId, ')
           ..write('tagId: $tagId, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(snippetId, tagId, createdAt);
+  int get hashCode => Object.hash(snippetId, tagId, createdAt, workspaceId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SnippetTagRow &&
           other.snippetId == this.snippetId &&
           other.tagId == this.tagId &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.workspaceId == this.workspaceId);
 }
 
 class SnippetTagsCompanion extends UpdateCompanion<SnippetTagRow> {
   final Value<String> snippetId;
   final Value<String> tagId;
   final Value<int> createdAt;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const SnippetTagsCompanion({
     this.snippetId = const Value.absent(),
     this.tagId = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SnippetTagsCompanion.insert({
     required String snippetId,
     required String tagId,
     required int createdAt,
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : snippetId = Value(snippetId),
        tagId = Value(tagId),
@@ -3921,12 +4243,14 @@ class SnippetTagsCompanion extends UpdateCompanion<SnippetTagRow> {
     Expression<String>? snippetId,
     Expression<String>? tagId,
     Expression<int>? createdAt,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (snippetId != null) 'snippet_id': snippetId,
       if (tagId != null) 'tag_id': tagId,
       if (createdAt != null) 'created_at': createdAt,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3935,12 +4259,14 @@ class SnippetTagsCompanion extends UpdateCompanion<SnippetTagRow> {
     Value<String>? snippetId,
     Value<String>? tagId,
     Value<int>? createdAt,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return SnippetTagsCompanion(
       snippetId: snippetId ?? this.snippetId,
       tagId: tagId ?? this.tagId,
       createdAt: createdAt ?? this.createdAt,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3957,6 +4283,9 @@ class SnippetTagsCompanion extends UpdateCompanion<SnippetTagRow> {
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3969,6 +4298,7 @@ class SnippetTagsCompanion extends UpdateCompanion<SnippetTagRow> {
           ..write('snippetId: $snippetId, ')
           ..write('tagId: $tagId, ')
           ..write('createdAt: $createdAt, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4070,6 +4400,17 @@ class $AiPromptMetaTable extends AiPromptMeta
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     snippetId,
@@ -4080,6 +4421,7 @@ class $AiPromptMetaTable extends AiPromptMeta
     maxTokens,
     variablesJson,
     updatedAt,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4160,6 +4502,15 @@ class $AiPromptMetaTable extends AiPromptMeta
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4201,6 +4552,10 @@ class $AiPromptMetaTable extends AiPromptMeta
         DriftSqlType.int,
         data['${effectivePrefix}updated_at'],
       )!,
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -4219,6 +4574,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
   final int? maxTokens;
   final String variablesJson;
   final int updatedAt;
+  final String? workspaceId;
   const AiPromptMetaRow({
     required this.snippetId,
     this.targetModel,
@@ -4228,6 +4584,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
     this.maxTokens,
     required this.variablesJson,
     required this.updatedAt,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4250,6 +4607,9 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
     }
     map['variables_json'] = Variable<String>(variablesJson);
     map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
+    }
     return map;
   }
 
@@ -4273,6 +4633,9 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
           : Value(maxTokens),
       variablesJson: Value(variablesJson),
       updatedAt: Value(updatedAt),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -4290,6 +4653,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
       maxTokens: serializer.fromJson<int?>(json['maxTokens']),
       variablesJson: serializer.fromJson<String>(json['variablesJson']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -4304,6 +4668,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
       'maxTokens': serializer.toJson<int?>(maxTokens),
       'variablesJson': serializer.toJson<String>(variablesJson),
       'updatedAt': serializer.toJson<int>(updatedAt),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -4316,6 +4681,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
     Value<int?> maxTokens = const Value.absent(),
     String? variablesJson,
     int? updatedAt,
+    Value<String?> workspaceId = const Value.absent(),
   }) => AiPromptMetaRow(
     snippetId: snippetId ?? this.snippetId,
     targetModel: targetModel.present ? targetModel.value : this.targetModel,
@@ -4327,6 +4693,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
     maxTokens: maxTokens.present ? maxTokens.value : this.maxTokens,
     variablesJson: variablesJson ?? this.variablesJson,
     updatedAt: updatedAt ?? this.updatedAt,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   AiPromptMetaRow copyWithCompanion(AiPromptMetaCompanion data) {
     return AiPromptMetaRow(
@@ -4348,6 +4715,9 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
           ? data.variablesJson.value
           : this.variablesJson,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -4361,7 +4731,8 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
           ..write('temperature: $temperature, ')
           ..write('maxTokens: $maxTokens, ')
           ..write('variablesJson: $variablesJson, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -4376,6 +4747,7 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
     maxTokens,
     variablesJson,
     updatedAt,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -4388,7 +4760,8 @@ class AiPromptMetaRow extends DataClass implements Insertable<AiPromptMetaRow> {
           other.temperature == this.temperature &&
           other.maxTokens == this.maxTokens &&
           other.variablesJson == this.variablesJson &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.workspaceId == this.workspaceId);
 }
 
 class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
@@ -4400,6 +4773,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
   final Value<int?> maxTokens;
   final Value<String> variablesJson;
   final Value<int> updatedAt;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const AiPromptMetaCompanion({
     this.snippetId = const Value.absent(),
@@ -4410,6 +4784,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
     this.maxTokens = const Value.absent(),
     this.variablesJson = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AiPromptMetaCompanion.insert({
@@ -4421,6 +4796,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
     this.maxTokens = const Value.absent(),
     this.variablesJson = const Value.absent(),
     required int updatedAt,
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : snippetId = Value(snippetId),
        updatedAt = Value(updatedAt);
@@ -4433,6 +4809,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
     Expression<int>? maxTokens,
     Expression<String>? variablesJson,
     Expression<int>? updatedAt,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -4444,6 +4821,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
       if (maxTokens != null) 'max_tokens': maxTokens,
       if (variablesJson != null) 'variables_json': variablesJson,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -4457,6 +4835,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
     Value<int?>? maxTokens,
     Value<String>? variablesJson,
     Value<int>? updatedAt,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return AiPromptMetaCompanion(
@@ -4468,6 +4847,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
       maxTokens: maxTokens ?? this.maxTokens,
       variablesJson: variablesJson ?? this.variablesJson,
       updatedAt: updatedAt ?? this.updatedAt,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -4499,6 +4879,9 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -4516,6 +4899,7 @@ class AiPromptMetaCompanion extends UpdateCompanion<AiPromptMetaRow> {
           ..write('maxTokens: $maxTokens, ')
           ..write('variablesJson: $variablesJson, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('workspaceId: $workspaceId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4916,6 +5300,17 @@ class $AttachmentsTable extends Attachments
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4929,6 +5324,7 @@ class $AttachmentsTable extends Attachments
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5015,6 +5411,15 @@ class $AttachmentsTable extends Attachments
         ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     }
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5068,6 +5473,10 @@ class $AttachmentsTable extends Attachments
         DriftSqlType.string,
         data['${effectivePrefix}owner_id'],
       ),
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      ),
     );
   }
 
@@ -5089,6 +5498,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
   final int? deletedAt;
   final bool dirty;
   final String? ownerId;
+  final String? workspaceId;
   const AttachmentRow({
     required this.id,
     required this.snippetId,
@@ -5101,6 +5511,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
     this.deletedAt,
     required this.dirty,
     this.ownerId,
+    this.workspaceId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5119,6 +5530,9 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
     map['dirty'] = Variable<bool>(dirty);
     if (!nullToAbsent || ownerId != null) {
       map['owner_id'] = Variable<String>(ownerId);
+    }
+    if (!nullToAbsent || workspaceId != null) {
+      map['workspace_id'] = Variable<String>(workspaceId);
     }
     return map;
   }
@@ -5140,6 +5554,9 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
       ownerId: ownerId == null && nullToAbsent
           ? const Value.absent()
           : Value(ownerId),
+      workspaceId: workspaceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workspaceId),
     );
   }
 
@@ -5160,6 +5577,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       dirty: serializer.fromJson<bool>(json['dirty']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
+      workspaceId: serializer.fromJson<String?>(json['workspaceId']),
     );
   }
   @override
@@ -5177,6 +5595,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'dirty': serializer.toJson<bool>(dirty),
       'ownerId': serializer.toJson<String?>(ownerId),
+      'workspaceId': serializer.toJson<String?>(workspaceId),
     };
   }
 
@@ -5192,6 +5611,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
     Value<int?> deletedAt = const Value.absent(),
     bool? dirty,
     Value<String?> ownerId = const Value.absent(),
+    Value<String?> workspaceId = const Value.absent(),
   }) => AttachmentRow(
     id: id ?? this.id,
     snippetId: snippetId ?? this.snippetId,
@@ -5204,6 +5624,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     dirty: dirty ?? this.dirty,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
+    workspaceId: workspaceId.present ? workspaceId.value : this.workspaceId,
   );
   AttachmentRow copyWithCompanion(AttachmentsCompanion data) {
     return AttachmentRow(
@@ -5218,6 +5639,9 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
     );
   }
 
@@ -5234,7 +5658,8 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
-          ..write('ownerId: $ownerId')
+          ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId')
           ..write(')'))
         .toString();
   }
@@ -5252,6 +5677,7 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
     deletedAt,
     dirty,
     ownerId,
+    workspaceId,
   );
   @override
   bool operator ==(Object other) =>
@@ -5267,7 +5693,8 @@ class AttachmentRow extends DataClass implements Insertable<AttachmentRow> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.dirty == this.dirty &&
-          other.ownerId == this.ownerId);
+          other.ownerId == this.ownerId &&
+          other.workspaceId == this.workspaceId);
 }
 
 class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
@@ -5282,6 +5709,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
   final Value<int?> deletedAt;
   final Value<bool> dirty;
   final Value<String?> ownerId;
+  final Value<String?> workspaceId;
   final Value<int> rowid;
   const AttachmentsCompanion({
     this.id = const Value.absent(),
@@ -5295,6 +5723,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AttachmentsCompanion.insert({
@@ -5309,6 +5738,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
     this.deletedAt = const Value.absent(),
     this.dirty = const Value.absent(),
     this.ownerId = const Value.absent(),
+    this.workspaceId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        snippetId = Value(snippetId),
@@ -5327,6 +5757,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
     Expression<int>? deletedAt,
     Expression<bool>? dirty,
     Expression<String>? ownerId,
+    Expression<String>? workspaceId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -5341,6 +5772,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (dirty != null) 'dirty': dirty,
       if (ownerId != null) 'owner_id': ownerId,
+      if (workspaceId != null) 'workspace_id': workspaceId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -5357,6 +5789,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
     Value<int?>? deletedAt,
     Value<bool>? dirty,
     Value<String?>? ownerId,
+    Value<String?>? workspaceId,
     Value<int>? rowid,
   }) {
     return AttachmentsCompanion(
@@ -5371,6 +5804,7 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
       deletedAt: deletedAt ?? this.deletedAt,
       dirty: dirty ?? this.dirty,
       ownerId: ownerId ?? this.ownerId,
+      workspaceId: workspaceId ?? this.workspaceId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -5411,6 +5845,9 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
     if (ownerId.present) {
       map['owner_id'] = Variable<String>(ownerId.value);
     }
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -5431,6 +5868,881 @@ class AttachmentsCompanion extends UpdateCompanion<AttachmentRow> {
           ..write('deletedAt: $deletedAt, ')
           ..write('dirty: $dirty, ')
           ..write('ownerId: $ownerId, ')
+          ..write('workspaceId: $workspaceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WorkspacesTable extends Workspaces
+    with TableInfo<$WorkspacesTable, WorkspaceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WorkspacesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  @override
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+    'role',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<int> deletedAt = GeneratedColumn<int>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
+  @override
+  late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
+    'dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    ownerId,
+    role,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    dirty,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'workspaces';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WorkspaceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('dirty')) {
+      context.handle(
+        _dirtyMeta,
+        dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WorkspaceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WorkspaceRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      dirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dirty'],
+      )!,
+    );
+  }
+
+  @override
+  $WorkspacesTable createAlias(String alias) {
+    return $WorkspacesTable(attachedDatabase, alias);
+  }
+}
+
+class WorkspaceRow extends DataClass implements Insertable<WorkspaceRow> {
+  final String id;
+  final String name;
+  final String ownerId;
+  final String? role;
+  final int createdAt;
+  final int updatedAt;
+  final int? deletedAt;
+  final bool dirty;
+  const WorkspaceRow({
+    required this.id,
+    required this.name,
+    required this.ownerId,
+    this.role,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.dirty,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['owner_id'] = Variable<String>(ownerId);
+    if (!nullToAbsent || role != null) {
+      map['role'] = Variable<String>(role);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<int>(deletedAt);
+    }
+    map['dirty'] = Variable<bool>(dirty);
+    return map;
+  }
+
+  WorkspacesCompanion toCompanion(bool nullToAbsent) {
+    return WorkspacesCompanion(
+      id: Value(id),
+      name: Value(name),
+      ownerId: Value(ownerId),
+      role: role == null && nullToAbsent ? const Value.absent() : Value(role),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      dirty: Value(dirty),
+    );
+  }
+
+  factory WorkspaceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WorkspaceRow(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
+      role: serializer.fromJson<String?>(json['role']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deletedAt: serializer.fromJson<int?>(json['deletedAt']),
+      dirty: serializer.fromJson<bool>(json['dirty']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'ownerId': serializer.toJson<String>(ownerId),
+      'role': serializer.toJson<String?>(role),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deletedAt': serializer.toJson<int?>(deletedAt),
+      'dirty': serializer.toJson<bool>(dirty),
+    };
+  }
+
+  WorkspaceRow copyWith({
+    String? id,
+    String? name,
+    String? ownerId,
+    Value<String?> role = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+    Value<int?> deletedAt = const Value.absent(),
+    bool? dirty,
+  }) => WorkspaceRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    ownerId: ownerId ?? this.ownerId,
+    role: role.present ? role.value : this.role,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    dirty: dirty ?? this.dirty,
+  );
+  WorkspaceRow copyWithCompanion(WorkspacesCompanion data) {
+    return WorkspaceRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+      role: data.role.present ? data.role.value : this.role,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      dirty: data.dirty.present ? data.dirty.value : this.dirty,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkspaceRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('role: $role, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('dirty: $dirty')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    ownerId,
+    role,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    dirty,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkspaceRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.ownerId == this.ownerId &&
+          other.role == this.role &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.dirty == this.dirty);
+}
+
+class WorkspacesCompanion extends UpdateCompanion<WorkspaceRow> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> ownerId;
+  final Value<String?> role;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int?> deletedAt;
+  final Value<bool> dirty;
+  final Value<int> rowid;
+  const WorkspacesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.role = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WorkspacesCompanion.insert({
+    required String id,
+    required String name,
+    required String ownerId,
+    this.role = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       ownerId = Value(ownerId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<WorkspaceRow> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? ownerId,
+    Expression<String>? role,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? deletedAt,
+    Expression<bool>? dirty,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (ownerId != null) 'owner_id': ownerId,
+      if (role != null) 'role': role,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (dirty != null) 'dirty': dirty,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WorkspacesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? ownerId,
+    Value<String?>? role,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int?>? deletedAt,
+    Value<bool>? dirty,
+    Value<int>? rowid,
+  }) {
+    return WorkspacesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      ownerId: ownerId ?? this.ownerId,
+      role: role ?? this.role,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      dirty: dirty ?? this.dirty,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<int>(deletedAt.value);
+    }
+    if (dirty.present) {
+      map['dirty'] = Variable<bool>(dirty.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkspacesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('role: $role, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('dirty: $dirty, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WorkspaceMembersTable extends WorkspaceMembers
+    with TableInfo<$WorkspaceMembersTable, WorkspaceMemberRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WorkspaceMembersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _workspaceIdMeta = const VerificationMeta(
+    'workspaceId',
+  );
+  @override
+  late final GeneratedColumn<String> workspaceId = GeneratedColumn<String>(
+    'workspace_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+    'role',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    workspaceId,
+    userId,
+    email,
+    role,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'workspace_members';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WorkspaceMemberRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('workspace_id')) {
+      context.handle(
+        _workspaceIdMeta,
+        workspaceId.isAcceptableOrUnknown(
+          data['workspace_id']!,
+          _workspaceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_workspaceIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_emailMeta);
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_roleMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {workspaceId, userId};
+  @override
+  WorkspaceMemberRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WorkspaceMemberRow(
+      workspaceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}workspace_id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      )!,
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $WorkspaceMembersTable createAlias(String alias) {
+    return $WorkspaceMembersTable(attachedDatabase, alias);
+  }
+}
+
+class WorkspaceMemberRow extends DataClass
+    implements Insertable<WorkspaceMemberRow> {
+  final String workspaceId;
+  final String userId;
+  final String email;
+  final String role;
+  final int createdAt;
+  const WorkspaceMemberRow({
+    required this.workspaceId,
+    required this.userId,
+    required this.email,
+    required this.role,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['workspace_id'] = Variable<String>(workspaceId);
+    map['user_id'] = Variable<String>(userId);
+    map['email'] = Variable<String>(email);
+    map['role'] = Variable<String>(role);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  WorkspaceMembersCompanion toCompanion(bool nullToAbsent) {
+    return WorkspaceMembersCompanion(
+      workspaceId: Value(workspaceId),
+      userId: Value(userId),
+      email: Value(email),
+      role: Value(role),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory WorkspaceMemberRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WorkspaceMemberRow(
+      workspaceId: serializer.fromJson<String>(json['workspaceId']),
+      userId: serializer.fromJson<String>(json['userId']),
+      email: serializer.fromJson<String>(json['email']),
+      role: serializer.fromJson<String>(json['role']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workspaceId': serializer.toJson<String>(workspaceId),
+      'userId': serializer.toJson<String>(userId),
+      'email': serializer.toJson<String>(email),
+      'role': serializer.toJson<String>(role),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  WorkspaceMemberRow copyWith({
+    String? workspaceId,
+    String? userId,
+    String? email,
+    String? role,
+    int? createdAt,
+  }) => WorkspaceMemberRow(
+    workspaceId: workspaceId ?? this.workspaceId,
+    userId: userId ?? this.userId,
+    email: email ?? this.email,
+    role: role ?? this.role,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  WorkspaceMemberRow copyWithCompanion(WorkspaceMembersCompanion data) {
+    return WorkspaceMemberRow(
+      workspaceId: data.workspaceId.present
+          ? data.workspaceId.value
+          : this.workspaceId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      email: data.email.present ? data.email.value : this.email,
+      role: data.role.present ? data.role.value : this.role,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkspaceMemberRow(')
+          ..write('workspaceId: $workspaceId, ')
+          ..write('userId: $userId, ')
+          ..write('email: $email, ')
+          ..write('role: $role, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(workspaceId, userId, email, role, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkspaceMemberRow &&
+          other.workspaceId == this.workspaceId &&
+          other.userId == this.userId &&
+          other.email == this.email &&
+          other.role == this.role &&
+          other.createdAt == this.createdAt);
+}
+
+class WorkspaceMembersCompanion extends UpdateCompanion<WorkspaceMemberRow> {
+  final Value<String> workspaceId;
+  final Value<String> userId;
+  final Value<String> email;
+  final Value<String> role;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const WorkspaceMembersCompanion({
+    this.workspaceId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.email = const Value.absent(),
+    this.role = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WorkspaceMembersCompanion.insert({
+    required String workspaceId,
+    required String userId,
+    required String email,
+    required String role,
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : workspaceId = Value(workspaceId),
+       userId = Value(userId),
+       email = Value(email),
+       role = Value(role),
+       createdAt = Value(createdAt);
+  static Insertable<WorkspaceMemberRow> custom({
+    Expression<String>? workspaceId,
+    Expression<String>? userId,
+    Expression<String>? email,
+    Expression<String>? role,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (workspaceId != null) 'workspace_id': workspaceId,
+      if (userId != null) 'user_id': userId,
+      if (email != null) 'email': email,
+      if (role != null) 'role': role,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WorkspaceMembersCompanion copyWith({
+    Value<String>? workspaceId,
+    Value<String>? userId,
+    Value<String>? email,
+    Value<String>? role,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return WorkspaceMembersCompanion(
+      workspaceId: workspaceId ?? this.workspaceId,
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (workspaceId.present) {
+      map['workspace_id'] = Variable<String>(workspaceId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkspaceMembersCompanion(')
+          ..write('workspaceId: $workspaceId, ')
+          ..write('userId: $userId, ')
+          ..write('email: $email, ')
+          ..write('role: $role, ')
+          ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -5451,6 +6763,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AiPromptMetaTable aiPromptMeta = $AiPromptMetaTable(this);
   late final $PurposesTable purposes = $PurposesTable(this);
   late final $AttachmentsTable attachments = $AttachmentsTable(this);
+  late final $WorkspacesTable workspaces = $WorkspacesTable(this);
+  late final $WorkspaceMembersTable workspaceMembers = $WorkspaceMembersTable(
+    this,
+  );
   late final Index snippetTypeIdx = Index(
     'snippet_type_idx',
     'CREATE INDEX snippet_type_idx ON snippets (type)',
@@ -5511,6 +6827,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'attachments_deleted_idx',
     'CREATE INDEX attachments_deleted_idx ON attachments (deleted_at)',
   );
+  late final Index workspaceMembersWsIdx = Index(
+    'workspace_members_ws_idx',
+    'CREATE INDEX workspace_members_ws_idx ON workspace_members (workspace_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5526,6 +6846,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     aiPromptMeta,
     purposes,
     attachments,
+    workspaces,
+    workspaceMembers,
     snippetTypeIdx,
     snippetLanguageIdx,
     snippetCollectionIdx,
@@ -5541,6 +6863,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     snippetTagsTagIdx,
     attachmentsSnippetIdx,
     attachmentsDeletedIdx,
+    workspaceMembersWsIdx,
   ];
 }
 
@@ -5562,6 +6885,7 @@ typedef $$SnippetsTableCreateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$SnippetsTableUpdateCompanionBuilder =
@@ -5582,6 +6906,7 @@ typedef $$SnippetsTableUpdateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -5671,6 +6996,11 @@ class $$SnippetsTableFilterComposer
 
   ColumnFilters<String> get ownerId => $composableBuilder(
     column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5763,6 +7093,11 @@ class $$SnippetsTableOrderingComposer
     column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SnippetsTableAnnotationComposer
@@ -5831,6 +7166,11 @@ class $$SnippetsTableAnnotationComposer
 
   GeneratedColumn<String> get ownerId =>
       $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$SnippetsTableTableManager
@@ -5880,6 +7220,7 @@ class $$SnippetsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetsCompanion(
                 id: id,
@@ -5898,6 +7239,7 @@ class $$SnippetsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5918,6 +7260,7 @@ class $$SnippetsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetsCompanion.insert(
                 id: id,
@@ -5936,6 +7279,7 @@ class $$SnippetsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -5973,6 +7317,7 @@ typedef $$SnippetFilesTableCreateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$SnippetFilesTableUpdateCompanionBuilder =
@@ -5988,6 +7333,7 @@ typedef $$SnippetFilesTableUpdateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -6052,6 +7398,11 @@ class $$SnippetFilesTableFilterComposer
 
   ColumnFilters<String> get ownerId => $composableBuilder(
     column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6119,6 +7470,11 @@ class $$SnippetFilesTableOrderingComposer
     column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SnippetFilesTableAnnotationComposer
@@ -6164,6 +7520,11 @@ class $$SnippetFilesTableAnnotationComposer
 
   GeneratedColumn<String> get ownerId =>
       $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$SnippetFilesTableTableManager
@@ -6208,6 +7569,7 @@ class $$SnippetFilesTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetFilesCompanion(
                 id: id,
@@ -6221,6 +7583,7 @@ class $$SnippetFilesTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6236,6 +7599,7 @@ class $$SnippetFilesTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetFilesCompanion.insert(
                 id: id,
@@ -6249,6 +7613,7 @@ class $$SnippetFilesTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -6287,6 +7652,7 @@ typedef $$SnippetFileVersionsTableCreateCompanionBuilder =
       required int savedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$SnippetFileVersionsTableUpdateCompanionBuilder =
@@ -6300,6 +7666,7 @@ typedef $$SnippetFileVersionsTableUpdateCompanionBuilder =
       Value<int> savedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -6354,6 +7721,11 @@ class $$SnippetFileVersionsTableFilterComposer
 
   ColumnFilters<String> get ownerId => $composableBuilder(
     column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6411,6 +7783,11 @@ class $$SnippetFileVersionsTableOrderingComposer
     column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SnippetFileVersionsTableAnnotationComposer
@@ -6450,6 +7827,11 @@ class $$SnippetFileVersionsTableAnnotationComposer
 
   GeneratedColumn<String> get ownerId =>
       $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$SnippetFileVersionsTableTableManager
@@ -6504,6 +7886,7 @@ class $$SnippetFileVersionsTableTableManager
                 Value<int> savedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetFileVersionsCompanion(
                 id: id,
@@ -6515,6 +7898,7 @@ class $$SnippetFileVersionsTableTableManager
                 savedAt: savedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6528,6 +7912,7 @@ class $$SnippetFileVersionsTableTableManager
                 required int savedAt,
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetFileVersionsCompanion.insert(
                 id: id,
@@ -6539,6 +7924,7 @@ class $$SnippetFileVersionsTableTableManager
                 savedAt: savedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -6786,6 +8172,7 @@ typedef $$CollectionsTableCreateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$CollectionsTableUpdateCompanionBuilder =
@@ -6800,6 +8187,7 @@ typedef $$CollectionsTableUpdateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -6859,6 +8247,11 @@ class $$CollectionsTableFilterComposer
 
   ColumnFilters<String> get ownerId => $composableBuilder(
     column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6921,6 +8314,11 @@ class $$CollectionsTableOrderingComposer
     column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CollectionsTableAnnotationComposer
@@ -6961,6 +8359,11 @@ class $$CollectionsTableAnnotationComposer
 
   GeneratedColumn<String> get ownerId =>
       $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$CollectionsTableTableManager
@@ -7004,6 +8407,7 @@ class $$CollectionsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CollectionsCompanion(
                 id: id,
@@ -7016,6 +8420,7 @@ class $$CollectionsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7030,6 +8435,7 @@ class $$CollectionsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CollectionsCompanion.insert(
                 id: id,
@@ -7042,6 +8448,7 @@ class $$CollectionsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -7081,6 +8488,7 @@ typedef $$TagsTableCreateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$TagsTableUpdateCompanionBuilder =
@@ -7095,6 +8503,7 @@ typedef $$TagsTableUpdateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -7153,6 +8562,11 @@ class $$TagsTableFilterComposer extends Composer<_$AppDatabase, $TagsTable> {
 
   ColumnFilters<String> get ownerId => $composableBuilder(
     column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7214,6 +8628,11 @@ class $$TagsTableOrderingComposer extends Composer<_$AppDatabase, $TagsTable> {
     column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TagsTableAnnotationComposer
@@ -7256,6 +8675,11 @@ class $$TagsTableAnnotationComposer
 
   GeneratedColumn<String> get ownerId =>
       $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$TagsTableTableManager
@@ -7296,6 +8720,7 @@ class $$TagsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TagsCompanion(
                 id: id,
@@ -7308,6 +8733,7 @@ class $$TagsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7322,6 +8748,7 @@ class $$TagsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TagsCompanion.insert(
                 id: id,
@@ -7334,6 +8761,7 @@ class $$TagsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -7363,6 +8791,7 @@ typedef $$SnippetTagsTableCreateCompanionBuilder =
       required String snippetId,
       required String tagId,
       required int createdAt,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$SnippetTagsTableUpdateCompanionBuilder =
@@ -7370,6 +8799,7 @@ typedef $$SnippetTagsTableUpdateCompanionBuilder =
       Value<String> snippetId,
       Value<String> tagId,
       Value<int> createdAt,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -7394,6 +8824,11 @@ class $$SnippetTagsTableFilterComposer
 
   ColumnFilters<int> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7421,6 +8856,11 @@ class $$SnippetTagsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SnippetTagsTableAnnotationComposer
@@ -7440,6 +8880,11 @@ class $$SnippetTagsTableAnnotationComposer
 
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$SnippetTagsTableTableManager
@@ -7476,11 +8921,13 @@ class $$SnippetTagsTableTableManager
                 Value<String> snippetId = const Value.absent(),
                 Value<String> tagId = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetTagsCompanion(
                 snippetId: snippetId,
                 tagId: tagId,
                 createdAt: createdAt,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7488,11 +8935,13 @@ class $$SnippetTagsTableTableManager
                 required String snippetId,
                 required String tagId,
                 required int createdAt,
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SnippetTagsCompanion.insert(
                 snippetId: snippetId,
                 tagId: tagId,
                 createdAt: createdAt,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -7530,6 +8979,7 @@ typedef $$AiPromptMetaTableCreateCompanionBuilder =
       Value<int?> maxTokens,
       Value<String> variablesJson,
       required int updatedAt,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$AiPromptMetaTableUpdateCompanionBuilder =
@@ -7542,6 +8992,7 @@ typedef $$AiPromptMetaTableUpdateCompanionBuilder =
       Value<int?> maxTokens,
       Value<String> variablesJson,
       Value<int> updatedAt,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -7591,6 +9042,11 @@ class $$AiPromptMetaTableFilterComposer
 
   ColumnFilters<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7643,6 +9099,11 @@ class $$AiPromptMetaTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AiPromptMetaTableAnnotationComposer
@@ -7687,6 +9148,11 @@ class $$AiPromptMetaTableAnnotationComposer
 
   GeneratedColumn<int> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$AiPromptMetaTableTableManager
@@ -7728,6 +9194,7 @@ class $$AiPromptMetaTableTableManager
                 Value<int?> maxTokens = const Value.absent(),
                 Value<String> variablesJson = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AiPromptMetaCompanion(
                 snippetId: snippetId,
@@ -7738,6 +9205,7 @@ class $$AiPromptMetaTableTableManager
                 maxTokens: maxTokens,
                 variablesJson: variablesJson,
                 updatedAt: updatedAt,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7750,6 +9218,7 @@ class $$AiPromptMetaTableTableManager
                 Value<int?> maxTokens = const Value.absent(),
                 Value<String> variablesJson = const Value.absent(),
                 required int updatedAt,
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AiPromptMetaCompanion.insert(
                 snippetId: snippetId,
@@ -7760,6 +9229,7 @@ class $$AiPromptMetaTableTableManager
                 maxTokens: maxTokens,
                 variablesJson: variablesJson,
                 updatedAt: updatedAt,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -7961,6 +9431,7 @@ typedef $$AttachmentsTableCreateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 typedef $$AttachmentsTableUpdateCompanionBuilder =
@@ -7976,6 +9447,7 @@ typedef $$AttachmentsTableUpdateCompanionBuilder =
       Value<int?> deletedAt,
       Value<bool> dirty,
       Value<String?> ownerId,
+      Value<String?> workspaceId,
       Value<int> rowid,
     });
 
@@ -8040,6 +9512,11 @@ class $$AttachmentsTableFilterComposer
 
   ColumnFilters<String> get ownerId => $composableBuilder(
     column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -8107,6 +9584,11 @@ class $$AttachmentsTableOrderingComposer
     column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AttachmentsTableAnnotationComposer
@@ -8150,6 +9632,11 @@ class $$AttachmentsTableAnnotationComposer
 
   GeneratedColumn<String> get ownerId =>
       $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
 }
 
 class $$AttachmentsTableTableManager
@@ -8194,6 +9681,7 @@ class $$AttachmentsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AttachmentsCompanion(
                 id: id,
@@ -8207,6 +9695,7 @@ class $$AttachmentsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -8222,6 +9711,7 @@ class $$AttachmentsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
                 Value<String?> ownerId = const Value.absent(),
+                Value<String?> workspaceId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AttachmentsCompanion.insert(
                 id: id,
@@ -8235,6 +9725,7 @@ class $$AttachmentsTableTableManager
                 deletedAt: deletedAt,
                 dirty: dirty,
                 ownerId: ownerId,
+                workspaceId: workspaceId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -8262,6 +9753,475 @@ typedef $$AttachmentsTableProcessedTableManager =
       AttachmentRow,
       PrefetchHooks Function()
     >;
+typedef $$WorkspacesTableCreateCompanionBuilder =
+    WorkspacesCompanion Function({
+      required String id,
+      required String name,
+      required String ownerId,
+      Value<String?> role,
+      required int createdAt,
+      required int updatedAt,
+      Value<int?> deletedAt,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+typedef $$WorkspacesTableUpdateCompanionBuilder =
+    WorkspacesCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> ownerId,
+      Value<String?> role,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int?> deletedAt,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+
+class $$WorkspacesTableFilterComposer
+    extends Composer<_$AppDatabase, $WorkspacesTable> {
+  $$WorkspacesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WorkspacesTableOrderingComposer
+    extends Composer<_$AppDatabase, $WorkspacesTable> {
+  $$WorkspacesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WorkspacesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WorkspacesTable> {
+  $$WorkspacesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get dirty =>
+      $composableBuilder(column: $table.dirty, builder: (column) => column);
+}
+
+class $$WorkspacesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WorkspacesTable,
+          WorkspaceRow,
+          $$WorkspacesTableFilterComposer,
+          $$WorkspacesTableOrderingComposer,
+          $$WorkspacesTableAnnotationComposer,
+          $$WorkspacesTableCreateCompanionBuilder,
+          $$WorkspacesTableUpdateCompanionBuilder,
+          (
+            WorkspaceRow,
+            BaseReferences<_$AppDatabase, $WorkspacesTable, WorkspaceRow>,
+          ),
+          WorkspaceRow,
+          PrefetchHooks Function()
+        > {
+  $$WorkspacesTableTableManager(_$AppDatabase db, $WorkspacesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WorkspacesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WorkspacesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WorkspacesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
+                Value<String?> role = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int?> deletedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WorkspacesCompanion(
+                id: id,
+                name: name,
+                ownerId: ownerId,
+                role: role,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String ownerId,
+                Value<String?> role = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int?> deletedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WorkspacesCompanion.insert(
+                id: id,
+                name: name,
+                ownerId: ownerId,
+                role: role,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WorkspacesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WorkspacesTable,
+      WorkspaceRow,
+      $$WorkspacesTableFilterComposer,
+      $$WorkspacesTableOrderingComposer,
+      $$WorkspacesTableAnnotationComposer,
+      $$WorkspacesTableCreateCompanionBuilder,
+      $$WorkspacesTableUpdateCompanionBuilder,
+      (
+        WorkspaceRow,
+        BaseReferences<_$AppDatabase, $WorkspacesTable, WorkspaceRow>,
+      ),
+      WorkspaceRow,
+      PrefetchHooks Function()
+    >;
+typedef $$WorkspaceMembersTableCreateCompanionBuilder =
+    WorkspaceMembersCompanion Function({
+      required String workspaceId,
+      required String userId,
+      required String email,
+      required String role,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$WorkspaceMembersTableUpdateCompanionBuilder =
+    WorkspaceMembersCompanion Function({
+      Value<String> workspaceId,
+      Value<String> userId,
+      Value<String> email,
+      Value<String> role,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+class $$WorkspaceMembersTableFilterComposer
+    extends Composer<_$AppDatabase, $WorkspaceMembersTable> {
+  $$WorkspaceMembersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WorkspaceMembersTableOrderingComposer
+    extends Composer<_$AppDatabase, $WorkspaceMembersTable> {
+  $$WorkspaceMembersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WorkspaceMembersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WorkspaceMembersTable> {
+  $$WorkspaceMembersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get workspaceId => $composableBuilder(
+    column: $table.workspaceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$WorkspaceMembersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WorkspaceMembersTable,
+          WorkspaceMemberRow,
+          $$WorkspaceMembersTableFilterComposer,
+          $$WorkspaceMembersTableOrderingComposer,
+          $$WorkspaceMembersTableAnnotationComposer,
+          $$WorkspaceMembersTableCreateCompanionBuilder,
+          $$WorkspaceMembersTableUpdateCompanionBuilder,
+          (
+            WorkspaceMemberRow,
+            BaseReferences<
+              _$AppDatabase,
+              $WorkspaceMembersTable,
+              WorkspaceMemberRow
+            >,
+          ),
+          WorkspaceMemberRow,
+          PrefetchHooks Function()
+        > {
+  $$WorkspaceMembersTableTableManager(
+    _$AppDatabase db,
+    $WorkspaceMembersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WorkspaceMembersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WorkspaceMembersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WorkspaceMembersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> workspaceId = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<String> role = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WorkspaceMembersCompanion(
+                workspaceId: workspaceId,
+                userId: userId,
+                email: email,
+                role: role,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String workspaceId,
+                required String userId,
+                required String email,
+                required String role,
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => WorkspaceMembersCompanion.insert(
+                workspaceId: workspaceId,
+                userId: userId,
+                email: email,
+                role: role,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WorkspaceMembersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WorkspaceMembersTable,
+      WorkspaceMemberRow,
+      $$WorkspaceMembersTableFilterComposer,
+      $$WorkspaceMembersTableOrderingComposer,
+      $$WorkspaceMembersTableAnnotationComposer,
+      $$WorkspaceMembersTableCreateCompanionBuilder,
+      $$WorkspaceMembersTableUpdateCompanionBuilder,
+      (
+        WorkspaceMemberRow,
+        BaseReferences<
+          _$AppDatabase,
+          $WorkspaceMembersTable,
+          WorkspaceMemberRow
+        >,
+      ),
+      WorkspaceMemberRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8285,4 +10245,8 @@ class $AppDatabaseManager {
       $$PurposesTableTableManager(_db, _db.purposes);
   $$AttachmentsTableTableManager get attachments =>
       $$AttachmentsTableTableManager(_db, _db.attachments);
+  $$WorkspacesTableTableManager get workspaces =>
+      $$WorkspacesTableTableManager(_db, _db.workspaces);
+  $$WorkspaceMembersTableTableManager get workspaceMembers =>
+      $$WorkspaceMembersTableTableManager(_db, _db.workspaceMembers);
 }

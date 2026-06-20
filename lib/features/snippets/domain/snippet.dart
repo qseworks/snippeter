@@ -22,6 +22,7 @@ class Snippet {
     this.promptMeta,
     this.files = const [],
     this.visibility = SnippetVisibility.private,
+    this.workspaceId,
   });
 
   final String id;
@@ -44,6 +45,9 @@ class Snippet {
   final AiPromptMeta? promptMeta;
   final List<SnippetFile> files;
   final SnippetVisibility visibility;
+
+  /// The team library this snippet belongs to, or null for personal.
+  final String? workspaceId;
 }
 
 /// A point-in-time snapshot of a snippet's files, for the history/restore UI.
@@ -71,6 +75,7 @@ class SnippetDraft {
     this.promptMeta,
     this.files = const [],
     this.visibility = SnippetVisibility.private,
+    this.workspaceId,
   });
 
   final String title;
@@ -89,6 +94,10 @@ class SnippetDraft {
   final List<SnippetFileDraft> files;
   final SnippetVisibility visibility;
 
+  /// The team library this snippet belongs to, or null for personal. The
+  /// repository persists this on the snippet row and all its child rows.
+  final String? workspaceId;
+
   factory SnippetDraft.fromSnippet(Snippet s) => SnippetDraft(
         title: s.title,
         body: s.body,
@@ -102,5 +111,6 @@ class SnippetDraft {
         promptMeta: s.promptMeta,
         files: [for (final f in s.files) SnippetFileDraft.fromFile(f)],
         visibility: s.visibility,
+        workspaceId: s.workspaceId,
       );
 }

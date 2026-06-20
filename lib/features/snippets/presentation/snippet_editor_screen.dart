@@ -13,6 +13,7 @@ import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../settings/application/settings_providers.dart';
+import '../../workspaces/application/workspace_providers.dart';
 import '../application/snippet_providers.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_type.dart';
@@ -91,6 +92,12 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   bool _saving = false;
   SnippetVisibility _visibility = SnippetVisibility.private;
 
+  /// The library this snippet belongs to. For an existing snippet this is
+  /// captured on load so editing never moves it between libraries; for a new
+  /// snippet it is stamped from the active workspace at save time (null =
+  /// personal, preserving the signed-out offline behavior exactly).
+  String? _workspaceId;
+
   @override
   void initState() {
     super.initState();
@@ -115,6 +122,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       _collectionId = snippet.collectionId;
       _labels = [for (final l in snippet.labels) l.name];
       _visibility = snippet.visibility;
+      _workspaceId = snippet.workspaceId;
 
       // Load files into per-file editors. Fall back to a single file built from
       // the denormalized body when the snippet has no file rows.
@@ -241,8 +249,13 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         ),
     ];
     final first = _files.first;
+    // Existing snippets keep the library captured on load; new snippets land in
+    // the active library (null = personal, matching the offline/signed-out path).
+    final workspaceId =
+        widget.isEditing ? _workspaceId : ref.read(activeWorkspaceProvider);
     final draft = SnippetDraft(
       title: title,
+      workspaceId: workspaceId,
       // Keep body/languageId mirroring the first file for legacy consumers; the
       // repository prefers `files` when present.
       body: first.contentController.text,
