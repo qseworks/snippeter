@@ -113,12 +113,16 @@ class Label {
     required this.name,
     required this.normalizedName,
     this.color,
+    this.parentId,
   });
 
   final String id;
   final String name;
   final String normalizedName;
   final String? color;
+
+  /// Optional parent label id for a nested label hierarchy (app-enforced).
+  final String? parentId;
 
   static String normalize(String name) => name.trim().toLowerCase();
 }

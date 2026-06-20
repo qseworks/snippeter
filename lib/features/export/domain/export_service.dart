@@ -39,4 +39,13 @@ abstract interface class ExportService {
 
   /// Share the snippet body as a source file with the correct extension.
   Future<void> shareSourceFile(SnippetExportData data, {Rect? origin});
+
+  /// Export a standalone, self-styled HTML document containing the snippet
+  /// title, an optional markdown [description] (rendered to HTML) and every
+  /// file as a syntax-neutral code block. Saved as `<baseName>.html`.
+  Future<void> exportHtml(SnippetExportData data, {String? description});
+
+  /// Export a PDF document with the snippet title, an optional [description]
+  /// and every file rendered in monospace. Saved as `<baseName>.pdf`.
+  Future<void> exportPdf(SnippetExportData data, {String? description});
 }

@@ -68,6 +68,7 @@ class Tags extends Table {
   TextColumn get name => text()();
   TextColumn get normalizedName => text()(); // lowercased; uniqueness app-enforced
   TextColumn get color => text().nullable()();
+  TextColumn get parentId => text().nullable()(); // self-reference (app-enforced)
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
   IntColumn get deletedAt => integer().nullable()();
@@ -124,6 +125,28 @@ class SnippetFiles extends Table {
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
   IntColumn get deletedAt => integer().nullable()();
+  BoolColumn get dirty => boolean().withDefault(const Constant(false))();
+  TextColumn get ownerId => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Immutable history snapshots of a snippet's files. A "version" is the set of
+/// rows sharing the same [savedAt]: every time a snippet's files are replaced
+/// the previous file set is copied here verbatim, so history can be browsed and
+/// restored. Append-only — never updated, only inserted/read.
+@DataClassName('SnippetFileVersionRow')
+@TableIndex(name: 'snippet_file_versions_snippet_idx', columns: {#snippetId})
+@TableIndex(name: 'snippet_file_versions_saved_idx', columns: {#savedAt})
+class SnippetFileVersions extends Table {
+  TextColumn get id => text()();
+  TextColumn get snippetId => text()();
+  TextColumn get filename => text().withDefault(const Constant(''))();
+  TextColumn get languageId => text().nullable()();
+  TextColumn get content => text().withDefault(const Constant(''))();
+  IntColumn get position => integer().withDefault(const Constant(0))();
+  IntColumn get savedAt => integer()(); // groups rows into one version
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
   TextColumn get ownerId => text().nullable()();
 

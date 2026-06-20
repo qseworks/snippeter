@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:re_editor/re_editor.dart';
@@ -595,50 +596,70 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     // In modal mode the host Dialog already constrains width/height; render the
     // bare content with a small header bar. Otherwise wrap in a Scaffold.
     if (widget.isModal) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
-            child: Row(
-              children: [
-                Text(
-                  widget.isEditing ? 'Edit snippet' : 'New snippet',
-                  style: theme.textTheme.titleLarge,
-                ),
-                const Spacer(),
-                IconButton(
-                  tooltip: 'Close',
-                  onPressed: _saving ? null : _discard,
-                  icon: const Icon(Icons.close),
-                ),
-              ],
+      return _withSaveShortcut(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+              child: Row(
+                children: [
+                  Text(
+                    widget.isEditing ? 'Edit snippet' : 'New snippet',
+                    style: theme.textTheme.titleLarge,
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'Close',
+                    onPressed: _saving ? null : _discard,
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Divider(height: 1),
-          Expanded(child: form),
-          footer,
-        ],
+            const Divider(height: 1),
+            Expanded(child: form),
+            footer,
+          ],
+        ),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isEditing ? 'Edit snippet' : 'New snippet'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 900),
-                child: form,
+    return _withSaveShortcut(
+      Scaffold(
+        appBar: AppBar(
+          title: Text(widget.isEditing ? 'Edit snippet' : 'New snippet'),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 900),
+                  child: form,
+                ),
               ),
             ),
-          ),
-          footer,
-        ],
+            footer,
+          ],
+        ),
       ),
+    );
+  }
+
+  /// Wraps [child] so Cmd/Ctrl+S triggers a save (ignored while already
+  /// saving). Both `meta` (macOS) and `control` (elsewhere) are bound.
+  Widget _withSaveShortcut(Widget child) {
+    void save() {
+      if (!_saving) _save();
+    }
+
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true): save,
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true): save,
+      },
+      child: child,
     );
   }
 }

@@ -1568,6 +1568,565 @@ class SnippetFilesCompanion extends UpdateCompanion<SnippetFileRow> {
   }
 }
 
+class $SnippetFileVersionsTable extends SnippetFileVersions
+    with TableInfo<$SnippetFileVersionsTable, SnippetFileVersionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SnippetFileVersionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _snippetIdMeta = const VerificationMeta(
+    'snippetId',
+  );
+  @override
+  late final GeneratedColumn<String> snippetId = GeneratedColumn<String>(
+    'snippet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _filenameMeta = const VerificationMeta(
+    'filename',
+  );
+  @override
+  late final GeneratedColumn<String> filename = GeneratedColumn<String>(
+    'filename',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _languageIdMeta = const VerificationMeta(
+    'languageId',
+  );
+  @override
+  late final GeneratedColumn<String> languageId = GeneratedColumn<String>(
+    'language_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _savedAtMeta = const VerificationMeta(
+    'savedAt',
+  );
+  @override
+  late final GeneratedColumn<int> savedAt = GeneratedColumn<int>(
+    'saved_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
+  @override
+  late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
+    'dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  @override
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    snippetId,
+    filename,
+    languageId,
+    content,
+    position,
+    savedAt,
+    dirty,
+    ownerId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'snippet_file_versions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SnippetFileVersionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('snippet_id')) {
+      context.handle(
+        _snippetIdMeta,
+        snippetId.isAcceptableOrUnknown(data['snippet_id']!, _snippetIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_snippetIdMeta);
+    }
+    if (data.containsKey('filename')) {
+      context.handle(
+        _filenameMeta,
+        filename.isAcceptableOrUnknown(data['filename']!, _filenameMeta),
+      );
+    }
+    if (data.containsKey('language_id')) {
+      context.handle(
+        _languageIdMeta,
+        languageId.isAcceptableOrUnknown(data['language_id']!, _languageIdMeta),
+      );
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    }
+    if (data.containsKey('saved_at')) {
+      context.handle(
+        _savedAtMeta,
+        savedAt.isAcceptableOrUnknown(data['saved_at']!, _savedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_savedAtMeta);
+    }
+    if (data.containsKey('dirty')) {
+      context.handle(
+        _dirtyMeta,
+        dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
+      );
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SnippetFileVersionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SnippetFileVersionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      snippetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snippet_id'],
+      )!,
+      filename: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}filename'],
+      )!,
+      languageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}language_id'],
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      savedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}saved_at'],
+      )!,
+      dirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dirty'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      ),
+    );
+  }
+
+  @override
+  $SnippetFileVersionsTable createAlias(String alias) {
+    return $SnippetFileVersionsTable(attachedDatabase, alias);
+  }
+}
+
+class SnippetFileVersionRow extends DataClass
+    implements Insertable<SnippetFileVersionRow> {
+  final String id;
+  final String snippetId;
+  final String filename;
+  final String? languageId;
+  final String content;
+  final int position;
+  final int savedAt;
+  final bool dirty;
+  final String? ownerId;
+  const SnippetFileVersionRow({
+    required this.id,
+    required this.snippetId,
+    required this.filename,
+    this.languageId,
+    required this.content,
+    required this.position,
+    required this.savedAt,
+    required this.dirty,
+    this.ownerId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['snippet_id'] = Variable<String>(snippetId);
+    map['filename'] = Variable<String>(filename);
+    if (!nullToAbsent || languageId != null) {
+      map['language_id'] = Variable<String>(languageId);
+    }
+    map['content'] = Variable<String>(content);
+    map['position'] = Variable<int>(position);
+    map['saved_at'] = Variable<int>(savedAt);
+    map['dirty'] = Variable<bool>(dirty);
+    if (!nullToAbsent || ownerId != null) {
+      map['owner_id'] = Variable<String>(ownerId);
+    }
+    return map;
+  }
+
+  SnippetFileVersionsCompanion toCompanion(bool nullToAbsent) {
+    return SnippetFileVersionsCompanion(
+      id: Value(id),
+      snippetId: Value(snippetId),
+      filename: Value(filename),
+      languageId: languageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(languageId),
+      content: Value(content),
+      position: Value(position),
+      savedAt: Value(savedAt),
+      dirty: Value(dirty),
+      ownerId: ownerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ownerId),
+    );
+  }
+
+  factory SnippetFileVersionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SnippetFileVersionRow(
+      id: serializer.fromJson<String>(json['id']),
+      snippetId: serializer.fromJson<String>(json['snippetId']),
+      filename: serializer.fromJson<String>(json['filename']),
+      languageId: serializer.fromJson<String?>(json['languageId']),
+      content: serializer.fromJson<String>(json['content']),
+      position: serializer.fromJson<int>(json['position']),
+      savedAt: serializer.fromJson<int>(json['savedAt']),
+      dirty: serializer.fromJson<bool>(json['dirty']),
+      ownerId: serializer.fromJson<String?>(json['ownerId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'snippetId': serializer.toJson<String>(snippetId),
+      'filename': serializer.toJson<String>(filename),
+      'languageId': serializer.toJson<String?>(languageId),
+      'content': serializer.toJson<String>(content),
+      'position': serializer.toJson<int>(position),
+      'savedAt': serializer.toJson<int>(savedAt),
+      'dirty': serializer.toJson<bool>(dirty),
+      'ownerId': serializer.toJson<String?>(ownerId),
+    };
+  }
+
+  SnippetFileVersionRow copyWith({
+    String? id,
+    String? snippetId,
+    String? filename,
+    Value<String?> languageId = const Value.absent(),
+    String? content,
+    int? position,
+    int? savedAt,
+    bool? dirty,
+    Value<String?> ownerId = const Value.absent(),
+  }) => SnippetFileVersionRow(
+    id: id ?? this.id,
+    snippetId: snippetId ?? this.snippetId,
+    filename: filename ?? this.filename,
+    languageId: languageId.present ? languageId.value : this.languageId,
+    content: content ?? this.content,
+    position: position ?? this.position,
+    savedAt: savedAt ?? this.savedAt,
+    dirty: dirty ?? this.dirty,
+    ownerId: ownerId.present ? ownerId.value : this.ownerId,
+  );
+  SnippetFileVersionRow copyWithCompanion(SnippetFileVersionsCompanion data) {
+    return SnippetFileVersionRow(
+      id: data.id.present ? data.id.value : this.id,
+      snippetId: data.snippetId.present ? data.snippetId.value : this.snippetId,
+      filename: data.filename.present ? data.filename.value : this.filename,
+      languageId: data.languageId.present
+          ? data.languageId.value
+          : this.languageId,
+      content: data.content.present ? data.content.value : this.content,
+      position: data.position.present ? data.position.value : this.position,
+      savedAt: data.savedAt.present ? data.savedAt.value : this.savedAt,
+      dirty: data.dirty.present ? data.dirty.value : this.dirty,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SnippetFileVersionRow(')
+          ..write('id: $id, ')
+          ..write('snippetId: $snippetId, ')
+          ..write('filename: $filename, ')
+          ..write('languageId: $languageId, ')
+          ..write('content: $content, ')
+          ..write('position: $position, ')
+          ..write('savedAt: $savedAt, ')
+          ..write('dirty: $dirty, ')
+          ..write('ownerId: $ownerId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    snippetId,
+    filename,
+    languageId,
+    content,
+    position,
+    savedAt,
+    dirty,
+    ownerId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SnippetFileVersionRow &&
+          other.id == this.id &&
+          other.snippetId == this.snippetId &&
+          other.filename == this.filename &&
+          other.languageId == this.languageId &&
+          other.content == this.content &&
+          other.position == this.position &&
+          other.savedAt == this.savedAt &&
+          other.dirty == this.dirty &&
+          other.ownerId == this.ownerId);
+}
+
+class SnippetFileVersionsCompanion
+    extends UpdateCompanion<SnippetFileVersionRow> {
+  final Value<String> id;
+  final Value<String> snippetId;
+  final Value<String> filename;
+  final Value<String?> languageId;
+  final Value<String> content;
+  final Value<int> position;
+  final Value<int> savedAt;
+  final Value<bool> dirty;
+  final Value<String?> ownerId;
+  final Value<int> rowid;
+  const SnippetFileVersionsCompanion({
+    this.id = const Value.absent(),
+    this.snippetId = const Value.absent(),
+    this.filename = const Value.absent(),
+    this.languageId = const Value.absent(),
+    this.content = const Value.absent(),
+    this.position = const Value.absent(),
+    this.savedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SnippetFileVersionsCompanion.insert({
+    required String id,
+    required String snippetId,
+    this.filename = const Value.absent(),
+    this.languageId = const Value.absent(),
+    this.content = const Value.absent(),
+    this.position = const Value.absent(),
+    required int savedAt,
+    this.dirty = const Value.absent(),
+    this.ownerId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       snippetId = Value(snippetId),
+       savedAt = Value(savedAt);
+  static Insertable<SnippetFileVersionRow> custom({
+    Expression<String>? id,
+    Expression<String>? snippetId,
+    Expression<String>? filename,
+    Expression<String>? languageId,
+    Expression<String>? content,
+    Expression<int>? position,
+    Expression<int>? savedAt,
+    Expression<bool>? dirty,
+    Expression<String>? ownerId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (snippetId != null) 'snippet_id': snippetId,
+      if (filename != null) 'filename': filename,
+      if (languageId != null) 'language_id': languageId,
+      if (content != null) 'content': content,
+      if (position != null) 'position': position,
+      if (savedAt != null) 'saved_at': savedAt,
+      if (dirty != null) 'dirty': dirty,
+      if (ownerId != null) 'owner_id': ownerId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SnippetFileVersionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? snippetId,
+    Value<String>? filename,
+    Value<String?>? languageId,
+    Value<String>? content,
+    Value<int>? position,
+    Value<int>? savedAt,
+    Value<bool>? dirty,
+    Value<String?>? ownerId,
+    Value<int>? rowid,
+  }) {
+    return SnippetFileVersionsCompanion(
+      id: id ?? this.id,
+      snippetId: snippetId ?? this.snippetId,
+      filename: filename ?? this.filename,
+      languageId: languageId ?? this.languageId,
+      content: content ?? this.content,
+      position: position ?? this.position,
+      savedAt: savedAt ?? this.savedAt,
+      dirty: dirty ?? this.dirty,
+      ownerId: ownerId ?? this.ownerId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (snippetId.present) {
+      map['snippet_id'] = Variable<String>(snippetId.value);
+    }
+    if (filename.present) {
+      map['filename'] = Variable<String>(filename.value);
+    }
+    if (languageId.present) {
+      map['language_id'] = Variable<String>(languageId.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (savedAt.present) {
+      map['saved_at'] = Variable<int>(savedAt.value);
+    }
+    if (dirty.present) {
+      map['dirty'] = Variable<bool>(dirty.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SnippetFileVersionsCompanion(')
+          ..write('id: $id, ')
+          ..write('snippetId: $snippetId, ')
+          ..write('filename: $filename, ')
+          ..write('languageId: $languageId, ')
+          ..write('content: $content, ')
+          ..write('position: $position, ')
+          ..write('savedAt: $savedAt, ')
+          ..write('dirty: $dirty, ')
+          ..write('ownerId: $ownerId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $LanguagesTable extends Languages
     with TableInfo<$LanguagesTable, LanguageRow> {
   @override
@@ -2584,6 +3143,17 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2647,6 +3217,7 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
     name,
     normalizedName,
     color,
+    parentId,
     createdAt,
     updatedAt,
     deletedAt,
@@ -2693,6 +3264,12 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
       context.handle(
         _colorMeta,
         color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
       );
     }
     if (data.containsKey('created_at')) {
@@ -2754,6 +3331,10 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
         DriftSqlType.string,
         data['${effectivePrefix}color'],
       ),
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}created_at'],
@@ -2788,6 +3369,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
   final String name;
   final String normalizedName;
   final String? color;
+  final String? parentId;
   final int createdAt;
   final int updatedAt;
   final int? deletedAt;
@@ -2798,6 +3380,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     required this.name,
     required this.normalizedName,
     this.color,
+    this.parentId,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -2812,6 +3395,9 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     map['normalized_name'] = Variable<String>(normalizedName);
     if (!nullToAbsent || color != null) {
       map['color'] = Variable<String>(color);
+    }
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
     }
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
@@ -2833,6 +3419,9 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       color: color == null && nullToAbsent
           ? const Value.absent()
           : Value(color),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -2855,6 +3444,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       name: serializer.fromJson<String>(json['name']),
       normalizedName: serializer.fromJson<String>(json['normalizedName']),
       color: serializer.fromJson<String?>(json['color']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
@@ -2870,6 +3460,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
       'name': serializer.toJson<String>(name),
       'normalizedName': serializer.toJson<String>(normalizedName),
       'color': serializer.toJson<String?>(color),
+      'parentId': serializer.toJson<String?>(parentId),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
       'deletedAt': serializer.toJson<int?>(deletedAt),
@@ -2883,6 +3474,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     String? name,
     String? normalizedName,
     Value<String?> color = const Value.absent(),
+    Value<String?> parentId = const Value.absent(),
     int? createdAt,
     int? updatedAt,
     Value<int?> deletedAt = const Value.absent(),
@@ -2893,6 +3485,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     name: name ?? this.name,
     normalizedName: normalizedName ?? this.normalizedName,
     color: color.present ? color.value : this.color,
+    parentId: parentId.present ? parentId.value : this.parentId,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -2907,6 +3500,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
           ? data.normalizedName.value
           : this.normalizedName,
       color: data.color.present ? data.color.value : this.color,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -2922,6 +3516,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
           ..write('name: $name, ')
           ..write('normalizedName: $normalizedName, ')
           ..write('color: $color, ')
+          ..write('parentId: $parentId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -2937,6 +3532,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
     name,
     normalizedName,
     color,
+    parentId,
     createdAt,
     updatedAt,
     deletedAt,
@@ -2951,6 +3547,7 @@ class TagRow extends DataClass implements Insertable<TagRow> {
           other.name == this.name &&
           other.normalizedName == this.normalizedName &&
           other.color == this.color &&
+          other.parentId == this.parentId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
@@ -2963,6 +3560,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
   final Value<String> name;
   final Value<String> normalizedName;
   final Value<String?> color;
+  final Value<String?> parentId;
   final Value<int> createdAt;
   final Value<int> updatedAt;
   final Value<int?> deletedAt;
@@ -2974,6 +3572,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     this.name = const Value.absent(),
     this.normalizedName = const Value.absent(),
     this.color = const Value.absent(),
+    this.parentId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -2986,6 +3585,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     required String name,
     required String normalizedName,
     this.color = const Value.absent(),
+    this.parentId = const Value.absent(),
     required int createdAt,
     required int updatedAt,
     this.deletedAt = const Value.absent(),
@@ -3002,6 +3602,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     Expression<String>? name,
     Expression<String>? normalizedName,
     Expression<String>? color,
+    Expression<String>? parentId,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
     Expression<int>? deletedAt,
@@ -3014,6 +3615,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
       if (name != null) 'name': name,
       if (normalizedName != null) 'normalized_name': normalizedName,
       if (color != null) 'color': color,
+      if (parentId != null) 'parent_id': parentId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -3028,6 +3630,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     Value<String>? name,
     Value<String>? normalizedName,
     Value<String?>? color,
+    Value<String?>? parentId,
     Value<int>? createdAt,
     Value<int>? updatedAt,
     Value<int?>? deletedAt,
@@ -3040,6 +3643,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
       name: name ?? this.name,
       normalizedName: normalizedName ?? this.normalizedName,
       color: color ?? this.color,
+      parentId: parentId ?? this.parentId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -3063,6 +3667,9 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
     }
     if (color.present) {
       map['color'] = Variable<String>(color.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
@@ -3092,6 +3699,7 @@ class TagsCompanion extends UpdateCompanion<TagRow> {
           ..write('name: $name, ')
           ..write('normalizedName: $normalizedName, ')
           ..write('color: $color, ')
+          ..write('parentId: $parentId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -4185,6 +4793,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SnippetsTable snippets = $SnippetsTable(this);
   late final $SnippetFilesTable snippetFiles = $SnippetFilesTable(this);
+  late final $SnippetFileVersionsTable snippetFileVersions =
+      $SnippetFileVersionsTable(this);
   late final $LanguagesTable languages = $LanguagesTable(this);
   late final $CollectionsTable collections = $CollectionsTable(this);
   late final $TagsTable tags = $TagsTable(this);
@@ -4223,6 +4833,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'snippet_files_deleted_idx',
     'CREATE INDEX snippet_files_deleted_idx ON snippet_files (deleted_at)',
   );
+  late final Index snippetFileVersionsSnippetIdx = Index(
+    'snippet_file_versions_snippet_idx',
+    'CREATE INDEX snippet_file_versions_snippet_idx ON snippet_file_versions (snippet_id)',
+  );
+  late final Index snippetFileVersionsSavedIdx = Index(
+    'snippet_file_versions_saved_idx',
+    'CREATE INDEX snippet_file_versions_saved_idx ON snippet_file_versions (saved_at)',
+  );
   late final Index collectionParentIdx = Index(
     'collection_parent_idx',
     'CREATE INDEX collection_parent_idx ON collections (parent_id)',
@@ -4242,6 +4860,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     snippets,
     snippetFiles,
+    snippetFileVersions,
     languages,
     collections,
     tags,
@@ -4256,6 +4875,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     snippetDeletedIdx,
     snippetFilesSnippetIdx,
     snippetFilesDeletedIdx,
+    snippetFileVersionsSnippetIdx,
+    snippetFileVersionsSavedIdx,
     collectionParentIdx,
     tagNormalizedIdx,
     snippetTagsTagIdx,
@@ -4994,6 +5615,300 @@ typedef $$SnippetFilesTableProcessedTableManager =
       SnippetFileRow,
       PrefetchHooks Function()
     >;
+typedef $$SnippetFileVersionsTableCreateCompanionBuilder =
+    SnippetFileVersionsCompanion Function({
+      required String id,
+      required String snippetId,
+      Value<String> filename,
+      Value<String?> languageId,
+      Value<String> content,
+      Value<int> position,
+      required int savedAt,
+      Value<bool> dirty,
+      Value<String?> ownerId,
+      Value<int> rowid,
+    });
+typedef $$SnippetFileVersionsTableUpdateCompanionBuilder =
+    SnippetFileVersionsCompanion Function({
+      Value<String> id,
+      Value<String> snippetId,
+      Value<String> filename,
+      Value<String?> languageId,
+      Value<String> content,
+      Value<int> position,
+      Value<int> savedAt,
+      Value<bool> dirty,
+      Value<String?> ownerId,
+      Value<int> rowid,
+    });
+
+class $$SnippetFileVersionsTableFilterComposer
+    extends Composer<_$AppDatabase, $SnippetFileVersionsTable> {
+  $$SnippetFileVersionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snippetId => $composableBuilder(
+    column: $table.snippetId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get filename => $composableBuilder(
+    column: $table.filename,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get languageId => $composableBuilder(
+    column: $table.languageId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get savedAt => $composableBuilder(
+    column: $table.savedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SnippetFileVersionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SnippetFileVersionsTable> {
+  $$SnippetFileVersionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snippetId => $composableBuilder(
+    column: $table.snippetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get filename => $composableBuilder(
+    column: $table.filename,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get languageId => $composableBuilder(
+    column: $table.languageId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get savedAt => $composableBuilder(
+    column: $table.savedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SnippetFileVersionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SnippetFileVersionsTable> {
+  $$SnippetFileVersionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get snippetId =>
+      $composableBuilder(column: $table.snippetId, builder: (column) => column);
+
+  GeneratedColumn<String> get filename =>
+      $composableBuilder(column: $table.filename, builder: (column) => column);
+
+  GeneratedColumn<String> get languageId => $composableBuilder(
+    column: $table.languageId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get savedAt =>
+      $composableBuilder(column: $table.savedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get dirty =>
+      $composableBuilder(column: $table.dirty, builder: (column) => column);
+
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+}
+
+class $$SnippetFileVersionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SnippetFileVersionsTable,
+          SnippetFileVersionRow,
+          $$SnippetFileVersionsTableFilterComposer,
+          $$SnippetFileVersionsTableOrderingComposer,
+          $$SnippetFileVersionsTableAnnotationComposer,
+          $$SnippetFileVersionsTableCreateCompanionBuilder,
+          $$SnippetFileVersionsTableUpdateCompanionBuilder,
+          (
+            SnippetFileVersionRow,
+            BaseReferences<
+              _$AppDatabase,
+              $SnippetFileVersionsTable,
+              SnippetFileVersionRow
+            >,
+          ),
+          SnippetFileVersionRow,
+          PrefetchHooks Function()
+        > {
+  $$SnippetFileVersionsTableTableManager(
+    _$AppDatabase db,
+    $SnippetFileVersionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SnippetFileVersionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SnippetFileVersionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$SnippetFileVersionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> snippetId = const Value.absent(),
+                Value<String> filename = const Value.absent(),
+                Value<String?> languageId = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> savedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<String?> ownerId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SnippetFileVersionsCompanion(
+                id: id,
+                snippetId: snippetId,
+                filename: filename,
+                languageId: languageId,
+                content: content,
+                position: position,
+                savedAt: savedAt,
+                dirty: dirty,
+                ownerId: ownerId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String snippetId,
+                Value<String> filename = const Value.absent(),
+                Value<String?> languageId = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                required int savedAt,
+                Value<bool> dirty = const Value.absent(),
+                Value<String?> ownerId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SnippetFileVersionsCompanion.insert(
+                id: id,
+                snippetId: snippetId,
+                filename: filename,
+                languageId: languageId,
+                content: content,
+                position: position,
+                savedAt: savedAt,
+                dirty: dirty,
+                ownerId: ownerId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SnippetFileVersionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SnippetFileVersionsTable,
+      SnippetFileVersionRow,
+      $$SnippetFileVersionsTableFilterComposer,
+      $$SnippetFileVersionsTableOrderingComposer,
+      $$SnippetFileVersionsTableAnnotationComposer,
+      $$SnippetFileVersionsTableCreateCompanionBuilder,
+      $$SnippetFileVersionsTableUpdateCompanionBuilder,
+      (
+        SnippetFileVersionRow,
+        BaseReferences<
+          _$AppDatabase,
+          $SnippetFileVersionsTable,
+          SnippetFileVersionRow
+        >,
+      ),
+      SnippetFileVersionRow,
+      PrefetchHooks Function()
+    >;
 typedef $$LanguagesTableCreateCompanionBuilder =
     LanguagesCompanion Function({
       required String id,
@@ -5499,6 +6414,7 @@ typedef $$TagsTableCreateCompanionBuilder =
       required String name,
       required String normalizedName,
       Value<String?> color,
+      Value<String?> parentId,
       required int createdAt,
       required int updatedAt,
       Value<int?> deletedAt,
@@ -5512,6 +6428,7 @@ typedef $$TagsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> normalizedName,
       Value<String?> color,
+      Value<String?> parentId,
       Value<int> createdAt,
       Value<int> updatedAt,
       Value<int?> deletedAt,
@@ -5545,6 +6462,11 @@ class $$TagsTableFilterComposer extends Composer<_$AppDatabase, $TagsTable> {
 
   ColumnFilters<String> get color => $composableBuilder(
     column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentId => $composableBuilder(
+    column: $table.parentId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5602,6 +6524,11 @@ class $$TagsTableOrderingComposer extends Composer<_$AppDatabase, $TagsTable> {
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -5651,6 +6578,9 @@ class $$TagsTableAnnotationComposer
   GeneratedColumn<String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 
+  GeneratedColumn<String> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -5699,6 +6629,7 @@ class $$TagsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> normalizedName = const Value.absent(),
                 Value<String?> color = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
@@ -5710,6 +6641,7 @@ class $$TagsTableTableManager
                 name: name,
                 normalizedName: normalizedName,
                 color: color,
+                parentId: parentId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -5723,6 +6655,7 @@ class $$TagsTableTableManager
                 required String name,
                 required String normalizedName,
                 Value<String?> color = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
                 required int createdAt,
                 required int updatedAt,
                 Value<int?> deletedAt = const Value.absent(),
@@ -5734,6 +6667,7 @@ class $$TagsTableTableManager
                 name: name,
                 normalizedName: normalizedName,
                 color: color,
+                parentId: parentId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -6361,6 +7295,8 @@ class $AppDatabaseManager {
       $$SnippetsTableTableManager(_db, _db.snippets);
   $$SnippetFilesTableTableManager get snippetFiles =>
       $$SnippetFilesTableTableManager(_db, _db.snippetFiles);
+  $$SnippetFileVersionsTableTableManager get snippetFileVersions =>
+      $$SnippetFileVersionsTableTableManager(_db, _db.snippetFileVersions);
   $$LanguagesTableTableManager get languages =>
       $$LanguagesTableTableManager(_db, _db.languages);
   $$CollectionsTableTableManager get collections =>

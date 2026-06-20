@@ -50,6 +50,8 @@ dependencies:
   cross_file: ^0.3.5+2
   shared_preferences: ^2.5.5
   flutter_markdown_plus: ^1.0.7
+  pdf: ^3.11.0
+  markdown: ^7.2.2
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +79,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Loadable assets. The JetBrains Mono TTF is also declared as a font family
+  # below; listing it here lets `rootBundle.load(...)` read its bytes for the
+  # PDF export (the `pdf` package embeds the glyphs into the document).
+  assets:
+    - assets/fonts/JetBrainsMono-Regular.ttf
 
   # Bundled fonts (offline-first, pixel-stable across every platform incl. PNG
   # export). Inter = UI type; JetBrains Mono = code. Both OFL-licensed.

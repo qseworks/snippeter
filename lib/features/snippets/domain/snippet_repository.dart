@@ -15,10 +15,19 @@ abstract interface class SnippetRepository {
   Future<void> setFavorite(String id, {required bool value});
   Future<void> softDelete(String id);
 
+  // --- version history ---
+  /// All saved versions of a snippet's files, most recent first.
+  Future<List<SnippetVersion>> getVersions(String snippetId);
+
+  /// Restores the file set captured at [savedAt] as the snippet's current files.
+  /// The current files are first snapshotted, so a restore is itself undoable.
+  Future<void> restoreVersion(String snippetId, int savedAt);
+
   // --- labels ---
   Stream<List<Label>> watchLabels();
-  Future<String> createLabel(String name, {String? color});
+  Future<String> createLabel(String name, {String? color, String? parentId});
   Future<void> setLabelColor(String id, String color);
+  Future<void> setLabelParent(String id, String? parentId);
   Future<void> renameLabel(String id, String name);
   Future<void> deleteLabel(String id);
 

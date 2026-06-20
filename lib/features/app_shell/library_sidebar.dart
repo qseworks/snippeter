@@ -142,17 +142,16 @@ class LibrarySidebar extends ConsumerWidget {
                       onTap: () => _showCreateLabelDialog(context, ref),
                     ),
                   ),
-                  for (final label in labels)
-                    _LabelRow(
-                      label: label,
-                      count: stats.byLabelId[label.id] ?? 0,
-                      selected: active.isLabel(label.id),
-                      onTap: () {
-                        _goLibrary(context);
-                        controller.selectLabel(label.id);
-                        _closeDrawerIfNeeded(context);
-                      },
-                    ),
+                  _LabelTree(
+                    labels: labels,
+                    stats: stats,
+                    active: active,
+                    onSelect: (id) {
+                      _goLibrary(context);
+                      controller.selectLabel(id);
+                      _closeDrawerIfNeeded(context);
+                    },
+                  ),
                   const SizedBox(height: 12),
                   const _SectionHeader(title: 'LANGUAGES'),
                   for (final entry in stats.byLanguageId.entries)
@@ -194,6 +193,13 @@ class LibrarySidebar extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final nameController = TextEditingController();
+    // Existing labels offered as possible parents. Only top-level labels are
+    // offered so we keep the hierarchy at a single level of nesting (Snippet-like).
+    final labels = ref.read(labelsProvider).value ?? const <Label>[];
+    final parentChoices = [
+      for (final l in labels)
+        if (l.parentId == null) l,
+    ];
     // A small Snippet-like palette to choose from.
     const palette = [
       Color(0xFF16B378),
@@ -206,6 +212,7 @@ class LibrarySidebar extends ConsumerWidget {
       Color(0xFF5753C6),
     ];
     var selectedColor = palette.first;
+    String? selectedParentId;
 
     final created = await showDialog<bool>(
       context: context,
@@ -221,6 +228,39 @@ class LibrarySidebar extends ConsumerWidget {
                 autofocus: true,
                 decoration: const InputDecoration(hintText: 'Label name'),
               ),
+              if (parentChoices.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String?>(
+                  initialValue: selectedParentId,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Parent label'),
+                  items: [
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text('None'),
+                    ),
+                    for (final p in parentChoices)
+                      DropdownMenuItem<String?>(
+                        value: p.id,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            LabelDot(color: labelColor(p)),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                p.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                  onChanged: (value) =>
+                      setState(() => selectedParentId = value),
+                ),
+              ],
               const SizedBox(height: 16),
               Wrap(
                 spacing: 10,
@@ -267,9 +307,11 @@ class LibrarySidebar extends ConsumerWidget {
           .toRadixString(16)
           .padLeft(6, '0')
           .toUpperCase()}';
-      await ref
-          .read(snippetRepositoryProvider)
-          .createLabel(nameController.text.trim(), color: hex);
+      await ref.read(snippetRepositoryProvider).createLabel(
+            nameController.text.trim(),
+            color: hex,
+            parentId: selectedParentId,
+          );
     }
     nameController.dispose();
   }
@@ -352,12 +394,99 @@ class _NavItem extends StatelessWidget {
   }
 }
 
+/// Renders the LABELS section as a nested tree built from [Label.parentId].
+/// Top-level labels (parentId == null) are roots; a label that has children
+/// shows an expand/collapse chevron and renders its children indented below it.
+/// Expand state is local to this widget.
+class _LabelTree extends StatefulWidget {
+  const _LabelTree({
+    required this.labels,
+    required this.stats,
+    required this.active,
+    required this.onSelect,
+  });
+
+  final List<Label> labels;
+  final LibraryStats stats;
+  final _ActiveSelection active;
+  final ValueChanged<String> onSelect;
+
+  @override
+  State<_LabelTree> createState() => _LabelTreeState();
+}
+
+class _LabelTreeState extends State<_LabelTree> {
+  /// Ids of parent labels whose children are currently expanded.
+  final Set<String> _expanded = <String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    // Group children by parent id; preserve the incoming (stream) order.
+    final childrenByParent = <String, List<Label>>{};
+    final roots = <Label>[];
+    final ids = {for (final l in widget.labels) l.id};
+    for (final label in widget.labels) {
+      final parentId = label.parentId;
+      // Treat a label whose parent is missing (or self-referential) as a root.
+      if (parentId == null || parentId == label.id || !ids.contains(parentId)) {
+        roots.add(label);
+      } else {
+        (childrenByParent[parentId] ??= <Label>[]).add(label);
+      }
+    }
+
+    final rows = <Widget>[];
+    for (final root in roots) {
+      final children = childrenByParent[root.id] ?? const <Label>[];
+      final hasChildren = children.isNotEmpty;
+      final expanded = _expanded.contains(root.id);
+      rows.add(
+        _LabelRow(
+          label: root,
+          count: widget.stats.byLabelId[root.id] ?? 0,
+          selected: widget.active.isLabel(root.id),
+          onTap: () => widget.onSelect(root.id),
+          hasChildren: hasChildren,
+          expanded: expanded,
+          onToggleExpand: hasChildren
+              ? () => setState(() {
+                    if (!_expanded.remove(root.id)) _expanded.add(root.id);
+                  })
+              : null,
+        ),
+      );
+      if (hasChildren && expanded) {
+        for (final child in children) {
+          rows.add(
+            _LabelRow(
+              label: child,
+              count: widget.stats.byLabelId[child.id] ?? 0,
+              selected: widget.active.isLabel(child.id),
+              onTap: () => widget.onSelect(child.id),
+              depth: 1,
+            ),
+          );
+        }
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: rows,
+    );
+  }
+}
+
 class _LabelRow extends StatelessWidget {
   const _LabelRow({
     required this.label,
     required this.count,
     required this.selected,
     required this.onTap,
+    this.depth = 0,
+    this.hasChildren = false,
+    this.expanded = false,
+    this.onToggleExpand,
   });
 
   final Label label;
@@ -365,14 +494,44 @@ class _LabelRow extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  /// Nesting depth; child rows are indented relative to their parent.
+  final int depth;
+
+  /// Whether this row has expandable children (shows a chevron).
+  final bool hasChildren;
+
+  /// Whether this row's children are currently shown.
+  final bool expanded;
+
+  /// Toggles the children's visibility; null when there are no children.
+  final VoidCallback? onToggleExpand;
+
   @override
   Widget build(BuildContext context) {
     final fg = selected ? AppTheme.sidebarText : AppTheme.sidebarMuted;
+    // Reserve a fixed-width slot for the chevron so dots align across rows.
+    final Widget chevron = SizedBox(
+      width: 18,
+      child: hasChildren
+          ? InkWell(
+              onTap: onToggleExpand,
+              borderRadius: BorderRadius.circular(4),
+              child: Icon(
+                expanded ? Icons.expand_more : Icons.chevron_right,
+                size: 16,
+                color: AppTheme.sidebarMuted,
+              ),
+            )
+          : null,
+    );
+
     return _SidebarRow(
       selected: selected,
       onTap: onTap,
       child: Row(
         children: [
+          SizedBox(width: depth * 16.0),
+          chevron,
           LabelDot(color: labelColor(label)),
           const SizedBox(width: 10),
           Expanded(

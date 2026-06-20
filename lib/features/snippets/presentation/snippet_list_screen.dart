@@ -213,6 +213,7 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _controller,
+      focusNode: ref.watch(searchFocusProvider),
       onChanged: _onChanged,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(

@@ -182,6 +182,9 @@ class LocalSnippetRepository implements SnippetRepository {
     final ts = nowMs();
     final files = _effectiveFiles(draft);
     await _db.transaction(() async {
+      // Snapshot the current files into history BEFORE replacing them, so the
+      // previous state can be browsed/restored later. (create() takes none.)
+      await _snapshotCurrentFiles(id, ts);
       await (_db.update(_db.snippets)..where((t) => t.id.equals(id))).write(
         SnippetsCompanion(
           title: Value(draft.title),
@@ -254,6 +257,98 @@ class LocalSnippetRepository implements SnippetRepository {
     );
   }
 
+  // --- version history -----------------------------------------------------
+
+  /// Copies the current snippet_files rows for [snippetId] into
+  /// snippet_file_versions as one version stamped [savedAt]. No-op when the
+  /// snippet has no live files. Must run inside a transaction.
+  Future<void> _snapshotCurrentFiles(String snippetId, int savedAt) async {
+    final current = await (_db.select(_db.snippetFiles)
+          ..where((f) => f.snippetId.equals(snippetId) & f.deletedAt.isNull())
+          ..orderBy([(f) => OrderingTerm.asc(f.position)]))
+        .get();
+    if (current.isEmpty) return;
+    await _db.batch((b) {
+      for (final f in current) {
+        b.insert(
+          _db.snippetFileVersions,
+          SnippetFileVersionsCompanion.insert(
+            id: newId(),
+            snippetId: snippetId,
+            filename: Value(f.filename),
+            languageId: Value(f.languageId),
+            content: Value(f.content),
+            position: Value(f.position),
+            savedAt: savedAt,
+            dirty: const Value(true),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  Future<List<SnippetVersion>> getVersions(String snippetId) async {
+    final rows = await (_db.select(_db.snippetFileVersions)
+          ..where((v) => v.snippetId.equals(snippetId))
+          ..orderBy([
+            (v) => OrderingTerm.desc(v.savedAt),
+            (v) => OrderingTerm.asc(v.position),
+          ]))
+        .get();
+    // Group by savedAt, preserving the desc order of first appearance.
+    final byVersion = <int, List<SnippetFile>>{};
+    for (final r in rows) {
+      (byVersion[r.savedAt] ??= []).add(
+        SnippetFile(
+          id: r.id,
+          filename: r.filename,
+          languageId: r.languageId,
+          content: r.content,
+          position: r.position,
+        ),
+      );
+    }
+    return [
+      for (final entry in byVersion.entries)
+        SnippetVersion(savedAt: entry.key, files: entry.value),
+    ];
+  }
+
+  @override
+  Future<void> restoreVersion(String snippetId, int savedAt) async {
+    final ts = nowMs();
+    await _db.transaction(() async {
+      final versionRows = await (_db.select(_db.snippetFileVersions)
+            ..where((v) =>
+                v.snippetId.equals(snippetId) & v.savedAt.equals(savedAt))
+            ..orderBy([(v) => OrderingTerm.asc(v.position)]))
+          .get();
+      if (versionRows.isEmpty) return;
+      // Snapshot current files first so the restore itself is undoable.
+      await _snapshotCurrentFiles(snippetId, ts);
+      // Replace current files with the chosen version's files (new ids).
+      final restored = [
+        for (final r in versionRows)
+          SnippetFileDraft(
+            filename: r.filename,
+            languageId: r.languageId,
+            content: r.content,
+          ),
+      ];
+      await _writeFiles(snippetId, restored, ts);
+      await (_db.update(_db.snippets)..where((t) => t.id.equals(snippetId)))
+          .write(
+        SnippetsCompanion(
+          body: Value(_denormBody(restored)),
+          languageId: Value(restored.first.languageId),
+          updatedAt: Value(ts),
+          dirty: const Value(true),
+        ),
+      );
+    });
+  }
+
   // --- labels --------------------------------------------------------------
 
   @override
@@ -265,7 +360,8 @@ class LocalSnippetRepository implements SnippetRepository {
   }
 
   @override
-  Future<String> createLabel(String name, {String? color}) async {
+  Future<String> createLabel(String name,
+      {String? color, String? parentId}) async {
     final id = newId();
     final ts = nowMs();
     await _db.into(_db.tags).insert(
@@ -274,6 +370,7 @@ class LocalSnippetRepository implements SnippetRepository {
             name: name,
             normalizedName: Label.normalize(name),
             color: Value(color),
+            parentId: Value(parentId),
             createdAt: ts,
             updatedAt: ts,
             dirty: const Value(true),
@@ -287,6 +384,17 @@ class LocalSnippetRepository implements SnippetRepository {
     await (_db.update(_db.tags)..where((t) => t.id.equals(id))).write(
       TagsCompanion(
         color: Value(color),
+        updatedAt: Value(nowMs()),
+        dirty: const Value(true),
+      ),
+    );
+  }
+
+  @override
+  Future<void> setLabelParent(String id, String? parentId) async {
+    await (_db.update(_db.tags)..where((t) => t.id.equals(id))).write(
+      TagsCompanion(
+        parentId: Value(parentId),
         updatedAt: Value(nowMs()),
         dirty: const Value(true),
       ),
@@ -518,6 +626,7 @@ class LocalSnippetRepository implements SnippetRepository {
         name: r.name,
         normalizedName: r.normalizedName,
         color: r.color,
+        parentId: r.parentId,
       );
 
   Collection _toCollection(CollectionRow r) => Collection(

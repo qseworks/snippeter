@@ -16,6 +16,7 @@ import '../domain/value_objects.dart';
 import 'snippet_editor_modal.dart';
 import 'type_visuals.dart';
 import 'widgets/label_chip.dart';
+import 'widgets/snippet_history_sheet.dart';
 
 /// Routed, full-screen detail view (with a back button on narrow layouts).
 class SnippetDetailScreen extends ConsumerWidget {
@@ -152,6 +153,11 @@ List<Widget> snippetActions(
       onPressed: () => ref
           .read(snippetRepositoryProvider)
           .setFavorite(snippet.id, value: !snippet.isFavorite),
+    ),
+    IconButton(
+      tooltip: 'History',
+      icon: const Icon(Icons.history),
+      onPressed: () => showSnippetHistory(context, snippetId: snippet.id),
     ),
     ExportMenuButton(snippet: snippet),
     IconButton(
@@ -537,6 +543,24 @@ class _FilesHeader extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        Tooltip(
+          message: 'History',
+          child: TextButton.icon(
+            onPressed: () => showSnippetHistory(context, snippetId: snippetId),
+            icon: const Icon(Icons.history, size: 16),
+            label: const Text('HISTORY'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.accent,
+              textStyle: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
         Tooltip(
           message: 'Add file',
           child: TextButton.icon(

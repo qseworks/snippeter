@@ -4,9 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../snippets/application/snippet_providers.dart';
 import '../../snippets/domain/snippet.dart';
 import '../application/export_providers.dart';
+import '../domain/snippet_export_data.dart';
 import 'export_image_sheet.dart';
 
-enum _ExportAction { copy, saveSource, saveTxt, image, shareText, shareFile }
+enum _ExportAction {
+  copy,
+  saveSource,
+  saveTxt,
+  saveHtml,
+  savePdf,
+  image,
+  shareText,
+  shareFile,
+}
 
 /// AppBar action exposing copy / save / image / share actions for a snippet.
 class ExportMenuButton extends ConsumerWidget {
@@ -43,6 +53,15 @@ class ExportMenuButton extends ConsumerWidget {
         const PopupMenuItem(
           value: _ExportAction.saveTxt,
           child: _MenuRow(icon: Icons.text_snippet_outlined, label: 'Save as .txt'),
+        ),
+        const PopupMenuItem(
+          value: _ExportAction.saveHtml,
+          child: _MenuRow(icon: Icons.html_outlined, label: 'Save as HTML'),
+        ),
+        const PopupMenuItem(
+          value: _ExportAction.savePdf,
+          child: _MenuRow(
+              icon: Icons.picture_as_pdf_outlined, label: 'Save as PDF'),
         ),
         const PopupMenuDivider(),
         const PopupMenuItem(
@@ -92,6 +111,18 @@ class ExportMenuButton extends ConsumerWidget {
           messenger.showSnackBar(
             SnackBar(content: Text('Saved ${data.baseName}.txt')),
           );
+        case _ExportAction.saveHtml:
+          final rich = _richExportData(data);
+          await export.exportHtml(rich, description: snippet.description);
+          messenger.showSnackBar(
+            SnackBar(content: Text('Saved ${rich.baseName}.html')),
+          );
+        case _ExportAction.savePdf:
+          final rich = _richExportData(data);
+          await export.exportPdf(rich, description: snippet.description);
+          messenger.showSnackBar(
+            SnackBar(content: Text('Saved ${rich.baseName}.pdf')),
+          );
         case _ExportAction.shareText:
           await export.shareText(data.body,
               subject: data.title, origin: origin);
@@ -101,6 +132,25 @@ class ExportMenuButton extends ConsumerWidget {
     } catch (error) {
       messenger.showSnackBar(SnackBar(content: Text('Export failed: $error')));
     }
+  }
+
+  /// Augments the single-body [data] with all of the snippet's files so the
+  /// HTML/PDF documents include every file (not just the denormalized body).
+  /// When the snippet has no explicit file rows, [SnippetExportData] falls back
+  /// to a synthetic single file built from the body.
+  SnippetExportData _richExportData(SnippetExportData data) {
+    if (snippet.files.isEmpty) return data;
+    return SnippetExportData(
+      title: data.title,
+      body: data.body,
+      fileExtension: data.fileExtension,
+      grammarId: data.grammarId,
+      languageName: data.languageName,
+      files: [
+        for (final f in snippet.files)
+          ExportFile(filename: f.filename, content: f.content),
+      ],
+    );
   }
 }
 

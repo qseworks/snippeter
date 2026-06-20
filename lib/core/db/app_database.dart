@@ -13,6 +13,7 @@ part 'app_database.g.dart';
   tables: [
     Snippets,
     SnippetFiles,
+    SnippetFileVersions,
     Languages,
     Collections,
     Tags,
@@ -27,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _open());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -41,6 +42,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(snippetFiles);
             await m.addColumn(snippets, snippets.visibility);
             await _backfillSnippetFiles();
+          }
+          if (from < 3) {
+            await m.createTable(snippetFileVersions);
+            await m.addColumn(tags, tags.parentId);
           }
         },
         beforeOpen: (details) async {

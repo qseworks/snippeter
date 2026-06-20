@@ -112,4 +112,46 @@ void main() {
     final cols = await repo.watchCollections().first;
     expect(cols.any((c) => c.id == colId), isFalse);
   });
+
+  test('update snapshots the previous files into version history', () async {
+    final id = await repo.create(const SnippetDraft(
+        title: 't', body: 'v1', type: SnippetType.code, languageId: 'python'));
+    // create() takes no snapshot.
+    expect(await repo.getVersions(id), isEmpty);
+
+    await repo.update(
+        id, const SnippetDraft(title: 't', body: 'v2', type: SnippetType.code));
+    final versions = await repo.getVersions(id);
+    expect(versions.length, 1);
+    expect(versions.single.files.single.content, 'v1');
+  });
+
+  test('restoreVersion reverts current files and is itself undoable', () async {
+    final id = await repo.create(const SnippetDraft(
+        title: 't', body: 'v1', type: SnippetType.code, languageId: 'python'));
+    await repo.update(
+        id, const SnippetDraft(title: 't', body: 'v2', type: SnippetType.code));
+
+    final v1 = (await repo.getVersions(id)).single; // the 'v1' snapshot
+    await repo.restoreVersion(id, v1.savedAt);
+
+    final s = await repo.getSnippet(id);
+    expect(s!.body, 'v1');
+    expect(s.languageId, 'python');
+    // The current 'v2' was snapshotted before restoring -> 2 versions now.
+    final versions = await repo.getVersions(id);
+    expect(versions.length, 2);
+    expect(versions.map((v) => v.files.single.content), containsAll(['v1', 'v2']));
+  });
+
+  test('setLabelParent persists a nested label parent', () async {
+    final parent = await repo.createLabel('Backend');
+    final child = await repo.createLabel('API', parentId: parent);
+    var labels = await repo.watchLabels().first;
+    expect(labels.firstWhere((l) => l.id == child).parentId, parent);
+
+    await repo.setLabelParent(child, null);
+    labels = await repo.watchLabels().first;
+    expect(labels.firstWhere((l) => l.id == child).parentId, isNull);
+  });
 }

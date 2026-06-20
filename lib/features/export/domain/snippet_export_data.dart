@@ -8,6 +8,7 @@ class SnippetExportData {
     required this.fileExtension,
     this.grammarId,
     this.languageName = 'Text',
+    this.files = const [],
   });
 
   final String title;
@@ -17,6 +18,17 @@ class SnippetExportData {
   final String fileExtension;
   final String? grammarId;
   final String languageName;
+
+  /// All files of the snippet, in order, for multi-file exports (HTML/PDF).
+  /// Empty for legacy single-body callers; [exportHtml]/[exportPdf] then fall
+  /// back to a single synthetic file built from [body]/[fileExtension].
+  final List<ExportFile> files;
+
+  /// The effective files to render: explicit [files] when present, otherwise a
+  /// single file synthesized from [body] so single-body callers keep working.
+  List<ExportFile> get effectiveFiles => files.isNotEmpty
+      ? files
+      : [ExportFile(filename: sourceFileName, content: body)];
 
   /// A filesystem-safe base name (no extension) derived from the title.
   String get baseName {
@@ -29,4 +41,12 @@ class SnippetExportData {
   }
 
   String get sourceFileName => '$baseName$fileExtension';
+}
+
+/// One file inside a multi-file export. Storage- and platform-agnostic.
+class ExportFile {
+  const ExportFile({required this.filename, required this.content});
+
+  final String filename;
+  final String content;
 }

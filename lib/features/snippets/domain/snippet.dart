@@ -46,6 +46,15 @@ class Snippet {
   final SnippetVisibility visibility;
 }
 
+/// A point-in-time snapshot of a snippet's files, for the history/restore UI.
+/// All files in a version share the same [savedAt] timestamp and are ordered by
+/// their original position.
+class SnippetVersion {
+  final int savedAt;
+  final List<SnippetFile> files;
+  const SnippetVersion({required this.savedAt, required this.files});
+}
+
 /// The editable shape used to create or update a snippet. Labels are given by
 /// name; the repository resolves them to [Label] rows (find-or-create).
 class SnippetDraft {

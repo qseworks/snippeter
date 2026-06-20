@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/database_provider.dart';
@@ -175,3 +176,11 @@ final selectedSnippetProvider =
     NotifierProvider<SelectedSnippetController, String?>(
   SelectedSnippetController.new,
 );
+
+/// Shared [FocusNode] for the Library search field, so a global Cmd/Ctrl+F
+/// shortcut can focus it from anywhere in the app.
+final searchFocusProvider = Provider<FocusNode>((ref) {
+  final node = FocusNode(debugLabel: 'librarySearch');
+  ref.onDispose(node.dispose);
+  return node;
+});

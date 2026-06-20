@@ -56,15 +56,27 @@ class SyncedSnippetRepository implements SnippetRepository {
   Future<void> softDelete(String id) => _local.softDelete(id);
 
   @override
+  Future<List<SnippetVersion>> getVersions(String snippetId) =>
+      _local.getVersions(snippetId);
+
+  @override
+  Future<void> restoreVersion(String snippetId, int savedAt) =>
+      _local.restoreVersion(snippetId, savedAt);
+
+  @override
   Stream<List<Label>> watchLabels() => _local.watchLabels();
 
   @override
-  Future<String> createLabel(String name, {String? color}) =>
-      _local.createLabel(name, color: color);
+  Future<String> createLabel(String name, {String? color, String? parentId}) =>
+      _local.createLabel(name, color: color, parentId: parentId);
 
   @override
   Future<void> setLabelColor(String id, String color) =>
       _local.setLabelColor(id, color);
+
+  @override
+  Future<void> setLabelParent(String id, String? parentId) =>
+      _local.setLabelParent(id, parentId);
 
   @override
   Future<void> renameLabel(String id, String name) =>
