@@ -16,4 +16,9 @@ class SupabaseConfig {
   );
 
   static bool get isConfigured => url.isNotEmpty && anonKey.isNotEmpty;
+
+  /// Public reader URL for a snippet, served by the `share` edge function.
+  /// Resolves once that function is deployed (see `supabase/functions/share`).
+  static String shareUrl(String snippetId) =>
+      '$url/functions/v1/share?id=$snippetId';
 }

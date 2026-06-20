@@ -4,6 +4,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/supabase_config.dart';
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/notebook/ipynb.dart';
 import '../../../core/routing/route_paths.dart';
@@ -564,7 +565,12 @@ class _ShareRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final link = 'snippet/${snippet.id}';
+    // Public snippets get a real share URL (served by the `share` edge
+    // function); private ones show a hint instead.
+    final isPublic = snippet.visibility == SnippetVisibility.public;
+    final link = isPublic
+        ? SupabaseConfig.shareUrl(snippet.id)
+        : 'Set to Public to get a shareable link';
     return Row(
       children: [
         Expanded(
@@ -576,7 +582,7 @@ class _ShareRow extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.link_rounded,
+                Icon(isPublic ? Icons.link_rounded : Icons.lock_outline,
                     size: 16, color: theme.colorScheme.onSurfaceVariant),
                 const SizedBox(width: 8),
                 Expanded(
@@ -584,12 +590,12 @@ class _ShareRow extends StatelessWidget {
                     link,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      fontFamily: AppTheme.monoFamily,
+                      fontFamily: isPublic ? AppTheme.monoFamily : null,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                _LinkCopyButton(text: link),
+                if (isPublic) _LinkCopyButton(text: link),
               ],
             ),
           ),
