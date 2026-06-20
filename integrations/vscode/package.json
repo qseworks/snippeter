@@ -1,0 +1,49 @@
+{
+  "name": "snippet-manager",
+  "displayName": "Snippet Manager",
+  "description": "Browse, insert, and save code snippets from your Snippet Manager account directly in VS Code.",
+  "version": "0.1.0",
+  "publisher": "snippet-manager",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Snippets"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:snippetManager.signIn",
+    "onCommand:snippetManager.insertSnippet",
+    "onCommand:snippetManager.saveSelection"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "snippetManager.signIn",
+        "title": "Snippet Manager: Sign In"
+      },
+      {
+        "command": "snippetManager.insertSnippet",
+        "title": "Snippet Manager: Insert Snippet"
+      },
+      {
+        "command": "snippetManager.saveSelection",
+        "title": "Snippet Manager: Save Selection as Snippet"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0"
+  }
+}
