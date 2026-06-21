@@ -70,7 +70,7 @@ class LanguageBadge extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: visual.color,
-        borderRadius: BorderRadius.circular(size * 0.28),
+        borderRadius: BorderRadius.circular(size * 0.3),
       ),
       child: visual.mono.isEmpty
           ? Icon(Icons.code, size: size * 0.6, color: visual.onColor)
@@ -103,21 +103,23 @@ class LanguagePill extends StatelessWidget {
     final theme = Theme.of(context);
     final visual = LanguageVisual.of(languageId);
     return Container(
-      padding: const EdgeInsets.fromLTRB(5, 4, 10, 4),
+      padding: const EdgeInsets.fromLTRB(4, 3, 9, 3),
       decoration: BoxDecoration(
-        color: visual.color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(20),
+        color: visual.color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: visual.color.withValues(alpha: 0.28)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          LanguageBadge(languageId: languageId, size: 18),
+          LanguageBadge(languageId: languageId, size: 16),
           const SizedBox(width: 6),
           Text(
             name,
-            style: theme.textTheme.labelMedium?.copyWith(
+            style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
+              letterSpacing: 0,
             ),
           ),
         ],

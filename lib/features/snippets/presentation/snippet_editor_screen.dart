@@ -18,6 +18,7 @@ import '../application/snippet_providers.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_type.dart';
 import '../domain/value_objects.dart';
+import 'type_visuals.dart';
 import 'widgets/code_find_panel.dart';
 import 'widgets/label_field.dart';
 
@@ -453,31 +454,33 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       for (final l in ref.watch(labelsProvider).value ?? const <Label>[]) l.name,
     ];
 
-    final form = ListView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-      children: [
-        // Big Snippet-style title field.
-        TextField(
-          controller: _titleController,
-          textInputAction: TextInputAction.next,
-          style: theme.textTheme.headlineSmall,
-          decoration: InputDecoration(
-            filled: false,
-            isDense: false,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8),
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            hintText: 'Title',
-            hintStyle: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
+    // ---------- Metadata (everything except the file/code editors) ----------
+    final metaChildren = <Widget>[
+      // Big Snippet-style title field.
+      TextField(
+        controller: _titleController,
+        textInputAction: TextInputAction.next,
+        style: theme.textTheme.headlineSmall,
+        decoration: InputDecoration(
+          filled: false,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 4),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          hintText: 'Title',
+          hintStyle: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
         ),
-        const Divider(height: 24),
-
-        // Type selector (kept).
-        SegmentedButton<SnippetType>(
+      ),
+      const Divider(height: 18),
+      const _SectionHeader(title: 'TYPE'),
+      const SizedBox(height: 8),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: SegmentedButton<SnippetType>(
+          showSelectedIcon: false,
           segments: const [
             ButtonSegment(
               value: SnippetType.code,
@@ -507,144 +510,201 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
             }
           }),
         ),
-        const SizedBox(height: 24),
-
-        // DESCRIPTION — Markdown supported, with a formatting toolbar.
-        _SectionHeader(
-          title: 'DESCRIPTION',
-          trailing: Text(
-            'Markdown supported',
-            style: theme.textTheme.labelSmall
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-          ),
+      ),
+      const SizedBox(height: 16),
+      _SectionHeader(
+        title: 'DESCRIPTION',
+        trailing: Text(
+          'Markdown supported',
+          style: theme.textTheme.labelSmall
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
-        const SizedBox(height: 8),
-        _MarkdownToolbar(
-          onHeading: () => _prefixLines('# '),
-          onBold: () => _wrapSelection('**', '**'),
-          onItalic: () => _wrapSelection('*', '*'),
-          onQuote: () => _prefixLines('> '),
-          onCode: () => _wrapSelection('`', '`'),
-          onLink: () => _wrapSelection('[', '](url)'),
-          onBullet: () => _prefixLines('- '),
-          onNumbered: () => _prefixLines('1. '),
-          onChecklist: () => _prefixLines('- [ ] '),
+      ),
+      const SizedBox(height: 8),
+      _MarkdownToolbar(
+        onHeading: () => _prefixLines('# '),
+        onBold: () => _wrapSelection('**', '**'),
+        onItalic: () => _wrapSelection('*', '*'),
+        onQuote: () => _prefixLines('> '),
+        onCode: () => _wrapSelection('`', '`'),
+        onLink: () => _wrapSelection('[', '](url)'),
+        onBullet: () => _prefixLines('- '),
+        onNumbered: () => _prefixLines('1. '),
+        onChecklist: () => _prefixLines('- [ ] '),
+      ),
+      const SizedBox(height: 8),
+      TextField(
+        controller: _descriptionController,
+        minLines: 2,
+        maxLines: 6,
+        style: theme.textTheme.bodyMedium,
+        decoration: const InputDecoration(
+          hintText: 'Describe this snippet… (Markdown supported)',
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _descriptionController,
-          minLines: 3,
-          maxLines: 8,
-          style: theme.textTheme.bodyMedium,
-          decoration: const InputDecoration(
-            hintText: 'Describe this snippet… (Markdown supported)',
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // Organization: purpose / collection / labels.
-        _PurposeDropdown(
-          purposes: purposes,
-          typeWire: _type.wire,
-          value: purposes.any((p) => p.id == _purpose) ? _purpose : null,
-          onChanged: (v) => setState(() => _purpose = v),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _CollectionDropdown(
-                collections: collections,
-                value: collections.any((c) => c.id == _collectionId)
-                    ? _collectionId
-                    : null,
-                onChanged: (v) => setState(() => _collectionId = v),
-              ),
+      ),
+      const SizedBox(height: 16),
+      // Purpose + Collection share one row to keep the metadata compact.
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: _PurposeDropdown(
+              purposes: purposes,
+              typeWire: _type.wire,
+              value: purposes.any((p) => p.id == _purpose) ? _purpose : null,
+              onChanged: (v) => setState(() => _purpose = v),
             ),
-            const SizedBox(width: 8),
-            IconButton.filledTonal(
-              tooltip: 'New collection',
-              onPressed: _createCollection,
-              icon: const Icon(Icons.create_new_folder_outlined),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _CollectionDropdown(
+              collections: collections,
+              value: collections.any((c) => c.id == _collectionId)
+                  ? _collectionId
+                  : null,
+              onChanged: (v) => setState(() => _collectionId = v),
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        LabelField(
-          labels: _labels,
-          suggestions: labelSuggestions,
-          onChanged: (t) => setState(() => _labels = t),
-        ),
-        const SizedBox(height: 24),
-
-        // FILES section: N files, each filename + language + code editor.
-        _SectionHeader(
-          title: 'FILES',
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ATTACH: pick binary files and attach them to this snippet. Only
-              // meaningful once the snippet exists (needs an id); for a brand
-              // new unsaved snippet we disable it with an explanatory tooltip.
-              Tooltip(
-                message: widget.isEditing
-                    ? 'Attach files'
-                    : 'Save the snippet first, then you can attach files',
-                child: TextButton.icon(
-                  onPressed: widget.isEditing ? _attachFiles : null,
-                  style: TextButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
-                  icon: const Icon(Icons.attach_file, size: 18),
-                  label: const Text('Attach'),
-                ),
-              ),
-              const SizedBox(width: 4),
-              TextButton.icon(
-                onPressed: _addFile,
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                ),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add file'),
-              ),
-            ],
           ),
-        ),
-        const SizedBox(height: 8),
-        for (var i = 0; i < _files.length; i++) ...[
-          _FileEditor(
-            key: ObjectKey(_files[i]),
-            file: _files[i],
-            languages: languages,
-            canRemove: _files.length > 1,
-            onFilenameChanged: (name) => _onFilenameChanged(_files[i], name),
-            onLanguageChanged: (id) => _onLanguagePicked(_files[i], id),
-            onRemove: () => _removeFile(i),
-          ),
-          const SizedBox(height: 16),
-        ],
-
-        if (_type == SnippetType.aiPrompt) ...[
-          Text(
-            'Tip: use {{variable}} placeholders — they are detected '
-            'automatically.',
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 16),
-          _PromptSettings(
-            providerController: _providerController,
-            modelController: _modelController,
-            systemPromptController: _systemPromptController,
-            temperatureController: _temperatureController,
-            maxTokensController: _maxTokensController,
+          const SizedBox(width: 8),
+          IconButton.filledTonal(
+            tooltip: 'New collection',
+            onPressed: _createCollection,
+            icon: const Icon(Icons.create_new_folder_outlined),
           ),
         ],
-        const SizedBox(height: 8),
+      ),
+      const SizedBox(height: 16),
+      LabelField(
+        labels: _labels,
+        suggestions: labelSuggestions,
+        onChanged: (t) => setState(() => _labels = t),
+      ),
+    ];
+
+    // AI-only tip + prompt settings; rendered alongside the metadata.
+    final aiChildren = <Widget>[
+      if (_type == SnippetType.aiPrompt) ...[
+        const SizedBox(height: 16),
+        Text(
+          'Tip: use {{variable}} placeholders — they are detected '
+          'automatically.',
+          style: theme.textTheme.bodySmall,
+        ),
+        const SizedBox(height: 12),
+        _PromptSettings(
+          providerController: _providerController,
+          modelController: _modelController,
+          systemPromptController: _systemPromptController,
+          temperatureController: _temperatureController,
+          maxTokensController: _maxTokensController,
+        ),
       ],
+    ];
+
+    // ---------- FILES ----------
+    final filesHeader = _SectionHeader(
+      title: 'FILES',
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ATTACH: pick binary files and attach them. Only meaningful once the
+          // snippet exists (needs an id); disabled with a tooltip otherwise.
+          Tooltip(
+            message: widget.isEditing
+                ? 'Attach files'
+                : 'Save the snippet first, then you can attach files',
+            child: TextButton.icon(
+              onPressed: widget.isEditing ? _attachFiles : null,
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+              icon: const Icon(Icons.attach_file, size: 18),
+              label: const Text('Attach'),
+            ),
+          ),
+          const SizedBox(width: 4),
+          TextButton.icon(
+            onPressed: _addFile,
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Add file'),
+          ),
+        ],
+      ),
     );
+
+    _FileEditor fileEditorAt(int i, {double? editorHeight, bool expand = false}) {
+      return _FileEditor(
+        key: ObjectKey(_files[i]),
+        file: _files[i],
+        languages: languages,
+        canRemove: _files.length > 1,
+        editorHeight: editorHeight,
+        expandEditor: expand,
+        onFilenameChanged: (name) => _onFilenameChanged(_files[i], name),
+        onLanguageChanged: (id) => _onLanguagePicked(_files[i], id),
+        onRemove: () => _removeFile(i),
+      );
+    }
+
+    // Stacked, fixed-height file editors (single-column layouts).
+    List<Widget> filesColumn() => [
+          filesHeader,
+          const SizedBox(height: 8),
+          for (var i = 0; i < _files.length; i++) ...[
+            fileEditorAt(i, editorHeight: 360),
+            const SizedBox(height: 16),
+          ],
+        ];
+
+    // Right pane for the wide modal: a single file fills the pane (no scroll);
+    // multiple files scroll within it.
+    Widget filesPane() {
+      if (_files.length == 1) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            filesHeader,
+            const SizedBox(height: 8),
+            Expanded(child: fileEditorAt(0, expand: true)),
+          ],
+        );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          filesHeader,
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                for (var i = 0; i < _files.length; i++) ...[
+                  fileEditorAt(i, editorHeight: 320),
+                  const SizedBox(height: 16),
+                ],
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    // One scrolling column — used by the non-modal route and the narrow modal.
+    Widget singleColumn() => ListView(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+          children: [
+            ...metaChildren,
+            const SizedBox(height: 20),
+            ...filesColumn(),
+            ...aiChildren,
+            const SizedBox(height: 8),
+          ],
+        );
 
     // Pinned footer — always visible, so you never scroll to reach Save.
     final footer = Container(
@@ -681,32 +741,46 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       ),
     );
 
-    // In modal mode the host Dialog already constrains width/height; render the
-    // bare content with a small header bar. Otherwise wrap in a Scaffold.
+    // In modal mode the host Dialog constrains width/height. On a wide modal we
+    // split metadata (left) from the file/code editor (right) so the editor is
+    // visible without scrolling; a narrow modal falls back to one column.
     if (widget.isModal) {
       return _withSaveShortcut(
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
-              child: Row(
-                children: [
-                  Text(
-                    widget.isEditing ? 'Edit snippet' : 'New snippet',
-                    style: theme.textTheme.titleLarge,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    tooltip: 'Close',
-                    onPressed: _saving ? null : _discard,
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
+            _ModalHeader(
+              type: _type,
+              isEditing: widget.isEditing,
+              onClose: _saving ? null : _discard,
             ),
             const Divider(height: 1),
-            Expanded(child: form),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 880) return singleColumn();
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        width: 440,
+                        child: ListView(
+                          padding: const EdgeInsets.fromLTRB(20, 18, 18, 20),
+                          children: [...metaChildren, ...aiChildren],
+                        ),
+                      ),
+                      const VerticalDivider(width: 1),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 18, 20, 16),
+                          child: filesPane(),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
             footer,
           ],
         ),
@@ -724,7 +798,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 900),
-                  child: form,
+                  child: singleColumn(),
                 ),
               ),
             ),
@@ -775,6 +849,76 @@ String _mimeTypeFor(String filename) {
     'zip': 'application/zip',
   };
   return map[ext] ?? 'application/octet-stream';
+}
+
+/// The modal's top bar: a brand-gradient mark carrying the current snippet
+/// type's glyph (it morphs as you switch Code / AI Prompt / Text), the title,
+/// a one-line subtitle, and a close button.
+class _ModalHeader extends StatelessWidget {
+  const _ModalHeader({
+    required this.type,
+    required this.isEditing,
+    required this.onClose,
+  });
+
+  final SnippetType type;
+  final bool isEditing;
+  final VoidCallback? onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 12, 14),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: AppTheme.brandGradient(theme.brightness),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.accent.withValues(alpha: 0.32),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(iconForType(type), size: 19, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isEditing ? 'Edit snippet' : 'New snippet',
+                  style: theme.textTheme.titleLarge,
+                ),
+                Text(
+                  isEditing
+                      ? 'Update the details and save your changes.'
+                      : 'Save code, a prompt, or a note to your library.',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: 'Close',
+            onPressed: onClose,
+            icon: const Icon(Icons.close),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// A small uppercase, letter-spaced Snippet-style section header with an
@@ -927,6 +1071,8 @@ class _FileEditor extends StatelessWidget {
     required this.onFilenameChanged,
     required this.onLanguageChanged,
     required this.onRemove,
+    this.editorHeight,
+    this.expandEditor = false,
   });
 
   final _FileEditState file;
@@ -935,6 +1081,15 @@ class _FileEditor extends StatelessWidget {
   final ValueChanged<String> onFilenameChanged;
   final ValueChanged<String?> onLanguageChanged;
   final VoidCallback onRemove;
+
+  /// Fixed editor height (single-column / stacked layouts). Ignored when
+  /// [expandEditor] is true.
+  final double? editorHeight;
+
+  /// When true the code editor fills the remaining vertical space (used in the
+  /// wide modal's right pane so the editor is visible without scrolling). The
+  /// parent must give this widget a bounded height (e.g. wrap it in Expanded).
+  final bool expandEditor;
 
   @override
   Widget build(BuildContext context) {
@@ -979,20 +1134,37 @@ class _FileEditor extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        _BodyEditor(
-          controller: file.contentController,
-          languageId: file.languageId,
-        ),
+        if (expandEditor)
+          Expanded(
+            child: _BodyEditor(
+              controller: file.contentController,
+              languageId: file.languageId,
+            ),
+          )
+        else
+          _BodyEditor(
+            controller: file.contentController,
+            languageId: file.languageId,
+            height: editorHeight ?? 360,
+          ),
       ],
     );
   }
 }
 
 class _BodyEditor extends StatefulWidget {
-  const _BodyEditor({required this.controller, required this.languageId});
+  const _BodyEditor({
+    required this.controller,
+    required this.languageId,
+    this.height,
+  });
 
   final CodeLineEditingController controller;
   final String? languageId;
+
+  /// Fixed editor height; when null the editor fills the available space
+  /// (parent must provide a bounded height).
+  final double? height;
 
   @override
   State<_BodyEditor> createState() => _BodyEditorState();
@@ -1030,6 +1202,65 @@ class _BodyEditorState extends State<_BodyEditor> {
     final mode = grammar == null ? null : builtinAllLanguages[grammar];
     final codeBackground = themeMap['root']?.backgroundColor;
     final codeForeground = themeMap['root']?.color ?? colorScheme.onSurface;
+
+    final codeEditor = CodeEditor(
+      controller: widget.controller,
+      findController: _findController,
+      wordWrap: _wordWrap,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      indicatorBuilder:
+          (context, editingController, chunkController, notifier) {
+        return Row(
+          children: [
+            DefaultCodeLineNumber(
+              controller: editingController,
+              notifier: notifier,
+            ),
+            DefaultCodeChunkIndicator(
+              width: 20,
+              controller: chunkController,
+              notifier: notifier,
+            ),
+          ],
+        );
+      },
+      sperator: Container(width: 1, color: colorScheme.outlineVariant),
+      findBuilder: (context, findController, readOnly) => CodeFindPanelView(
+        controller: findController,
+        readOnly: readOnly,
+        inputTextColor: colorScheme.onSurface,
+        resultFontColor: colorScheme.onSurfaceVariant,
+        iconColor: colorScheme.onSurfaceVariant,
+        iconSelectedColor: colorScheme.primary,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: colorScheme.surfaceContainerHighest,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+      style: CodeEditorStyle(
+        fontSize: 13.5,
+        fontFamily: kMonoFallback.first,
+        fontFamilyFallback: kMonoFallback.sublist(1),
+        backgroundColor: codeBackground,
+        cursorColor: colorScheme.primary,
+        selectionColor: colorScheme.primary.withValues(alpha: 0.30),
+        cursorLineColor: codeForeground.withValues(alpha: 0.06),
+        chunkIndicatorColor: codeForeground.withValues(alpha: 0.5),
+        codeTheme: CodeHighlightTheme(
+          languages: {
+            if (grammar != null && mode != null)
+              grammar: CodeHighlightThemeMode(mode: mode),
+          },
+          theme: themeMap,
+        ),
+      ),
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -1079,68 +1310,10 @@ class _BodyEditorState extends State<_BodyEditor> {
               ],
             ),
           ),
-          SizedBox(
-            height: 360,
-            child: CodeEditor(
-              controller: widget.controller,
-              findController: _findController,
-              wordWrap: _wordWrap,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              indicatorBuilder:
-                  (context, editingController, chunkController, notifier) {
-                return Row(
-                  children: [
-                    DefaultCodeLineNumber(
-                      controller: editingController,
-                      notifier: notifier,
-                    ),
-                    DefaultCodeChunkIndicator(
-                      width: 20,
-                      controller: chunkController,
-                      notifier: notifier,
-                    ),
-                  ],
-                );
-              },
-              sperator: Container(width: 1, color: colorScheme.outlineVariant),
-              findBuilder: (context, findController, readOnly) =>
-                  CodeFindPanelView(
-                controller: findController,
-                readOnly: readOnly,
-                inputTextColor: colorScheme.onSurface,
-                resultFontColor: colorScheme.onSurfaceVariant,
-                iconColor: colorScheme.onSurfaceVariant,
-                iconSelectedColor: colorScheme.primary,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: colorScheme.surfaceContainerHighest,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              style: CodeEditorStyle(
-                fontSize: 13.5,
-                fontFamily: kMonoFallback.first,
-                fontFamilyFallback: kMonoFallback.sublist(1),
-                backgroundColor: codeBackground,
-                cursorColor: colorScheme.primary,
-                selectionColor: colorScheme.primary.withValues(alpha: 0.30),
-                cursorLineColor: codeForeground.withValues(alpha: 0.06),
-                chunkIndicatorColor: codeForeground.withValues(alpha: 0.5),
-                codeTheme: CodeHighlightTheme(
-                  languages: {
-                    if (grammar != null && mode != null)
-                      grammar: CodeHighlightThemeMode(mode: mode),
-                  },
-                  theme: themeMap,
-                ),
-              ),
-            ),
-          ),
+          if (widget.height != null)
+            SizedBox(height: widget.height, child: codeEditor)
+          else
+            Expanded(child: codeEditor),
         ],
       ),
     );

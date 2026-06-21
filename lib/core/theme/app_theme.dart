@@ -18,9 +18,11 @@ class AppTheme {
   static const String monoFamily = 'JetBrains Mono';
 
   /// Corner radius vocabulary used across components.
+  static const double radiusXs = 8;
   static const double radiusSm = 10;
   static const double radiusMd = 14;
   static const double radiusLg = 20;
+  static const double radiusPill = 999;
 
   // --- Snippet-style dark sidebar tokens (used by the shell/sidebar) --------
   static const Color sidebarBg = Color(0xFF21262F);
@@ -76,19 +78,34 @@ class AppTheme {
             : Typography.material2021().black)
         .apply(fontFamily: uiFamily);
 
+    // A compact, desktop-first type scale. Sizes run roughly 10–15% below the
+    // Material defaults and headings carry tight negative tracking — the dense,
+    // high-information feel of Linear/Snippet rather than stock Material.
     final textTheme = baseText.copyWith(
       displaySmall: baseText.displaySmall?.copyWith(
-          fontWeight: FontWeight.w700, letterSpacing: -0.5),
+          fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: -0.6),
+      headlineMedium: baseText.headlineMedium?.copyWith(
+          fontSize: 24, fontWeight: FontWeight.w700, letterSpacing: -0.5),
       headlineSmall: baseText.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w700, letterSpacing: -0.3),
+          fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.4),
       titleLarge: baseText.titleLarge?.copyWith(
-          fontWeight: FontWeight.w700, letterSpacing: -0.2),
-      titleMedium:
-          baseText.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-      titleSmall: baseText.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-      labelLarge: baseText.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+          fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3),
+      titleMedium: baseText.titleMedium?.copyWith(
+          fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: -0.1),
+      titleSmall: baseText.titleSmall?.copyWith(
+          fontSize: 12.5, fontWeight: FontWeight.w600, letterSpacing: -0.1),
+      bodyLarge: baseText.bodyLarge?.copyWith(fontSize: 14, height: 1.45),
+      bodyMedium: baseText.bodyMedium?.copyWith(fontSize: 13, height: 1.45),
+      bodySmall: baseText.bodySmall?.copyWith(fontSize: 11.5, height: 1.4),
+      labelLarge: baseText.labelLarge?.copyWith(
+          fontSize: 12.5, fontWeight: FontWeight.w600, letterSpacing: 0),
+      labelMedium: baseText.labelMedium?.copyWith(
+          fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: 0.1),
+      labelSmall: baseText.labelSmall?.copyWith(
+          fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: 0.3),
     );
 
+    final rXs = BorderRadius.circular(radiusXs);
     final rSm = BorderRadius.circular(radiusSm);
     final rMd = BorderRadius.circular(radiusMd);
     final rLg = BorderRadius.circular(radiusLg);
@@ -107,13 +124,13 @@ class AppTheme {
         scrolledUnderElevation: 2,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: textTheme.titleLarge?.copyWith(fontSize: 20),
+        titleTextStyle: textTheme.titleLarge?.copyWith(fontSize: 17),
       ),
       cardTheme: CardThemeData(
         clipBehavior: Clip.antiAlias,
         elevation: 0,
         color: scheme.surfaceContainerLow,
-        margin: const EdgeInsets.symmetric(vertical: 5),
+        margin: const EdgeInsets.symmetric(vertical: 4),
         shape: RoundedRectangleBorder(
           borderRadius: rMd,
           side: BorderSide(color: scheme.outlineVariant),
@@ -143,48 +160,54 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerHighest,
+        fillColor: isDark
+            ? scheme.surfaceContainerHigh
+            : scheme.surfaceContainerHighest,
         isDense: true,
+        hintStyle: textTheme.bodyMedium
+            ?.copyWith(color: scheme.onSurfaceVariant.withValues(alpha: 0.7)),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
         border: OutlineInputBorder(
-          borderRadius: rSm,
+          borderRadius: rXs,
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: rSm,
-          borderSide: BorderSide.none,
+          borderRadius: rXs,
+          borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: rSm,
-          borderSide: BorderSide(color: scheme.primary, width: 1.6),
+          borderRadius: rXs,
+          borderSide: BorderSide(color: scheme.primary, width: 1.5),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: scheme.surfaceContainerHighest,
-        side: BorderSide.none,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: BorderSide(color: scheme.outlineVariant),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusXs)),
         labelStyle: textTheme.labelMedium,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
+          textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: rSm),
+            RoundedRectangleBorder(borderRadius: rXs),
           ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: rSm),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: rXs),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           textStyle: textTheme.labelLarge,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: rSm),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: rXs),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           textStyle: textTheme.labelLarge,
         ),
       ),

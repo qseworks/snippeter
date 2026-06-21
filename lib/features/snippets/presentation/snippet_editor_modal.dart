@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_theme.dart';
 import 'snippet_editor_screen.dart';
 
 /// Opens the snippet editor as a large centered modal dialog.
@@ -21,14 +22,18 @@ Future<void> showSnippetEditor(
     barrierDismissible: false,
     builder: (context) {
       final size = MediaQuery.sizeOf(context);
-      // Fill most of the window so the whole editor (description + all files +
-      // prompt settings) is visible, while keeping a small margin and a sensible
-      // cap on very large/ultrawide displays.
-      final width = size.width < 720 ? size.width : (size.width * 0.94).clamp(0, 1280).toDouble();
-      final height = (size.height * 0.94).clamp(0, 1100).toDouble();
+      // Fill most of the window so the two-pane editor (metadata on the left,
+      // the code editor on the right) has room without scrolling, while keeping
+      // a slim margin and a sensible cap on very large/ultrawide displays.
+      final width = size.width < 720 ? size.width : (size.width * 0.96).clamp(0, 1500).toDouble();
+      final height = (size.height * 0.96).clamp(0, 1400).toDouble();
       return Dialog(
         clipBehavior: Clip.antiAlias,
-        insetPadding: const EdgeInsets.all(16),
+        insetPadding: const EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        ),
         child: SizedBox(
           width: width,
           height: height,

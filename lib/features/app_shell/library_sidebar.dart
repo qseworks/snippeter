@@ -62,8 +62,9 @@ class LibrarySidebar extends ConsumerWidget {
                       'Personal Library',
                       style: TextStyle(
                         color: AppTheme.sidebarText,
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
+                        letterSpacing: -0.1,
                       ),
                     ),
                   ),
@@ -452,7 +453,7 @@ class _NavItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: fg,
-                fontSize: 13.5,
+                fontSize: 13,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
@@ -610,7 +611,7 @@ class _LabelRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: fg,
-                fontSize: 13.5,
+                fontSize: 13,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
@@ -646,7 +647,7 @@ class _LanguageRow extends StatelessWidget {
           Text('#',
               style: TextStyle(
                   color: AppTheme.sidebarSection,
-                  fontSize: 13.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700)),
           const SizedBox(width: 6),
           Expanded(
@@ -655,7 +656,7 @@ class _LanguageRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: fg,
-                fontSize: 13.5,
+                fontSize: 13,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
@@ -721,7 +722,7 @@ class _CountBadge extends StatelessWidget {
       '$count',
       style: TextStyle(
         color: selected ? AppTheme.sidebarText : AppTheme.sidebarSection,
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -745,9 +746,9 @@ class _SectionHeader extends StatelessWidget {
               title,
               style: const TextStyle(
                 color: AppTheme.sidebarSection,
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 1.1,
+                letterSpacing: 1.2,
               ),
             ),
           ),

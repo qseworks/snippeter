@@ -361,24 +361,31 @@ class _ChipFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fg = active
-        ? theme.colorScheme.onSecondaryContainer
-        : theme.colorScheme.onSurfaceVariant;
+    final scheme = theme.colorScheme;
+    final fg = active ? scheme.primary : scheme.onSurfaceVariant;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(10, 6, 6, 6),
       decoration: BoxDecoration(
         color: active
-            ? theme.colorScheme.secondaryContainer
-            : theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
+            ? scheme.primary.withValues(alpha: 0.12)
+            : scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color:
+              active ? scheme.primary.withValues(alpha: 0.45) : scheme.outlineVariant,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          leading ?? Icon(icon, size: 16, color: fg),
+          leading ?? Icon(icon, size: 15, color: fg),
           const SizedBox(width: 6),
-          Text(label, style: theme.textTheme.labelMedium?.copyWith(color: fg)),
-          Icon(Icons.arrow_drop_down, size: 18, color: fg),
+          Text(
+            label,
+            style: theme.textTheme.labelMedium
+                ?.copyWith(color: fg, fontWeight: FontWeight.w600),
+          ),
+          Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: fg),
         ],
       ),
     );

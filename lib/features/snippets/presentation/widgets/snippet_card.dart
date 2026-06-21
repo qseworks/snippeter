@@ -68,8 +68,11 @@ class SnippetCard extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         snippet.title.isEmpty ? 'Untitled' : snippet.title,
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.1,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

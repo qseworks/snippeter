@@ -88,26 +88,31 @@ class LabelChip extends StatelessWidget {
     final theme = Theme.of(context);
 
     final bg = onColored
-        ? color.withValues(alpha: 0.22)
-        : color.withValues(alpha: 0.14);
+        ? color.withValues(alpha: 0.24)
+        : color.withValues(alpha: 0.13);
     final fg = onColored ? Colors.white : color;
+    final borderColor = onColored
+        ? Colors.white.withValues(alpha: 0.16)
+        : color.withValues(alpha: 0.30);
 
     final chip = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.fromLTRB(7, 3, 9, 3),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          LabelDot(color: color, size: 8),
+          LabelDot(color: color, size: 6),
           const SizedBox(width: 6),
           Text(
             label.name,
             style: theme.textTheme.labelSmall?.copyWith(
               color: fg,
               fontWeight: FontWeight.w600,
+              letterSpacing: 0,
             ),
           ),
         ],
