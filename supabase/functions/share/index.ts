@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
   const { data: snip } = await sb
-    .from("snippets").select("*")
+    .from("snippets").select("title,description,body")
     .eq("id", id).eq("visibility", "public").is("deleted_at", null)
     .maybeSingle();
   if (!snip) {
@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       "<h1>Snippet not found</h1><p>This snippet is private or does not exist.</p>", 200);
   }
   const { data: files } = await sb
-    .from("snippet_files").select("*")
+    .from("snippet_files").select("filename,content")
     .eq("snippet_id", id).is("deleted_at", null)
     .order("position", { ascending: true });
   const list = (files && files.length ? files : [{ filename: "", content: snip.body ?? "" }]);
