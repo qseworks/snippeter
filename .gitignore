@@ -48,3 +48,30 @@ app.*.map.json
 integrations/**/node_modules/
 integrations/cli/dist/
 integrations/vscode/out/
+
+# Secrets & local environment — never commit these.
+# (Publishable/anon Supabase keys are public by design; the danger is the
+# service-role key and any local .env that holds it.)
+.env
+.env.*
+!.env.example
+*.local
+**/.env
+**/.env.*
+.envrc
+
+# Keys / certificates / credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+**/service-account*.json
+**/*credentials*.json
+secrets/
+
+# Supabase local stack & secrets
+supabase/.branches/
+supabase/.temp/
+supabase/.env
