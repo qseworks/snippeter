@@ -31,6 +31,13 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Localization: official Flutter delegates + the `intl` message/format runtime.
+  # ARB files in lib/l10n are compiled to `AppLocalizations` via `flutter gen-l10n`
+  # (configured in l10n.yaml; `generate: true` below enables it on `pub get`).
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -82,6 +89,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Generate the localized `AppLocalizations` class from lib/l10n/*.arb on
+  # `flutter pub get` / `flutter gen-l10n` (see l10n.yaml for the config).
+  generate: true
 
   # Loadable assets. The JetBrains Mono TTF is also declared as a font family
   # below; listing it here lets `rootBundle.load(...)` read its bytes for the

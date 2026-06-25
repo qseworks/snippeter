@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../snippets/application/snippet_providers.dart';
 import '../snippets/domain/snippet.dart';
@@ -52,9 +53,10 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
   bool get _busy => _phase == _Phase.fetching || _phase == _Phase.importing;
 
   Future<void> _fetch() async {
+    final l10n = AppLocalizations.of(context);
     final source = _sourceController.text.trim();
     if (source.isEmpty) {
-      setState(() => _error = 'Enter a GitHub username or a gist URL/ID.');
+      setState(() => _error = l10n.gistImportErrorEmptySource);
       return;
     }
     final token = _tokenController.text.trim();
@@ -82,7 +84,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
       if (drafts.isEmpty) {
         setState(() {
           _phase = _Phase.input;
-          _error = 'No importable gists found for that input.';
+          _error = l10n.gistImportErrorNoGistsFound;
         });
         return;
       }
@@ -98,13 +100,13 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
       if (!mounted) return;
       setState(() {
         _phase = _Phase.input;
-        _error = _friendlyError(e);
+        _error = _friendlyError(l10n, e);
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _phase = _Phase.input;
-        _error = 'Could not reach GitHub. Check your connection and try again.';
+        _error = l10n.gistImportErrorNetwork;
       });
     } finally {
       importer.dispose();
@@ -112,8 +114,9 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
   }
 
   Future<void> _import() async {
+    final l10n = AppLocalizations.of(context);
     if (_selected.isEmpty) {
-      setState(() => _error = 'Select at least one gist to import.');
+      setState(() => _error = l10n.gistImportErrorSelectAtLeastOne);
       return;
     }
     setState(() {
@@ -145,13 +148,13 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
     navigator.pop();
     if (failure != null && created == 0) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Import failed. No snippets were added.')),
+        SnackBar(content: Text(l10n.gistImportSnackFailedAll)),
       );
     } else if (failure != null) {
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            'Imported $created of ${toImport.length} gists; some failed.',
+            l10n.gistImportSnackPartial(created, toImport.length),
           ),
         ),
       );
@@ -159,7 +162,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            'Imported $created ${created == 1 ? 'gist' : 'gists'}.',
+            l10n.gistImportSnackSuccess(created),
           ),
         ),
       );
@@ -168,6 +171,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final size = MediaQuery.sizeOf(context);
     final width = size.width < 560 ? size.width - 32 : 520.0;
 
@@ -176,7 +180,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
         children: [
           const Icon(Icons.cloud_download_outlined, size: 22),
           const SizedBox(width: 10),
-          const Expanded(child: Text('Import from GitHub Gist')),
+          Expanded(child: Text(l10n.gistImportTitle)),
         ],
       ),
       content: SizedBox(
@@ -190,6 +194,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
   }
 
   Widget _buildInput(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,10 +204,10 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
           autofocus: true,
           enabled: !_busy,
           textInputAction: TextInputAction.next,
-          decoration: const InputDecoration(
-            labelText: 'GitHub username or gist URL/ID',
-            hintText: 'octocat  or  https://gist.github.com/...',
-            prefixIcon: Icon(Icons.person_outline),
+          decoration: InputDecoration(
+            labelText: l10n.gistImportSourceLabel,
+            hintText: l10n.gistImportSourceHint,
+            prefixIcon: const Icon(Icons.person_outline),
           ),
         ),
         const SizedBox(height: 16),
@@ -211,10 +216,10 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
           enabled: !_busy,
           obscureText: true,
           onSubmitted: (_) => _busy ? null : _fetch(),
-          decoration: const InputDecoration(
-            labelText: 'Personal access token (optional)',
-            hintText: 'For private gists / higher rate limits',
-            prefixIcon: Icon(Icons.key_outlined),
+          decoration: InputDecoration(
+            labelText: l10n.gistImportTokenLabel,
+            hintText: l10n.gistImportTokenHint,
+            prefixIcon: const Icon(Icons.key_outlined),
           ),
         ),
         if (_error != null) ...[
@@ -232,7 +237,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Fetching gists...',
+                l10n.gistImportFetching,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -243,6 +248,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
   }
 
   Widget _buildPreview(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +257,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
           children: [
             Expanded(
               child: Text(
-                '${_selected.length} of ${_drafts.length} selected',
+                l10n.gistImportSelectedCount(_selected.length, _drafts.length),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
@@ -259,8 +265,8 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
               onPressed: _busy ? null : _toggleSelectAll,
               child: Text(
                 _selected.length == _drafts.length
-                    ? 'Deselect all'
-                    : 'Select all',
+                    ? l10n.gistImportDeselectAll
+                    : l10n.gistImportSelectAll,
               ),
             ),
           ],
@@ -288,13 +294,13 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
                             }
                           }),
                   title: Text(
-                    draft.title.isEmpty ? '(untitled)' : draft.title,
+                    draft.title.isEmpty ? l10n.gistImportUntitled : draft.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
-                    '$fileCount ${fileCount == 1 ? 'file' : 'files'}'
-                    '${draft.visibility.wire == 'public' ? '' : ' · private'}',
+                    '${l10n.gistImportFileCount(fileCount)}'
+                    '${draft.visibility.wire == 'public' ? '' : l10n.gistImportPrivateSuffix}',
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
@@ -318,7 +324,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Importing...',
+                l10n.gistImportImporting,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -329,6 +335,7 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
   }
 
   List<Widget> _buildActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_phase == _Phase.preview) {
       return [
         TextButton(
@@ -338,15 +345,15 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
                     _phase = _Phase.input;
                     _error = null;
                   }),
-          child: const Text('Back'),
+          child: Text(l10n.commonBack),
         ),
         FilledButton.icon(
           onPressed: _busy || _selected.isEmpty ? null : _import,
           icon: const Icon(Icons.download, size: 18),
           label: Text(
             _selected.isEmpty
-                ? 'Import'
-                : 'Import ${_selected.length}',
+                ? l10n.gistImportButton
+                : l10n.gistImportButtonWithCount(_selected.length),
           ),
         ),
       ];
@@ -354,12 +361,12 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
     return [
       TextButton(
         onPressed: _busy ? null : () => Navigator.of(context).pop(),
-        child: const Text('Cancel'),
+        child: Text(l10n.commonCancel),
       ),
       FilledButton.icon(
         onPressed: _busy ? null : _fetch,
         icon: const Icon(Icons.search, size: 18),
-        label: const Text('Fetch'),
+        label: Text(l10n.gistImportFetchButton),
       ),
     ];
   }
@@ -383,14 +390,13 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
     return RegExp(r'^[0-9a-fA-F]+$').hasMatch(s);
   }
 
-  static String _friendlyError(GistImportException e) {
+  static String _friendlyError(AppLocalizations l10n, GistImportException e) {
     switch (e.statusCode) {
       case 404:
-        return 'Not found. Check the username or gist URL/ID.';
+        return l10n.gistImportErrorNotFound;
       case 401:
       case 403:
-        return 'Access denied or rate-limited. Add a personal access token '
-            'and try again.';
+        return l10n.gistImportErrorAccessDenied;
       default:
         return e.message;
     }

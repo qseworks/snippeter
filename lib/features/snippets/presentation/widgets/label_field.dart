@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 /// A chips-style label editor: existing labels render as deletable chips and the
 /// trailing text field adds a new label on submit (Enter) or comma.
@@ -47,6 +48,7 @@ class _LabelFieldState extends State<LabelField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final available = widget.suggestions
         .where((s) => !widget.labels
             .map((t) => t.toLowerCase())
@@ -57,9 +59,9 @@ class _LabelFieldState extends State<LabelField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InputDecorator(
-          decoration: const InputDecoration(
-            labelText: 'Labels',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.labelFieldLabel,
+            border: const OutlineInputBorder(),
           ),
           child: Wrap(
             spacing: 6,
@@ -76,10 +78,10 @@ class _LabelFieldState extends State<LabelField> {
                 child: TextField(
                   controller: _controller,
                   focusNode: _focusNode,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
-                    hintText: 'Add label…',
+                    hintText: l10n.labelFieldHint,
                   ),
                   onChanged: (value) {
                     if (value.endsWith(',')) _add(value);

@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Snippeter",
+  "version": "1.0.0",
+  "description": "Snippeter — a fast, local-first manager for code snippets & AI prompts. Save selections and insert snippets anywhere.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Snippeter",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "scripting",
+    "activeTab",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://xxxxxxxxxxxxxxxxxxxx.supabase.co/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

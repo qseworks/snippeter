@@ -25,13 +25,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => AppShell(child: child),
         routes: [
+          // These two panes are swapped by the sidebar inside the fixed shell
+          // chrome, so they must NOT animate like pushed pages. The default
+          // builder wraps them in a MaterialPage, which on macOS/web applies a
+          // Cupertino slide-from-right — within the fixed content pane that
+          // reads as the panel "sliding"/distorting. NoTransitionPage makes the
+          // swap instant (Snippet/VS Code style).
           GoRoute(
             path: RoutePaths.library,
-            builder: (context, state) => const LibraryContent(),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: LibraryContent()),
           ),
           GoRoute(
             path: RoutePaths.settings,
-            builder: (context, state) => const SettingsScreen(),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsScreen()),
           ),
         ],
       ),

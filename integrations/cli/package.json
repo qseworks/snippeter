@@ -1,7 +1,7 @@
 {
   "name": "@snippet-manager/cli",
   "version": "0.1.0",
-  "description": "Command-line client for the Snippet Manager (Supabase-backed).",
+  "description": "Command-line client for the Snippeter (Supabase-backed).",
   "type": "module",
   "bin": {
     "snip": "dist/index.js"

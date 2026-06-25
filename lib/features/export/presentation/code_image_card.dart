@@ -111,9 +111,12 @@ class CodeImageCard extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text.rich(span),
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text.rich(span),
+                    ),
                   ),
                 ),
               ],
@@ -123,7 +126,7 @@ class CodeImageCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 16),
               child: Text(
-                'Snippet Manager · ${data.languageName}',
+                'Snippeter · ${data.languageName}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: watermarkColor,

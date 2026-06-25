@@ -1,7 +1,7 @@
-# snip — Snippet Manager CLI
+# snip — Snippeter CLI
 
 A small, self-contained command-line client for the
-[Snippet Manager](../../README.md), talking directly to the project's Supabase
+[Snippeter](../../README.md), talking directly to the project's Supabase
 (PostgREST) backend. It signs you in with email/password and lets you list,
 read, and create snippets from your terminal. Everything is scoped to your
 account by Supabase Row Level Security.

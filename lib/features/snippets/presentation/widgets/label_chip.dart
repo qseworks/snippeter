@@ -96,7 +96,7 @@ class LabelChip extends StatelessWidget {
         : color.withValues(alpha: 0.30);
 
     final chip = Container(
-      padding: const EdgeInsets.fromLTRB(7, 3, 9, 3),
+      padding: const EdgeInsetsDirectional.fromSTEB(7, 3, 9, 3),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),

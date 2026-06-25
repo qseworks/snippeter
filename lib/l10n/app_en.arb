@@ -1,0 +1,1513 @@
+{
+  "@@locale": "en",
+  "editorTitleRequiredSnack": "Please enter a title",
+  "@editorTitleRequiredSnack": {
+    "description": "SnackBar shown when saving with an empty title"
+  },
+  "editorCouldNotSaveSnack": "Could not save: {error}",
+  "@editorCouldNotSaveSnack": {
+    "description": "SnackBar shown when saving a snippet fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "editorCouldNotPickFilesSnack": "Could not pick files: {error}",
+  "@editorCouldNotPickFilesSnack": {
+    "description": "SnackBar shown when the file picker throws",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Permission denied"
+      }
+    }
+  },
+  "editorCouldNotAttachSnack": "Could not attach {filename}: {error}",
+  "@editorCouldNotAttachSnack": {
+    "description": "SnackBar shown when attaching a specific file fails",
+    "placeholders": {
+      "filename": {
+        "type": "String",
+        "example": "image.png"
+      },
+      "error": {
+        "type": "String",
+        "example": "Read error"
+      }
+    }
+  },
+  "editorAttachedFilesSnack": "{count, plural, =1{Attached 1 file} other{Attached {count} files}}",
+  "@editorAttachedFilesSnack": {
+    "description": "SnackBar confirming how many files were attached",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "editorNewCollectionDialogTitle": "New collection",
+  "@editorNewCollectionDialogTitle": {
+    "description": "AlertDialog title for creating a new collection"
+  },
+  "commonName": "Name",
+  "@commonName": {
+    "description": "labelText for the new-collection name TextField"
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "TextButton in the new-collection dialog"
+  },
+  "commonCreate": "Create",
+  "@commonCreate": {
+    "description": "FilledButton in the new-collection dialog"
+  },
+  "editorTitleHint": "Title",
+  "@editorTitleHint": {
+    "description": "hintText for the snippet title field"
+  },
+  "editorSectionType": "TYPE",
+  "@editorSectionType": {
+    "description": "Uppercase section header for snippet type selector"
+  },
+  "editorTypeCode": "Code",
+  "@editorTypeCode": {
+    "description": "Segmented button label for the Code snippet type"
+  },
+  "editorTypeAiPrompt": "AI Prompt",
+  "@editorTypeAiPrompt": {
+    "description": "Segmented button label for the AI Prompt snippet type"
+  },
+  "editorTypeText": "Text",
+  "@editorTypeText": {
+    "description": "Segmented button label for the Text snippet type"
+  },
+  "editorSectionDescription": "DESCRIPTION",
+  "@editorSectionDescription": {
+    "description": "Uppercase section header for the description field"
+  },
+  "editorMarkdownSupportedLabel": "Markdown supported",
+  "@editorMarkdownSupportedLabel": {
+    "description": "Trailing hint next to the DESCRIPTION header"
+  },
+  "editorDescriptionHint": "Describe this snippet… (Markdown supported)",
+  "@editorDescriptionHint": {
+    "description": "hintText for the description TextField"
+  },
+  "editorNewCollectionTooltip": "New collection",
+  "@editorNewCollectionTooltip": {
+    "description": "Tooltip on the create-collection IconButton"
+  },
+  "editorAiVariableTip": "Tip: use {sample} placeholders — they are detected automatically.",
+  "@editorAiVariableTip": {
+    "description": "AI-prompt-only tip about variable placeholders. {sample} is injected at runtime as the literal text {{variable}} so the curly braces are never parsed by ICU. Keep {sample} verbatim in translations; translate only the surrounding sentence.",
+    "placeholders": {
+      "sample": {
+        "type": "String",
+        "example": "{{variable}}"
+      }
+    }
+  },
+  "editorSectionFiles": "FILES",
+  "@editorSectionFiles": {
+    "description": "Uppercase section header for the files area"
+  },
+  "editorAttachFilesTooltip": "Attach files",
+  "@editorAttachFilesTooltip": {
+    "description": "Tooltip on the Attach button when editing an existing snippet"
+  },
+  "editorAttachFilesDisabledTooltip": "Save the snippet first, then you can attach files",
+  "@editorAttachFilesDisabledTooltip": {
+    "description": "Tooltip on the Attach button when creating a new (unsaved) snippet"
+  },
+  "editorAttachButton": "Attach",
+  "@editorAttachButton": {
+    "description": "TextButton.icon label for attaching files"
+  },
+  "editorAddFileButton": "Add file",
+  "@editorAddFileButton": {
+    "description": "TextButton.icon label for adding a new file editor"
+  },
+  "commonDiscard": "Discard",
+  "@commonDiscard": {
+    "description": "Footer TextButton to discard edits"
+  },
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "Footer FilledButton.icon label to save the snippet"
+  },
+  "editorAppBarEditTitle": "Edit snippet",
+  "@editorAppBarEditTitle": {
+    "description": "AppBar title when editing an existing snippet (non-modal route)"
+  },
+  "editorAppBarNewTitle": "New snippet",
+  "@editorAppBarNewTitle": {
+    "description": "AppBar title when creating a new snippet (non-modal route)"
+  },
+  "editorModalHeaderEditTitle": "Edit snippet",
+  "@editorModalHeaderEditTitle": {
+    "description": "Modal header title when editing an existing snippet"
+  },
+  "editorModalHeaderNewTitle": "New snippet",
+  "@editorModalHeaderNewTitle": {
+    "description": "Modal header title when creating a new snippet"
+  },
+  "editorModalHeaderEditSubtitle": "Update the details and save your changes.",
+  "@editorModalHeaderEditSubtitle": {
+    "description": "Modal header subtitle when editing an existing snippet"
+  },
+  "editorModalHeaderNewSubtitle": "Save code, a prompt, or a note to your library.",
+  "@editorModalHeaderNewSubtitle": {
+    "description": "Modal header subtitle when creating a new snippet"
+  },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "Tooltip on the modal header close IconButton"
+  },
+  "editorMarkdownHeadingTooltip": "Heading",
+  "@editorMarkdownHeadingTooltip": {
+    "description": "Markdown toolbar tooltip for the heading button"
+  },
+  "editorMarkdownBoldTooltip": "Bold",
+  "@editorMarkdownBoldTooltip": {
+    "description": "Markdown toolbar tooltip for the bold button"
+  },
+  "editorMarkdownItalicTooltip": "Italic",
+  "@editorMarkdownItalicTooltip": {
+    "description": "Markdown toolbar tooltip for the italic button"
+  },
+  "editorMarkdownQuoteTooltip": "Quote",
+  "@editorMarkdownQuoteTooltip": {
+    "description": "Markdown toolbar tooltip for the quote button"
+  },
+  "editorMarkdownInlineCodeTooltip": "Inline code",
+  "@editorMarkdownInlineCodeTooltip": {
+    "description": "Markdown toolbar tooltip for the inline-code button"
+  },
+  "editorMarkdownLinkTooltip": "Link",
+  "@editorMarkdownLinkTooltip": {
+    "description": "Markdown toolbar tooltip for the link button"
+  },
+  "editorMarkdownBulletListTooltip": "Bullet list",
+  "@editorMarkdownBulletListTooltip": {
+    "description": "Markdown toolbar tooltip for the bullet list button"
+  },
+  "editorMarkdownNumberedListTooltip": "Numbered list",
+  "@editorMarkdownNumberedListTooltip": {
+    "description": "Markdown toolbar tooltip for the numbered list button"
+  },
+  "editorMarkdownChecklistTooltip": "Checklist",
+  "@editorMarkdownChecklistTooltip": {
+    "description": "Markdown toolbar tooltip for the checklist button"
+  },
+  "editorVisibilityPrivate": "Private",
+  "@editorVisibilityPrivate": {
+    "description": "Visibility toggle label when snippet is private"
+  },
+  "editorVisibilityPublic": "Public",
+  "@editorVisibilityPublic": {
+    "description": "Visibility toggle label when snippet is public"
+  },
+  "editorFilenameLabel": "Filename",
+  "@editorFilenameLabel": {
+    "description": "labelText for the per-file filename TextField"
+  },
+  "editorFilenameHint": "e.g. main.dart",
+  "@editorFilenameHint": {
+    "description": "hintText for the per-file filename TextField (example filename)"
+  },
+  "editorRemoveFileTooltip": "Remove file",
+  "@editorRemoveFileTooltip": {
+    "description": "Tooltip on the remove-file IconButton"
+  },
+  "editorPlainTextLanguage": "Plain text",
+  "@editorPlainTextLanguage": {
+    "description": "Fallback language name shown in the editor toolbar when no language is set"
+  },
+  "editorDisableLineWrapTooltip": "Disable line wrap",
+  "@editorDisableLineWrapTooltip": {
+    "description": "Tooltip on the wrap toggle when wrapping is currently enabled"
+  },
+  "editorWrapLinesTooltip": "Wrap lines",
+  "@editorWrapLinesTooltip": {
+    "description": "Tooltip on the wrap toggle when wrapping is currently disabled"
+  },
+  "editorFindReplaceTooltip": "Find / replace",
+  "@editorFindReplaceTooltip": {
+    "description": "Tooltip on the find/replace IconButton in the editor toolbar"
+  },
+  "editorLanguageDropdownLabel": "Language",
+  "@editorLanguageDropdownLabel": {
+    "description": "label for the language DropdownMenu"
+  },
+  "editorLanguageSearchHint": "Search languages…",
+  "@editorLanguageSearchHint": {
+    "description": "hintText for the searchable language DropdownMenu"
+  },
+  "editorNoLanguageOption": "No language",
+  "@editorNoLanguageOption": {
+    "description": "DropdownMenuEntry label for clearing the language selection"
+  },
+  "editorPurposeLabel": "Purpose",
+  "@editorPurposeLabel": {
+    "description": "labelText for the purpose DropdownButtonFormField"
+  },
+  "editorNoPurposeOption": "No purpose",
+  "@editorNoPurposeOption": {
+    "description": "DropdownMenuItem label for clearing the purpose selection"
+  },
+  "editorCollectionLabel": "Collection",
+  "@editorCollectionLabel": {
+    "description": "labelText for the collection DropdownButtonFormField"
+  },
+  "editorNoCollectionOption": "No collection",
+  "@editorNoCollectionOption": {
+    "description": "DropdownMenuItem label for clearing the collection selection"
+  },
+  "editorPromptSettingsHeader": "Prompt settings (optional)",
+  "@editorPromptSettingsHeader": {
+    "description": "Section header above the AI prompt settings fields"
+  },
+  "editorPromptProviderLabel": "Provider",
+  "@editorPromptProviderLabel": {
+    "description": "labelText for the AI provider TextField"
+  },
+  "editorPromptProviderHint": "e.g. Anthropic",
+  "@editorPromptProviderHint": {
+    "description": "hintText for the AI provider TextField"
+  },
+  "editorPromptModelLabel": "Model",
+  "@editorPromptModelLabel": {
+    "description": "labelText for the AI model TextField"
+  },
+  "editorPromptModelHint": "e.g. claude-opus-4-8",
+  "@editorPromptModelHint": {
+    "description": "hintText example for the AI model TextField. Borderline: it is example UI text but the value itself is a model id. Included as user-facing hint; the 'claude-opus-4-8' token should likely stay verbatim."
+  },
+  "editorPromptTemperatureLabel": "Temperature",
+  "@editorPromptTemperatureLabel": {
+    "description": "labelText for the temperature TextField"
+  },
+  "editorPromptMaxTokensLabel": "Max tokens",
+  "@editorPromptMaxTokensLabel": {
+    "description": "labelText for the max-tokens TextField"
+  },
+  "editorPromptSystemPromptLabel": "System prompt",
+  "@editorPromptSystemPromptLabel": {
+    "description": "labelText for the system prompt TextField"
+  },
+  "commonError": "Error: {error}",
+  "@commonError": {
+    "description": "Error fallback shown in body Center when snippet load fails (both routed screen and inline pane)",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network timeout"
+      }
+    }
+  },
+  "detailUntitledTitle": "Untitled",
+  "@detailUntitledTitle": {
+    "description": "AppBar title fallback when a snippet has no title (routed screen and inline pane)"
+  },
+  "detailSnippetNotFound": "Snippet not found",
+  "@detailSnippetNotFound": {
+    "description": "Body message when the routed snippet is null"
+  },
+  "detailSnippetUnavailable": "This snippet is no longer available.",
+  "@detailSnippetUnavailable": {
+    "description": "Pane message when inline snippet is null"
+  },
+  "detailSelectSnippetPlaceholder": "Select a snippet to view it here.",
+  "@detailSelectSnippetPlaceholder": {
+    "description": "Placeholder text in the detail pane when nothing is selected"
+  },
+  "detailDeleteSnippetTitle": "Delete snippet?",
+  "@detailDeleteSnippetTitle": {
+    "description": "AlertDialog title for the delete confirmation"
+  },
+  "detailDeleteSnippetConfirm": "“{title}” will be removed.",
+  "@detailDeleteSnippetConfirm": {
+    "description": "AlertDialog content confirming deletion of a named snippet (curly quotes around interpolated title)",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "My snippet"
+      }
+    }
+  },
+  "commonDelete": "Delete",
+  "@commonDelete": {
+    "description": "FilledButton in delete confirmation dialog"
+  },
+  "detailUnfavoriteTooltip": "Unfavorite",
+  "@detailUnfavoriteTooltip": {
+    "description": "IconButton tooltip when snippet is favorited"
+  },
+  "detailFavoriteTooltip": "Favorite",
+  "@detailFavoriteTooltip": {
+    "description": "IconButton tooltip when snippet is not favorited"
+  },
+  "detailHistoryTooltip": "History",
+  "@detailHistoryTooltip": {
+    "description": "IconButton tooltip / Tooltip message for snippet history (AppBar action and files header)"
+  },
+  "commonEdit": "Edit",
+  "@commonEdit": {
+    "description": "IconButton tooltip to open the snippet editor"
+  },
+  "detailDeleteTooltip": "Delete",
+  "@detailDeleteTooltip": {
+    "description": "IconButton tooltip to delete the snippet (AppBar action)"
+  },
+  "detailAttachmentsHeader": "Attachments ({count})",
+  "@detailAttachmentsHeader": {
+    "description": "Attachments section header with count of attachments",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "detailDeleteAttachmentTooltip": "Delete attachment",
+  "@detailDeleteAttachmentTooltip": {
+    "description": "IconButton tooltip on each attachment row"
+  },
+  "detailUpdatedLabel": "Updated {date}",
+  "@detailUpdatedLabel": {
+    "description": "Meta line under the title showing last-updated short date",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Jun 20"
+      }
+    }
+  },
+  "detailManageLabelsTooltip": "Manage labels — coming soon",
+  "@detailManageLabelsTooltip": {
+    "description": "Tooltip message on the LABELS affordance"
+  },
+  "detailLabelsAffordance": "LABELS",
+  "@detailLabelsAffordance": {
+    "description": "Text on the non-interactive LABELS dropdown affordance (uppercase styling)"
+  },
+  "detailShareSetPublicHint": "Set to Public to get a shareable link",
+  "@detailShareSetPublicHint": {
+    "description": "Hint shown in the share row link field when snippet is private"
+  },
+  "detailCopyLinkTooltip": "Copy link",
+  "@detailCopyLinkTooltip": {
+    "description": "IconButton tooltip on the share-row copy button"
+  },
+  "detailVisibilityPrivate": "Private",
+  "@detailVisibilityPrivate": {
+    "description": "Visibility pill label when snippet is private"
+  },
+  "detailVisibilityPublic": "Public",
+  "@detailVisibilityPublic": {
+    "description": "Visibility pill label when snippet is public"
+  },
+  "detailFilesHeader": "Files ({count})",
+  "@detailFilesHeader": {
+    "description": "Files section header with file count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "detailHistoryButton": "HISTORY",
+  "@detailHistoryButton": {
+    "description": "TextButton.icon label in the files header (uppercase styling)"
+  },
+  "detailAddFileTooltip": "Add file",
+  "@detailAddFileTooltip": {
+    "description": "Tooltip message on the ADD FILE button"
+  },
+  "detailAddFileButton": "ADD FILE",
+  "@detailAddFileButton": {
+    "description": "TextButton.icon label in the files header (uppercase styling)"
+  },
+  "detailPromptSettingsHeader": "Prompt settings",
+  "@detailPromptSettingsHeader": {
+    "description": "Section header for AI prompt metadata"
+  },
+  "detailPromptProviderLabel": "Provider",
+  "@detailPromptProviderLabel": {
+    "description": "Key in the prompt-meta key/value row for the model provider"
+  },
+  "detailPromptModelLabel": "Model",
+  "@detailPromptModelLabel": {
+    "description": "Key in the prompt-meta key/value row for the target model"
+  },
+  "detailPromptTemperatureLabel": "Temperature",
+  "@detailPromptTemperatureLabel": {
+    "description": "Key in the prompt-meta key/value row for temperature"
+  },
+  "detailPromptMaxTokensLabel": "Max tokens",
+  "@detailPromptMaxTokensLabel": {
+    "description": "Key in the prompt-meta key/value row for max tokens"
+  },
+  "detailPromptSystemPromptLabel": "System prompt",
+  "@detailPromptSystemPromptLabel": {
+    "description": "Label above the system prompt text in prompt meta view"
+  },
+  "detailPromptVariablesLabel": "Variables",
+  "@detailPromptVariablesLabel": {
+    "description": "Label above the variables chips in prompt meta view"
+  },
+  "teamFallbackTitle": "Team",
+  "@teamFallbackTitle": {
+    "description": "team_screen.dart: dialog header title fallback when the workspace has no name (line 65)"
+  },
+  "teamSubtitleLabel": "Team library",
+  "@teamSubtitleLabel": {
+    "description": "team_screen.dart: subtitle under the team name in the header (line 89)"
+  },
+  "teamOfflineTitle": "Team management is unavailable",
+  "@teamOfflineTitle": {
+    "description": "team_screen.dart: offline-notice title shown when there is no WorkspaceService (line 152)"
+  },
+  "teamOfflineBody": "Sign in and reconnect to invite members, change roles, or manage this team.",
+  "@teamOfflineBody": {
+    "description": "team_screen.dart: offline-notice body text (lines 158-159)"
+  },
+  "teamMembersSectionHeader": "MEMBERS",
+  "@teamMembersSectionHeader": {
+    "description": "team_screen.dart: section header above the members list (line 199)"
+  },
+  "teamNoMembers": "No members yet.",
+  "@teamNoMembers": {
+    "description": "team_screen.dart: empty-state text when the member list is empty (line 211)"
+  },
+  "teamInviteSectionHeader": "INVITE",
+  "@teamInviteSectionHeader": {
+    "description": "team_screen.dart: section header above the invite row (line 232)"
+  },
+  "teamRemoveMemberTitle": "Remove member?",
+  "@teamRemoveMemberTitle": {
+    "description": "team_screen.dart: AlertDialog title for removing a member (line 319)"
+  },
+  "teamRemoveMemberBody": "{email} will lose access to this team library.",
+  "@teamRemoveMemberBody": {
+    "description": "team_screen.dart: AlertDialog content for member removal confirmation; interpolates member email (line 321)",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "teammate@example.com"
+      }
+    }
+  },
+  "commonRemove": "Remove",
+  "@commonRemove": {
+    "description": "team_screen.dart: confirm button in the remove-member dialog (line 333)"
+  },
+  "teamMemberUnknownEmail": "(unknown)",
+  "@teamMemberUnknownEmail": {
+    "description": "team_screen.dart: placeholder shown for a member with an empty email (line 383)"
+  },
+  "teamMemberYouLabel": "(you)",
+  "@teamMemberYouLabel": {
+    "description": "team_screen.dart: marker appended to the current user's own member row (line 392)"
+  },
+  "teamRemoveMemberTooltip": "Remove member",
+  "@teamRemoveMemberTooltip": {
+    "description": "team_screen.dart: tooltip on the per-member remove IconButton (line 417)"
+  },
+  "teamRemovedMemberSnack": "Removed {email}.",
+  "@teamRemovedMemberSnack": {
+    "description": "team_screen.dart: SnackBar confirming a member was removed; interpolates email (line 346)",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "teammate@example.com"
+      }
+    }
+  },
+  "teamInviteInvalidEmail": "Enter a valid email address.",
+  "@teamInviteInvalidEmail": {
+    "description": "team_screen.dart: inline error when the invite email is empty or missing '@' (line 462)"
+  },
+  "teamInvitedSnack": "Invited {email} as {role}.",
+  "@teamInvitedSnack": {
+    "description": "team_screen.dart: SnackBar after a successful invite; interpolates email and role wire name (line 475). NOTE: {role} comes from _role.wire which may be a non-translated wire/enum value (e.g. 'member'); flagging since it is displayed to the user.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "teammate@example.com"
+      },
+      "role": {
+        "type": "String",
+        "example": "member"
+      }
+    }
+  },
+  "teamInviteEmailHint": "teammate@example.com",
+  "@teamInviteEmailHint": {
+    "description": "team_screen.dart: hintText for the invite email TextField (line 501). NOTE: an example email placeholder; arguably should be translated/localized example address - including as user-facing."
+  },
+  "teamInviteButton": "Invite",
+  "@teamInviteButton": {
+    "description": "team_screen.dart: label on the invite FilledButton.icon (line 527)"
+  },
+  "teamLeaveTitle": "Leave team?",
+  "@teamLeaveTitle": {
+    "description": "team_screen.dart: confirm dialog title for leaving a team (line 598)"
+  },
+  "teamLeaveBody": "You'll lose access to this team library until you're invited again.",
+  "@teamLeaveBody": {
+    "description": "team_screen.dart: confirm dialog body for leaving a team (lines 599-600)"
+  },
+  "teamLeaveAction": "Leave",
+  "@teamLeaveAction": {
+    "description": "team_screen.dart: confirm action label for leaving (line 601), also matches the Leave team button label root"
+  },
+  "teamLeftSnack": "Left the team.",
+  "@teamLeftSnack": {
+    "description": "team_screen.dart: SnackBar after successfully leaving a team (line 612)"
+  },
+  "teamDeleteTitle": "Delete team?",
+  "@teamDeleteTitle": {
+    "description": "team_screen.dart: confirm dialog title for deleting a team (line 624)"
+  },
+  "teamDeleteBody": "This permanently deletes the team library and its shared content for everyone. This cannot be undone.",
+  "@teamDeleteBody": {
+    "description": "team_screen.dart: confirm dialog body for deleting a team (lines 625-626)"
+  },
+  "teamDeletedSnack": "Team deleted.",
+  "@teamDeletedSnack": {
+    "description": "team_screen.dart: SnackBar after a team is deleted (line 638)"
+  },
+  "teamLeaveButton": "Leave team",
+  "@teamLeaveButton": {
+    "description": "team_screen.dart: label on the OutlinedButton.icon to leave the team (line 668)"
+  },
+  "teamDeleteButton": "Delete team",
+  "@teamDeleteButton": {
+    "description": "team_screen.dart: label on the TextButton.icon to delete the team, owner only (line 679)"
+  },
+  "teamRoleOwner": "Owner",
+  "@teamRoleOwner": {
+    "description": "team_screen.dart: role label for WorkspaceRole.owner, shown in dropdown and RoleChip (line 778)"
+  },
+  "teamRoleManager": "Manager",
+  "@teamRoleManager": {
+    "description": "team_screen.dart: role label for WorkspaceRole.manager (line 780)"
+  },
+  "teamRoleMember": "Member",
+  "@teamRoleMember": {
+    "description": "team_screen.dart: role label for WorkspaceRole.member (line 782)"
+  },
+  "teamRoleViewer": "Viewer",
+  "@teamRoleViewer": {
+    "description": "team_screen.dart: role label for WorkspaceRole.viewer (line 784)"
+  },
+  "teamErrorOnlyManagers": "Only managers can do that.",
+  "@teamErrorOnlyManagers": {
+    "description": "team_screen.dart: friendlyWorkspaceError message for RLS/permission denials, shown in SnackBars/inline error (line 815)"
+  },
+  "teamErrorNetworkUnavailable": "Network unavailable. Reconnect and try again.",
+  "@teamErrorNetworkUnavailable": {
+    "description": "team_screen.dart: friendlyWorkspaceError message for network failures, shown in UI (line 828)"
+  },
+  "teamErrorGeneric": "Something went wrong. Please try again.",
+  "@teamErrorGeneric": {
+    "description": "team_screen.dart: friendlyWorkspaceError generic fallback shown in UI (line 830)"
+  },
+  "createWorkspaceSignInError": "Sign in to create a team.",
+  "@createWorkspaceSignInError": {
+    "description": "create_workspace_dialog.dart: inline error when there is no workspace service (signed out) (line 44)"
+  },
+  "createWorkspaceFailedError": "Couldn't create the team — you may be offline.",
+  "@createWorkspaceFailedError": {
+    "description": "create_workspace_dialog.dart: inline error when workspace creation throws (line 60)"
+  },
+  "createWorkspaceTitle": "New team",
+  "@createWorkspaceTitle": {
+    "description": "create_workspace_dialog.dart: AlertDialog title (line 70)"
+  },
+  "createWorkspaceNameHint": "Team name",
+  "@createWorkspaceNameHint": {
+    "description": "create_workspace_dialog.dart: hintText for the team-name TextField (line 80)"
+  },
+  "createWorkspaceCreateButton": "Create",
+  "@createWorkspaceCreateButton": {
+    "description": "create_workspace_dialog.dart: label on the create FilledButton (line 105)"
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "AppBar title of the Settings screen"
+  },
+  "settingsSectionSync": "Sync",
+  "@settingsSectionSync": {
+    "description": "Section header above the cloud sync/account card"
+  },
+  "settingsSectionAppearance": "Appearance",
+  "@settingsSectionAppearance": {
+    "description": "Section header for theme/appearance settings"
+  },
+  "settingsThemeLabel": "Theme",
+  "@settingsThemeLabel": {
+    "description": "ListTile title for the theme mode selector"
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Segmented button label for system theme mode"
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Segmented button label for light theme mode"
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Segmented button label for dark theme mode"
+  },
+  "settingsSectionExportDefaults": "Export defaults",
+  "@settingsSectionExportDefaults": {
+    "description": "Section header for export default settings"
+  },
+  "settingsDefaultImageTheme": "Default image theme",
+  "@settingsDefaultImageTheme": {
+    "description": "ListTile title for the default image export theme dropdown"
+  },
+  "settingsShowWatermark": "Show watermark on image exports",
+  "@settingsShowWatermark": {
+    "description": "SwitchListTile title toggling watermark on image exports"
+  },
+  "settingsSectionEditorDefaults": "Editor defaults",
+  "@settingsSectionEditorDefaults": {
+    "description": "Section header for editor default settings"
+  },
+  "settingsDefaultLanguage": "Default language for new snippets",
+  "@settingsDefaultLanguage": {
+    "description": "ListTile title for the default language dropdown"
+  },
+  "commonNone": "None",
+  "@commonNone": {
+    "description": "Dropdown item for no default language selected"
+  },
+  "settingsSectionAbout": "About",
+  "@settingsSectionAbout": {
+    "description": "Section header for the about card"
+  },
+  "settingsAppName": "Snippet Manager",
+  "@settingsAppName": {
+    "description": "App name shown as the about ListTile title; may be a brand name kept untranslated - included as it is user-facing"
+  },
+  "settingsAboutTagline": "Local-first • sync-ready • all your platforms",
+  "@settingsAboutTagline": {
+    "description": "About card subtitle tagline"
+  },
+  "settingsSyncBlurb": "Sign in to sync your snippets across devices.",
+  "@settingsSyncBlurb": {
+    "description": "Intro text on the signed-out sync form"
+  },
+  "settingsEmailLabel": "Email",
+  "@settingsEmailLabel": {
+    "description": "labelText for the email TextField on the sign-in form"
+  },
+  "settingsPasswordLabel": "Password",
+  "@settingsPasswordLabel": {
+    "description": "labelText for the password TextField on the sign-in form"
+  },
+  "settingsSignIn": "Sign in",
+  "@settingsSignIn": {
+    "description": "FilledButton label to sign in"
+  },
+  "settingsCreateAccount": "Create account",
+  "@settingsCreateAccount": {
+    "description": "OutlinedButton label to create an account"
+  },
+  "settingsGenericError": "Something went wrong. Please try again.",
+  "@settingsGenericError": {
+    "description": "Inline error message shown when a non-auth exception occurs during sign in/up"
+  },
+  "settingsConfirmEmailInfo": "Check your email to confirm your account.",
+  "@settingsConfirmEmailInfo": {
+    "description": "Inline info message after creating an account, prompting email confirmation"
+  },
+  "settingsSignedInFallback": "Signed in",
+  "@settingsSignedInFallback": {
+    "description": "Fallback ListTile title when the signed-in user has no email"
+  },
+  "settingsNotSyncedYet": "Not synced yet",
+  "@settingsNotSyncedYet": {
+    "description": "Subtitle when the account has never synced"
+  },
+  "settingsLastSynced": "Last synced {time}",
+  "@settingsLastSynced": {
+    "description": "Subtitle showing relative time of last sync; time is a relative-time string like '5m ago'",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "5m ago"
+      }
+    }
+  },
+  "settingsSyncNow": "Sync now",
+  "@settingsSyncNow": {
+    "description": "FilledButton label to trigger a manual sync"
+  },
+  "settingsSignOut": "Sign out",
+  "@settingsSignOut": {
+    "description": "OutlinedButton label to sign out"
+  },
+  "settingsRelativeJustNow": "just now",
+  "@settingsRelativeJustNow": {
+    "description": "Relative time string for a sync less than a minute ago"
+  },
+  "settingsRelativeMinutesAgo": "{minutes}m ago",
+  "@settingsRelativeMinutesAgo": {
+    "description": "Relative time string in minutes; rendered into the Last synced subtitle",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "settingsRelativeHoursAgo": "{hours}h ago",
+  "@settingsRelativeHoursAgo": {
+    "description": "Relative time string in hours; rendered into the Last synced subtitle",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "settingsRelativeDaysAgo": "{days}d ago",
+  "@settingsRelativeDaysAgo": {
+    "description": "Relative time string in days; rendered into the Last synced subtitle",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "gistImportErrorEmptySource": "Enter a GitHub username or a gist URL/ID.",
+  "@gistImportErrorEmptySource": {
+    "description": "Inline validation error shown when the source field is empty on fetch"
+  },
+  "gistImportErrorNoGistsFound": "No importable gists found for that input.",
+  "@gistImportErrorNoGistsFound": {
+    "description": "Inline error when GitHub returns no importable gists for the input"
+  },
+  "gistImportErrorNetwork": "Could not reach GitHub. Check your connection and try again.",
+  "@gistImportErrorNetwork": {
+    "description": "Inline error on network/connection failure during fetch"
+  },
+  "gistImportErrorSelectAtLeastOne": "Select at least one gist to import.",
+  "@gistImportErrorSelectAtLeastOne": {
+    "description": "Inline error when user tries to import with nothing selected"
+  },
+  "gistImportSnackFailedAll": "Import failed. No snippets were added.",
+  "@gistImportSnackFailedAll": {
+    "description": "SnackBar shown when all selected gists failed to import"
+  },
+  "gistImportSnackPartial": "{created, plural, other{Imported {created} of {total} gists; some failed.}}",
+  "@gistImportSnackPartial": {
+    "description": "SnackBar shown when some gists imported and some failed",
+    "placeholders": {
+      "created": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gistImportSnackSuccess": "{created, plural, =1{Imported 1 gist.} other{Imported {created} gists.}}",
+  "@gistImportSnackSuccess": {
+    "description": "SnackBar shown when all selected gists imported successfully; count drives singular/plural",
+    "placeholders": {
+      "created": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "gistImportTitle": "Import from GitHub Gist",
+  "@gistImportTitle": {
+    "description": "AlertDialog title (also the dialog header next to cloud icon)"
+  },
+  "gistImportSourceLabel": "GitHub username or gist URL/ID",
+  "@gistImportSourceLabel": {
+    "description": "labelText for the source TextField"
+  },
+  "gistImportSourceHint": "octocat  or  https://gist.github.com/...",
+  "@gistImportSourceHint": {
+    "description": "hintText for the source TextField (octocat is a GitHub sample handle / data, may not need translation)"
+  },
+  "gistImportTokenLabel": "Personal access token (optional)",
+  "@gistImportTokenLabel": {
+    "description": "labelText for the token TextField"
+  },
+  "gistImportTokenHint": "For private gists / higher rate limits",
+  "@gistImportTokenHint": {
+    "description": "hintText for the token TextField"
+  },
+  "gistImportFetching": "Fetching gists...",
+  "@gistImportFetching": {
+    "description": "Progress text shown while fetching gists"
+  },
+  "gistImportSelectedCount": "{selected} of {total} selected",
+  "@gistImportSelectedCount": {
+    "description": "Preview header showing how many gists are selected",
+    "placeholders": {
+      "selected": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "gistImportDeselectAll": "Deselect all",
+  "@gistImportDeselectAll": {
+    "description": "TextButton label to deselect all gists in preview"
+  },
+  "gistImportSelectAll": "Select all",
+  "@gistImportSelectAll": {
+    "description": "TextButton label to select all gists in preview"
+  },
+  "gistImportUntitled": "(untitled)",
+  "@gistImportUntitled": {
+    "description": "Placeholder title shown for a gist draft with an empty title"
+  },
+  "gistImportFileCount": "{fileCount, plural, =1{1 file} other{{fileCount} files}}",
+  "@gistImportFileCount": {
+    "description": "Subtitle file count for a gist draft; combined with optional private suffix",
+    "placeholders": {
+      "fileCount": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "gistImportPrivateSuffix": " · private",
+  "@gistImportPrivateSuffix": {
+    "description": "Suffix appended to the file-count subtitle for non-public gists"
+  },
+  "gistImportImporting": "Importing...",
+  "@gistImportImporting": {
+    "description": "Progress text shown while importing selected gists"
+  },
+  "commonBack": "Back",
+  "@commonBack": {
+    "description": "TextButton to return from preview to input phase"
+  },
+  "gistImportButton": "Import",
+  "@gistImportButton": {
+    "description": "FilledButton label when nothing is selected (no count)"
+  },
+  "gistImportButtonWithCount": "Import {count}",
+  "@gistImportButtonWithCount": {
+    "description": "FilledButton label showing the number of gists to import",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "gistImportFetchButton": "Fetch",
+  "@gistImportFetchButton": {
+    "description": "FilledButton label to start fetching gists"
+  },
+  "gistImportErrorNotFound": "Not found. Check the username or gist URL/ID.",
+  "@gistImportErrorNotFound": {
+    "description": "Friendly error message for HTTP 404 from GitHub"
+  },
+  "gistImportErrorAccessDenied": "Access denied or rate-limited. Add a personal access token and try again.",
+  "@gistImportErrorAccessDenied": {
+    "description": "Friendly error message for HTTP 401/403 from GitHub"
+  },
+  "sidebarPersonalLibraryTitle": "Personal Library",
+  "@sidebarPersonalLibraryTitle": {
+    "description": "library_sidebar.dart: sidebar header title"
+  },
+  "sidebarImportFromGistTooltip": "Import from GitHub Gist",
+  "@sidebarImportFromGistTooltip": {
+    "description": "library_sidebar.dart: IconButton tooltip for Gist import"
+  },
+  "commonRefresh": "Refresh",
+  "@commonRefresh": {
+    "description": "library_sidebar.dart: IconButton tooltip to refresh snippets"
+  },
+  "sidebarNewSnippetButton": "NEW SNIPPET",
+  "@sidebarNewSnippetButton": {
+    "description": "library_sidebar.dart: FilledButton label to create a new snippet"
+  },
+  "sidebarNavAllSnippets": "All Snippets",
+  "@sidebarNavAllSnippets": {
+    "description": "library_sidebar.dart: nav item label for all snippets"
+  },
+  "sidebarNavStarred": "Starred",
+  "@sidebarNavStarred": {
+    "description": "library_sidebar.dart: nav item label for starred snippets"
+  },
+  "sidebarNavUnlabeled": "Unlabeled",
+  "@sidebarNavUnlabeled": {
+    "description": "library_sidebar.dart: nav item label for unlabeled snippets"
+  },
+  "sidebarSectionLabels": "LABELS",
+  "@sidebarSectionLabels": {
+    "description": "library_sidebar.dart: section header for the labels filter section"
+  },
+  "sidebarCreateLabelTooltip": "Create label",
+  "@sidebarCreateLabelTooltip": {
+    "description": "library_sidebar.dart: tooltip on the add (+) action in the LABELS section header"
+  },
+  "sidebarSectionLanguages": "LANGUAGES",
+  "@sidebarSectionLanguages": {
+    "description": "library_sidebar.dart: section header for the languages filter section"
+  },
+  "sidebarNavSettings": "Settings",
+  "@sidebarNavSettings": {
+    "description": "library_sidebar.dart: nav item label for Settings"
+  },
+  "sidebarNewLabelDialogTitle": "New label",
+  "@sidebarNewLabelDialogTitle": {
+    "description": "library_sidebar.dart: AlertDialog title for creating a label"
+  },
+  "sidebarLabelNameHint": "Label name",
+  "@sidebarLabelNameHint": {
+    "description": "library_sidebar.dart: TextField hintText for the new label name"
+  },
+  "sidebarParentLabelDropdownLabel": "Parent label",
+  "@sidebarParentLabelDropdownLabel": {
+    "description": "library_sidebar.dart: DropdownButtonFormField labelText for choosing a parent label"
+  },
+  "sidebarParentLabelNone": "None",
+  "@sidebarParentLabelNone": {
+    "description": "library_sidebar.dart: dropdown item meaning no parent label"
+  },
+  "sidebarSyncingAsTooltip": "Syncing as {account}",
+  "@sidebarSyncingAsTooltip": {
+    "description": "library_sidebar.dart: sync indicator tooltip when signed in; shows user email or fallback 'your account'",
+    "placeholders": {
+      "account": {
+        "type": "String",
+        "example": "user@example.com"
+      }
+    }
+  },
+  "sidebarSyncAccountFallback": "your account",
+  "@sidebarSyncAccountFallback": {
+    "description": "library_sidebar.dart: fallback text inserted into the syncing-as tooltip when no email is present"
+  },
+  "sidebarNotSyncingTooltip": "Not syncing — sign in",
+  "@sidebarNotSyncingTooltip": {
+    "description": "library_sidebar.dart: sync indicator tooltip when signed out"
+  },
+  "filterTypeChipDefault": "Type",
+  "@filterTypeChipDefault": {
+    "description": "library_filter_bar.dart: default label on the snippet-type filter chip when no type selected"
+  },
+  "filterAllTypes": "All types",
+  "@filterAllTypes": {
+    "description": "library_filter_bar.dart: popup menu item to clear the type filter"
+  },
+  "filterLanguageChipDefault": "Language",
+  "@filterLanguageChipDefault": {
+    "description": "library_filter_bar.dart: default label on the language filter chip when none selected"
+  },
+  "filterAllLanguages": "All languages",
+  "@filterAllLanguages": {
+    "description": "library_filter_bar.dart: popup menu item to clear the language filter"
+  },
+  "filterCollectionChipDefault": "Collection",
+  "@filterCollectionChipDefault": {
+    "description": "library_filter_bar.dart: default label on the collection filter chip when none selected"
+  },
+  "filterAllCollections": "All collections",
+  "@filterAllCollections": {
+    "description": "library_filter_bar.dart: popup menu item to clear the collection filter"
+  },
+  "filterClearChip": "Clear",
+  "@filterClearChip": {
+    "description": "library_filter_bar.dart: ActionChip label to clear all active filters"
+  },
+  "filterSearchHint": "Search snippets…",
+  "@filterSearchHint": {
+    "description": "library_filter_bar.dart: search TextField hintText"
+  },
+  "commonSort": "Sort",
+  "@commonSort": {
+    "description": "library_filter_bar.dart: PopupMenuButton tooltip for sort"
+  },
+  "filterSortRecentlyUpdated": "Recently updated",
+  "@filterSortRecentlyUpdated": {
+    "description": "library_filter_bar.dart: sort option label (SnippetSort.recent)"
+  },
+  "filterSortRecentlyCreated": "Recently created",
+  "@filterSortRecentlyCreated": {
+    "description": "library_filter_bar.dart: sort option label (SnippetSort.created)"
+  },
+  "filterSortTitleAsc": "Title A–Z",
+  "@filterSortTitleAsc": {
+    "description": "library_filter_bar.dart: sort option label (SnippetSort.titleAsc)"
+  },
+  "filterSortRelevance": "Relevance",
+  "@filterSortRelevance": {
+    "description": "library_filter_bar.dart: sort option label (SnippetSort.relevance)"
+  },
+  "filterByLabelsDialogTitle": "Filter by labels",
+  "@filterByLabelsDialogTitle": {
+    "description": "library_filter_bar.dart: AlertDialog title for the labels filter dialog"
+  },
+  "filterNoLabelsYet": "No labels yet.",
+  "@filterNoLabelsYet": {
+    "description": "library_filter_bar.dart: empty-state text in labels filter dialog"
+  },
+  "filterMatchLabel": "Match",
+  "@filterMatchLabel": {
+    "description": "library_filter_bar.dart: label preceding the Any/All segmented button"
+  },
+  "filterMatchAny": "Any",
+  "@filterMatchAny": {
+    "description": "library_filter_bar.dart: segmented button option to match any label"
+  },
+  "filterMatchAll": "All",
+  "@filterMatchAll": {
+    "description": "library_filter_bar.dart: segmented button option to match all labels"
+  },
+  "commonApply": "Apply",
+  "@commonApply": {
+    "description": "library_filter_bar.dart: confirm button in labels filter dialog"
+  },
+  "filterLabelsChipDefault": "Labels",
+  "@filterLabelsChipDefault": {
+    "description": "library_filter_bar.dart: default label on the Labels filter chip when none selected"
+  },
+  "filterLabelsChipWithCount": "{count, plural, other{Labels ({count})}}",
+  "@filterLabelsChipWithCount": {
+    "description": "library_filter_bar.dart: Labels filter chip label showing how many labels are selected",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "historySheetTitle": "History",
+  "@historySheetTitle": {
+    "description": "snippet_history_sheet.dart: barrierLabel for the history dialog (line 21) and the header title Text (line 102). Both render 'History'."
+  },
+  "historyLoadError": "Could not load history.\n{error}",
+  "@historyLoadError": {
+    "description": "snippet_history_sheet.dart: empty-state text shown when history fails to load (line 127). Interpolates snapshot.error.",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Database is locked"
+      }
+    }
+  },
+  "historyEmptyState": "No history yet",
+  "@historyEmptyState": {
+    "description": "snippet_history_sheet.dart: empty-state text shown when there are no saved versions (line 134)."
+  },
+  "historyLatestBadge": "Latest",
+  "@historyLatestBadge": {
+    "description": "snippet_history_sheet.dart: badge on the most recent version tile (line 211)."
+  },
+  "commonRestore": "Restore",
+  "@commonRestore": {
+    "description": "snippet_history_sheet.dart: label on the FilledButton.tonalIcon that restores a version (line 243)."
+  },
+  "historyNoFiles": "No files",
+  "@historyNoFiles": {
+    "description": "snippet_history_sheet.dart: version summary text when a version has zero files (line 253), shown as the ExpansionTile subtitle."
+  },
+  "historyFileCount": "{count, plural, =1{1 file} other{{count} files}}",
+  "@historyFileCount": {
+    "description": "snippet_history_sheet.dart: version file-count summary (lines 254-255). Built as '1 file' or '$count files', optionally suffixed with ' · <filename>' (see historyFileSummary). isPlural drives singular/plural.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "historyFileSummary": "{label} · {filename}",
+  "@historyFileSummary": {
+    "description": "snippet_history_sheet.dart: composed version summary joining the file-count label with the first filename (line 257). The separator/format is locale-relevant; filename is user data and not translated.",
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "example": "3 files"
+      },
+      "filename": {
+        "type": "String",
+        "example": "main.dart"
+      }
+    }
+  },
+  "historyTimestampFormat": "{month} {day}, {year} · {hh}:{mm}",
+  "@historyTimestampFormat": {
+    "description": "snippet_history_sheet.dart: _formatTimestamp output for a version's saved time, shown as the tile title (lines 196, 352). Hand-rolled date format with a hardcoded English month abbreviation list (lines 345-348). Recommend replacing with DateFormat from intl for proper localization rather than localizing this template literally.",
+    "placeholders": {
+      "month": {
+        "type": "String",
+        "example": "Jun"
+      },
+      "day": {
+        "type": "int",
+        "example": "20"
+      },
+      "year": {
+        "type": "int",
+        "example": "2026"
+      },
+      "hh": {
+        "type": "String",
+        "example": "14"
+      },
+      "mm": {
+        "type": "String",
+        "example": "32"
+      }
+    }
+  },
+  "cardUntitled": "Untitled",
+  "@cardUntitled": {
+    "description": "snippet_card.dart: fallback title shown when snippet.title is empty (line 70)."
+  },
+  "cardUnfavorite": "Unfavorite",
+  "@cardUnfavorite": {
+    "description": "snippet_card.dart: tooltip on the favorite toggle IconButton when the snippet is currently a favorite (line 91)."
+  },
+  "cardFavorite": "Favorite",
+  "@cardFavorite": {
+    "description": "snippet_card.dart: tooltip on the favorite toggle IconButton when the snippet is not a favorite (line 91)."
+  },
+  "cardMoreLabelsCount": "+{count}",
+  "@cardMoreLabelsCount": {
+    "description": "snippet_card.dart: overflow indicator shown when there are more than 4 labels, e.g. '+2' (line 120).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "cardTimeFormat": "{hh}:{mm}",
+  "@cardTimeFormat": {
+    "description": "snippet_card.dart: _shortDate same-day time format shown on the right of the row (lines 82, 143-145). Hand-rolled; recommend intl DateFormat for localization.",
+    "placeholders": {
+      "hh": {
+        "type": "String",
+        "example": "09"
+      },
+      "mm": {
+        "type": "String",
+        "example": "05"
+      }
+    }
+  },
+  "cardDaysAgo": "{days, plural, other{{days}d ago}}",
+  "@cardDaysAgo": {
+    "description": "snippet_card.dart: _shortDate relative format for the last week, e.g. '3d ago' (line 147). Abbreviated 'd ago' is English-specific; isPlural noted though current code uses a single 'd' form.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "cardDateFormatSameYear": "{month} {day}",
+  "@cardDateFormatSameYear": {
+    "description": "snippet_card.dart: _shortDate format for dates in the current year, e.g. 'Jun 20' (line 154). Uses hardcoded English month abbreviations (lines 148-151). Recommend intl DateFormat.",
+    "placeholders": {
+      "month": {
+        "type": "String",
+        "example": "Jun"
+      },
+      "day": {
+        "type": "int",
+        "example": "20"
+      }
+    }
+  },
+  "cardDateFormatOtherYear": "{month} {day}, {year}",
+  "@cardDateFormatOtherYear": {
+    "description": "snippet_card.dart: _shortDate format for dates in other years, e.g. 'Jun 20, 2025' (line 155). Uses hardcoded English month abbreviations. Recommend intl DateFormat.",
+    "placeholders": {
+      "month": {
+        "type": "String",
+        "example": "Jun"
+      },
+      "day": {
+        "type": "int",
+        "example": "20"
+      },
+      "year": {
+        "type": "int",
+        "example": "2025"
+      }
+    }
+  },
+  "labelFieldLabel": "Labels",
+  "@labelFieldLabel": {
+    "description": "label_field.dart: labelText of the InputDecorator wrapping the chip editor (line 61)."
+  },
+  "labelFieldHint": "Add label…",
+  "@labelFieldHint": {
+    "description": "label_field.dart: hintText of the trailing TextField for adding a new label (line 82)."
+  },
+  "listSortRecentlyUpdated": "Recently updated",
+  "@listSortRecentlyUpdated": {
+    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.recent)"
+  },
+  "listSortRecentlyCreated": "Recently created",
+  "@listSortRecentlyCreated": {
+    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.created)"
+  },
+  "listSortTitleAsc": "Title A–Z",
+  "@listSortTitleAsc": {
+    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.titleAsc). Contains an en-dash."
+  },
+  "listSortRelevance": "Relevance",
+  "@listSortRelevance": {
+    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.relevance)"
+  },
+  "listSortTooltip": "Sort",
+  "@listSortTooltip": {
+    "description": "snippet_list_screen.dart: tooltip on the sort PopupMenuButton, and the fallback shown in the header Text when value has no label (lines 148, 159)"
+  },
+  "listSearchHint": "Search snippets…",
+  "@listSearchHint": {
+    "description": "snippet_list_screen.dart: hintText of the library search TextField. Note: an integration test searches for this exact string per the comment at line 176."
+  },
+  "listErrorGeneric": "Something went wrong:\n{error}",
+  "@listErrorGeneric": {
+    "description": "snippet_list_screen.dart: error state Text shown in the results area when the snippet list fails to load",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "DatabaseException"
+      }
+    }
+  },
+  "listEmptyFilteredTitle": "No matching snippets",
+  "@listEmptyFilteredTitle": {
+    "description": "snippet_list_screen.dart: empty-state title when a search/filter is active"
+  },
+  "listEmptyFilteredSubtitle": "Try a different search or clear the filters.",
+  "@listEmptyFilteredSubtitle": {
+    "description": "snippet_list_screen.dart: empty-state subtitle when a search/filter is active"
+  },
+  "listEmptyTitle": "No snippets yet",
+  "@listEmptyTitle": {
+    "description": "snippet_list_screen.dart: empty-state title when library has no snippets"
+  },
+  "listEmptySubtitle": "Tap “New snippet” to create your first one.",
+  "@listEmptySubtitle": {
+    "description": "snippet_list_screen.dart: empty-state subtitle when library has no snippets. Contains curly quotes around the New snippet button label."
+  },
+  "codeFindToggleReplaceTooltip": "Toggle replace",
+  "@codeFindToggleReplaceTooltip": {
+    "description": "code_find_panel.dart: tooltip on the expand/collapse IconButton that toggles replace mode"
+  },
+  "codeFindFindHint": "Find",
+  "@codeFindFindHint": {
+    "description": "code_find_panel.dart: hintText of the find TextField"
+  },
+  "codeFindPreviousTooltip": "Previous",
+  "@codeFindPreviousTooltip": {
+    "description": "code_find_panel.dart: tooltip on the previous-match (arrow up) IconButton"
+  },
+  "codeFindNextTooltip": "Next",
+  "@codeFindNextTooltip": {
+    "description": "code_find_panel.dart: tooltip on the next-match (arrow down) IconButton"
+  },
+  "codeFindReplaceHint": "Replace",
+  "@codeFindReplaceHint": {
+    "description": "code_find_panel.dart: hintText of the replace TextField (line 185) and tooltip on the single-replace IconButton (line 190)"
+  },
+  "codeFindReplaceAllTooltip": "Replace all",
+  "@codeFindReplaceAllTooltip": {
+    "description": "code_find_panel.dart: tooltip on the replace-all IconButton"
+  },
+  "codeViewPlainText": "Plain text",
+  "@codeViewPlainText": {
+    "description": "code_view.dart (CodeBlock): fallback language name shown in the code window header when languageName is null"
+  },
+  "codeViewLineCount": "{count, plural, =1{1 line} other{{count} lines}}",
+  "@codeViewLineCount": {
+    "description": "code_view.dart (CodeBlock): line-count label shown in the code window header (currently '$lineCount line'/'lines' via inline ternary)",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "codeViewCopyTooltip": "Copy code",
+  "@codeViewCopyTooltip": {
+    "description": "code_view.dart: tooltip on the copy-to-clipboard IconButton in the code window header"
+  },
+  "exportImageRenderError": "Could not render the image",
+  "@exportImageRenderError": {
+    "description": "Snackbar toast shown when the export image fails to render before save"
+  },
+  "exportImageSavedNamed": "Saved {name}.png",
+  "@exportImageSavedNamed": {
+    "description": "Snackbar toast confirming the PNG was saved, with the file base name",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "fibonacci"
+      }
+    }
+  },
+  "exportImageSaveFailed": "Save failed: {error}",
+  "@exportImageSaveFailed": {
+    "description": "Snackbar toast when saving the PNG throws an error",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Permission denied"
+      }
+    }
+  },
+  "exportImageShareFailed": "Share failed: {error}",
+  "@exportImageShareFailed": {
+    "description": "Snackbar toast when sharing the PNG throws an error",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Cancelled"
+      }
+    }
+  },
+  "exportImageTitle": "Export as image",
+  "@exportImageTitle": {
+    "description": "Title of the export-as-image bottom sheet"
+  },
+  "exportImageThemeLabel": "Theme",
+  "@exportImageThemeLabel": {
+    "description": "Label preceding the code-theme dropdown in the export sheet"
+  },
+  "exportImageBackgroundLabel": "Background",
+  "@exportImageBackgroundLabel": {
+    "description": "Section header for the background preset chips in the export sheet"
+  },
+  "exportImageWatermarkLabel": "Watermark",
+  "@exportImageWatermarkLabel": {
+    "description": "Title of the watermark toggle in the export sheet"
+  },
+  "exportImageSavePng": "Save PNG",
+  "@exportImageSavePng": {
+    "description": "Label of the primary filled button that saves the PNG"
+  },
+  "commonShare": "Share",
+  "@commonShare": {
+    "description": "Label of the outlined button that shares the exported image"
+  },
+  "shellSnippetsTitle": "Snippets",
+  "@shellSnippetsTitle": {
+    "description": "Mobile app-bar title for the snippets library"
+  },
+  "shellWorkspacePersonal": "Personal",
+  "@shellWorkspacePersonal": {
+    "description": "Workspace rail label for the personal (non-team) library"
+  },
+  "shellCreateTeam": "Create team",
+  "@shellCreateTeam": {
+    "description": "Workspace rail label to create a team library"
+  },
+  "shellManageTeam": "Manage team",
+  "@shellManageTeam": {
+    "description": "Tooltip on the gear badge that opens team management"
+  },
+  "findNoMatches": "none",
+  "@findNoMatches": {
+    "description": "Find panel result indicator shown when the search has no matches"
+  },
+  "exportMenuTooltip": "Export & share",
+  "@exportMenuTooltip": {
+    "description": "Tooltip on the export/share popup menu button"
+  },
+  "exportMenuCopyText": "Copy text",
+  "@exportMenuCopyText": {
+    "description": "Export menu item: copy snippet text to the clipboard"
+  },
+  "exportMenuExportAsImage": "Export as image…",
+  "@exportMenuExportAsImage": {
+    "description": "Export menu item: open the image export sheet"
+  },
+  "exportMenuSaveSourceFile": "Save as {extension} file",
+  "@exportMenuSaveSourceFile": {
+    "description": "Export menu item: save as the snippet's source file type",
+    "placeholders": {
+      "extension": {
+        "type": "String",
+        "example": ".dart"
+      }
+    }
+  },
+  "exportMenuSaveTxt": "Save as .txt",
+  "@exportMenuSaveTxt": {
+    "description": "Export menu item: save as a plain .txt file"
+  },
+  "exportMenuSaveHtml": "Save as HTML",
+  "@exportMenuSaveHtml": {
+    "description": "Export menu item: save as an HTML file"
+  },
+  "exportMenuSavePdf": "Save as PDF",
+  "@exportMenuSavePdf": {
+    "description": "Export menu item: save as a PDF file"
+  },
+  "exportMenuShareText": "Share text",
+  "@exportMenuShareText": {
+    "description": "Export menu item: share the snippet as text"
+  },
+  "exportMenuShareFile": "Share as file",
+  "@exportMenuShareFile": {
+    "description": "Export menu item: share the snippet as a file"
+  },
+  "exportMenuCopiedSnack": "Copied to clipboard",
+  "@exportMenuCopiedSnack": {
+    "description": "SnackBar confirming text was copied"
+  },
+  "exportMenuSavedSnack": "Saved {filename}",
+  "@exportMenuSavedSnack": {
+    "description": "SnackBar confirming a file was saved",
+    "placeholders": {
+      "filename": {
+        "type": "String",
+        "example": "main.dart"
+      }
+    }
+  },
+  "exportMenuExportFailedSnack": "Export failed: {error}",
+  "@exportMenuExportFailedSnack": {
+    "description": "SnackBar shown when an export action fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Disk full"
+      }
+    }
+  },
+  "settingsAppLanguageLabel": "App language",
+  "@settingsAppLanguageLabel": {
+    "description": "ListTile title for the interface-language picker (distinct from the default snippet language)"
+  },
+  "settingsLanguageSystemDefault": "System default",
+  "@settingsLanguageSystemDefault": {
+    "description": "Language picker option that follows the device/system locale"
+  }
+}

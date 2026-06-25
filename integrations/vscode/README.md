@@ -1,6 +1,6 @@
-# Snippet Manager — VS Code Extension
+# Snippeter — VS Code Extension
 
-Browse, insert, and save code snippets from your [Snippet Manager](https://xxxxxxxxxxxxxxxxxxxx.supabase.co) account directly inside VS Code. The extension talks to the Supabase REST API (PostgREST) using `@supabase/supabase-js`; Row Level Security on the server scopes everything to your account and your team workspaces.
+Browse, insert, and save code snippets from your [Snippeter](https://xxxxxxxxxxxxxxxxxxxx.supabase.co) account directly inside VS Code. The extension talks to the Supabase REST API (PostgREST) using `@supabase/supabase-js`; Row Level Security on the server scopes everything to your account and your team workspaces.
 
 This folder is **self-contained** — it does not touch the Flutter app.
 
@@ -10,9 +10,9 @@ Open the Command Palette (`Cmd/Ctrl+Shift+P`) and run:
 
 | Command | Title | What it does |
 | --- | --- | --- |
-| `snippetManager.signIn` | **Snippet Manager: Sign In** | Prompts for email + password, signs in, and stores the session securely in VS Code's secret storage. |
-| `snippetManager.insertSnippet` | **Snippet Manager: Insert Snippet** | Pick a snippet (and a file, if it has more than one) and insert its content at the cursor. |
-| `snippetManager.saveSelection` | **Snippet Manager: Save Selection as Snippet** | Saves the current selection (or the whole document) as a new snippet. |
+| `snippetManager.signIn` | **Snippeter: Sign In** | Prompts for email + password, signs in, and stores the session securely in VS Code's secret storage. |
+| `snippetManager.insertSnippet` | **Snippeter: Insert Snippet** | Pick a snippet (and a file, if it has more than one) and insert its content at the cursor. |
+| `snippetManager.saveSelection` | **Snippeter: Save Selection as Snippet** | Saves the current selection (or the whole document) as a new snippet. |
 
 Your session is stored in `context.secrets` and restored automatically on the next launch, so you only sign in once per machine.
 
@@ -35,7 +35,7 @@ For an iterative loop you can use `npm run watch`.
 
 1. Open this `integrations/vscode/` folder in VS Code.
 2. Press **F5** (Run > Start Debugging). This launches a new "Extension Development Host" window with the extension loaded.
-3. In that window, run **Snippet Manager: Sign In**, then try **Insert Snippet** / **Save Selection as Snippet**.
+3. In that window, run **Snippeter: Sign In**, then try **Insert Snippet** / **Save Selection as Snippet**.
 
 > The first time, make sure you have run `npm install` and `npm run compile` so `out/extension.js` exists.
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../core/routing/route_paths.dart';
 import '../../core/theme/app_theme.dart';
@@ -36,6 +37,7 @@ class LibrarySidebar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final stats = ref.watch(libraryStatsProvider);
     final query = ref.watch(libraryQueryProvider);
     final controller = ref.read(libraryQueryProvider.notifier);
@@ -54,13 +56,13 @@ class LibrarySidebar extends ConsumerWidget {
           children: [
             // Header.
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 8, 8),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Personal Library',
-                      style: TextStyle(
+                      l10n.sidebarPersonalLibraryTitle,
+                      style: const TextStyle(
                         color: AppTheme.sidebarText,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -70,7 +72,7 @@ class LibrarySidebar extends ConsumerWidget {
                   ),
                   _SyncIndicator(onCloseDrawer: () => _closeDrawerIfNeeded(context)),
                   IconButton(
-                    tooltip: 'Import from GitHub Gist',
+                    tooltip: l10n.sidebarImportFromGistTooltip,
                     visualDensity: VisualDensity.compact,
                     iconSize: 18,
                     color: AppTheme.sidebarMuted,
@@ -78,7 +80,7 @@ class LibrarySidebar extends ConsumerWidget {
                     onPressed: () => showGistImportDialog(context),
                   ),
                   IconButton(
-                    tooltip: 'Refresh',
+                    tooltip: l10n.commonRefresh,
                     visualDensity: VisualDensity.compact,
                     iconSize: 18,
                     color: AppTheme.sidebarMuted,
@@ -90,7 +92,7 @@ class LibrarySidebar extends ConsumerWidget {
             ),
             // NEW SNIPPET.
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              padding: const EdgeInsetsDirectional.fromSTEB(12, 4, 12, 12),
               child: SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
@@ -104,7 +106,7 @@ class LibrarySidebar extends ConsumerWidget {
                     showSnippetEditor(context);
                   },
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('NEW SNIPPET'),
+                  label: Text(l10n.sidebarNewSnippetButton),
                 ),
               ),
             ),
@@ -115,7 +117,7 @@ class LibrarySidebar extends ConsumerWidget {
                 children: [
                   _NavItem(
                     icon: Icons.inbox_outlined,
-                    label: 'All Snippets',
+                    label: l10n.sidebarNavAllSnippets,
                     count: stats.total,
                     selected: active.isAll(),
                     onTap: () {
@@ -126,7 +128,7 @@ class LibrarySidebar extends ConsumerWidget {
                   ),
                   _NavItem(
                     icon: Icons.star_outline,
-                    label: 'Starred',
+                    label: l10n.sidebarNavStarred,
                     count: stats.starred,
                     selected: active.isStarred(),
                     onTap: () {
@@ -137,7 +139,7 @@ class LibrarySidebar extends ConsumerWidget {
                   ),
                   _NavItem(
                     icon: Icons.label_off_outlined,
-                    label: 'Unlabeled',
+                    label: l10n.sidebarNavUnlabeled,
                     count: stats.unlabeled,
                     selected: active.isUnlabeled(),
                     onTap: () {
@@ -148,10 +150,10 @@ class LibrarySidebar extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _SectionHeader(
-                    title: 'LABELS',
+                    title: l10n.sidebarSectionLabels,
                     trailing: _SectionAction(
                       icon: Icons.add,
-                      tooltip: 'Create label',
+                      tooltip: l10n.sidebarCreateLabelTooltip,
                       onTap: () => _showCreateLabelDialog(context, ref),
                     ),
                   ),
@@ -166,7 +168,7 @@ class LibrarySidebar extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(height: 12),
-                  const _SectionHeader(title: 'LANGUAGES'),
+                  _SectionHeader(title: l10n.sidebarSectionLanguages),
                   for (final entry in stats.byLanguageId.entries)
                     if (entry.value > 0)
                       _LanguageRow(
@@ -186,7 +188,7 @@ class LibrarySidebar extends ConsumerWidget {
             // Settings gear.
             _NavItem(
               icon: Icons.settings_outlined,
-              label: 'Settings',
+              label: l10n.sidebarNavSettings,
               selected:
                   GoRouterState.of(context).uri.path == RoutePaths.settings,
               onTap: () {
@@ -205,6 +207,7 @@ class LibrarySidebar extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController();
     // Existing labels offered as possible parents. Only top-level labels are
     // offered so we keep the hierarchy at a single level of nesting (Snippet-like).
@@ -231,7 +234,7 @@ class LibrarySidebar extends ConsumerWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('New label'),
+          title: Text(l10n.sidebarNewLabelDialogTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,18 +242,19 @@ class LibrarySidebar extends ConsumerWidget {
               TextField(
                 controller: nameController,
                 autofocus: true,
-                decoration: const InputDecoration(hintText: 'Label name'),
+                decoration: InputDecoration(hintText: l10n.sidebarLabelNameHint),
               ),
               if (parentChoices.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String?>(
                   initialValue: selectedParentId,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Parent label'),
+                  decoration:
+                      InputDecoration(labelText: l10n.sidebarParentLabelDropdownLabel),
                   items: [
-                    const DropdownMenuItem<String?>(
+                    DropdownMenuItem<String?>(
                       value: null,
-                      child: Text('None'),
+                      child: Text(l10n.sidebarParentLabelNone),
                     ),
                     for (final p in parentChoices)
                       DropdownMenuItem<String?>(
@@ -304,11 +308,11 @@ class LibrarySidebar extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Create'),
+              child: Text(l10n.commonCreate),
             ),
           ],
         ),
@@ -345,6 +349,7 @@ class _SyncIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     // No backend configured: keep the header clean, render nothing.
     if (ref.watch(authServiceProvider) == null) {
       return const SizedBox.shrink();
@@ -361,12 +366,13 @@ class _SyncIndicator extends ConsumerWidget {
     if (signedIn) {
       icon = Icons.cloud_done_outlined;
       color = AppTheme.accent;
-      tooltip = 'Syncing as ${user.email ?? 'your account'}';
+      tooltip = l10n.sidebarSyncingAsTooltip(
+          user.email ?? l10n.sidebarSyncAccountFallback);
       onTap = () => ref.read(syncServiceProvider)?.syncOnce();
     } else {
       icon = Icons.cloud_off_outlined;
       color = AppTheme.sidebarSection;
-      tooltip = 'Not syncing — sign in';
+      tooltip = l10n.sidebarNotSyncingTooltip;
       onTap = () {
         context.go(RoutePaths.settings);
         onCloseDrawer();
@@ -588,7 +594,11 @@ class _LabelRow extends StatelessWidget {
               onTap: onToggleExpand,
               borderRadius: BorderRadius.circular(4),
               child: Icon(
-                expanded ? Icons.expand_more : Icons.chevron_right,
+                expanded
+                    ? Icons.expand_more
+                    : (Directionality.of(context) == TextDirection.rtl
+                        ? Icons.chevron_left
+                        : Icons.chevron_right),
                 size: 16,
                 color: AppTheme.sidebarMuted,
               ),
@@ -694,14 +704,14 @@ class _SidebarRow extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              border: Border(
-                left: BorderSide(
+              border: BorderDirectional(
+                start: BorderSide(
                   color: selected ? AppTheme.accent : Colors.transparent,
                   width: 3,
                 ),
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(11, 9, 12, 9),
+            padding: const EdgeInsetsDirectional.fromSTEB(11, 9, 12, 9),
             child: child,
           ),
         ),
@@ -738,7 +748,7 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(19, 6, 12, 6),
+      padding: const EdgeInsetsDirectional.fromSTEB(19, 6, 12, 6),
       child: Row(
         children: [
           Expanded(

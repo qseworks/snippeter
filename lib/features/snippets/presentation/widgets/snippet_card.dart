@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../../core/highlight/language_visuals.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -25,6 +26,7 @@ class SnippetCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     // Preview language comes from the first file (falls back to the snippet's
@@ -46,14 +48,14 @@ class SnippetCard extends ConsumerWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              border: Border(
-                left: BorderSide(
+              border: BorderDirectional(
+                start: BorderSide(
                   color: selected ? AppTheme.accent : Colors.transparent,
                   width: 3,
                 ),
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(11, 10, 8, 10),
+            padding: const EdgeInsetsDirectional.fromSTEB(11, 10, 8, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -67,7 +69,7 @@ class SnippetCard extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        snippet.title.isEmpty ? 'Untitled' : snippet.title,
+                        snippet.title.isEmpty ? l10n.cardUntitled : snippet.title,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,
@@ -79,16 +81,18 @@ class SnippetCard extends ConsumerWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _shortDate(snippet.updatedAt),
+                      _shortDate(l10n, snippet.updatedAt),
                       style: theme.textTheme.labelSmall
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     IconButton(
                       visualDensity: VisualDensity.compact,
                       iconSize: 18,
-                      padding: const EdgeInsets.only(left: 4),
+                      padding: const EdgeInsetsDirectional.only(start: 4),
                       constraints: const BoxConstraints(),
-                      tooltip: snippet.isFavorite ? 'Unfavorite' : 'Favorite',
+                      tooltip: snippet.isFavorite
+                          ? l10n.cardUnfavorite
+                          : l10n.cardFavorite,
                       icon: Icon(
                         snippet.isFavorite ? Icons.star : Icons.star_border,
                         color: snippet.isFavorite ? Colors.amber : null,
@@ -102,7 +106,7 @@ class SnippetCard extends ConsumerWidget {
                 if (language != null || snippet.labels.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Padding(
-                    padding: const EdgeInsets.only(left: 22),
+                    padding: const EdgeInsetsDirectional.only(start: 22),
                     child: Wrap(
                       spacing: 6,
                       runSpacing: 4,
@@ -117,7 +121,7 @@ class SnippetCard extends ConsumerWidget {
                           LabelChip(label: label),
                         if (snippet.labels.length > 4)
                           Text(
-                            '+${snippet.labels.length - 4}',
+                            l10n.cardMoreLabelsCount(snippet.labels.length - 4),
                             style: theme.textTheme.labelSmall
                                 ?.copyWith(color: scheme.onSurfaceVariant),
                           ),
@@ -135,22 +139,24 @@ class SnippetCard extends ConsumerWidget {
 }
 
 /// A compact relative/short date from an epoch-ms timestamp.
-String _shortDate(int epochMs) {
+String _shortDate(AppLocalizations l10n, int epochMs) {
   final date = DateTime.fromMillisecondsSinceEpoch(epochMs);
   final now = DateTime.now();
   final diff = now.difference(date);
   if (diff.inDays == 0 && now.day == date.day) {
     final h = date.hour.toString().padLeft(2, '0');
     final m = date.minute.toString().padLeft(2, '0');
-    return '$h:$m';
+    return l10n.cardTimeFormat(h, m);
   }
-  if (diff.inDays < 7 && diff.inDays >= 0) return '${diff.inDays + 1}d ago';
+  if (diff.inDays < 7 && diff.inDays >= 0) {
+    return l10n.cardDaysAgo(diff.inDays + 1);
+  }
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
   final month = months[date.month - 1];
   return date.year == now.year
-      ? '$month ${date.day}'
-      : '$month ${date.day}, ${date.year}';
+      ? l10n.cardDateFormatSameYear(month, date.day)
+      : l10n.cardDateFormatOtherYear(month, date.day, date.year);
 }

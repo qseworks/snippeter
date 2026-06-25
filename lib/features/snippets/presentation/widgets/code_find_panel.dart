@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:re_editor/re_editor.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 /// Find / replace panel for the code [CodeEditor]. Adapted from the re_editor
 /// example (Apache-2.0); colours are themed by the caller via the constructor
 /// so it blends with the app. Wire it through `CodeEditor.findBuilder`.
-const EdgeInsetsGeometry _kMargin = EdgeInsets.only(right: 10, top: 6);
+const EdgeInsetsGeometry _kMargin = EdgeInsetsDirectional.only(end: 10, top: 6);
 const double _kPanelWidth = 360;
 const double _kFindPanelHeight = 40;
 const double _kReplacePanelHeight = _kFindPanelHeight * 2;
@@ -62,7 +63,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
     }
     return Container(
       margin: margin,
-      alignment: Alignment.topRight,
+      alignment: AlignmentDirectional.topEnd,
       height: preferredSize.height,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -89,10 +90,11 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildFindInputView(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final CodeFindValue value = controller.value!;
     final String result;
     if (value.result == null) {
-      result = 'none';
+      result = l10n.findNoMatches;
     } else {
       result = '${value.result!.index + 1}/${value.result!.matches.length}';
     }
@@ -102,9 +104,11 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
           onPressed: controller.toggleMode,
           icon: Icon(value.replaceMode
               ? Icons.expand_more
-              : Icons.chevron_right),
+              : (Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right)),
           iconSize: iconSize,
-          tooltip: 'Toggle replace',
+          tooltip: l10n.codeFindToggleReplaceTooltip,
           constraints:
               const BoxConstraints(maxWidth: _kIconWidth, maxHeight: _kIconHeight),
         ),
@@ -118,7 +122,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
                 context: context,
                 controller: controller.findInputController,
                 focusNode: controller.findInputFocusNode,
-                hint: 'Find',
+                hint: l10n.codeFindFindHint,
                 iconsWidth: _kIconWidth * 1.5,
               ),
               Row(
@@ -150,17 +154,17 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
               _buildIconButton(
                 onPressed: value.result == null ? null : controller.previousMatch,
                 icon: Icons.arrow_upward,
-                tooltip: 'Previous',
+                tooltip: l10n.codeFindPreviousTooltip,
               ),
               _buildIconButton(
                 onPressed: value.result == null ? null : controller.nextMatch,
                 icon: Icons.arrow_downward,
-                tooltip: 'Next',
+                tooltip: l10n.codeFindNextTooltip,
               ),
               _buildIconButton(
                 onPressed: controller.close,
                 icon: Icons.close,
-                tooltip: 'Close',
+                tooltip: l10n.commonClose,
               ),
             ],
           ),
@@ -170,6 +174,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildReplaceInputView(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final CodeFindValue value = controller.value!;
     return Row(
       children: [
@@ -181,18 +186,18 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
             context: context,
             controller: controller.replaceInputController,
             focusNode: controller.replaceInputFocusNode,
-            hint: 'Replace',
+            hint: l10n.codeFindReplaceHint,
           ),
         ),
         _buildIconButton(
           onPressed: value.result == null ? null : controller.replaceMatch,
           icon: Icons.done,
-          tooltip: 'Replace',
+          tooltip: l10n.codeFindReplaceHint,
         ),
         _buildIconButton(
           onPressed: value.result == null ? null : controller.replaceAllMatches,
           icon: Icons.done_all,
-          tooltip: 'Replace all',
+          tooltip: l10n.codeFindReplaceAllTooltip,
         ),
       ],
     );
@@ -215,7 +220,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
           hintText: hint,
           isDense: true,
           contentPadding: (decoration.contentPadding ?? EdgeInsets.zero)
-              .add(EdgeInsets.only(right: iconsWidth)),
+              .add(EdgeInsetsDirectional.only(end: iconsWidth)),
         ),
         controller: controller,
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/code_view.dart';
@@ -15,10 +16,11 @@ Future<void> showSnippetHistory(
   BuildContext context, {
   required String snippetId,
 }) {
+  final l10n = AppLocalizations.of(context);
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'History',
+    barrierLabel: l10n.historySheetTitle,
     barrierColor: Colors.black54,
     transitionDuration: const Duration(milliseconds: 220),
     pageBuilder: (context, _, _) => _SnippetHistorySheet(snippetId: snippetId),
@@ -28,11 +30,12 @@ Future<void> showSnippetHistory(
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       );
+      final isRtl = Directionality.of(context) == TextDirection.rtl;
       return Align(
-        alignment: Alignment.centerRight,
+        alignment: AlignmentDirectional.centerEnd,
         child: SlideTransition(
           position: Tween<Offset>(
-            begin: const Offset(1, 0),
+            begin: Offset(isRtl ? -1 : 1, 0),
             end: Offset.zero,
           ).animate(curved),
           child: child,
@@ -73,12 +76,13 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final width = MediaQuery.sizeOf(context).width;
     final sheetWidth = width < 560 ? width : 460.0;
 
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: AlignmentDirectional.centerEnd,
       child: Material(
         color: theme.colorScheme.surface,
         elevation: 8,
@@ -91,7 +95,7 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
               children: [
                 // Header.
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                  padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 8, 12),
                   child: Row(
                     children: [
                       Icon(Icons.history,
@@ -99,14 +103,14 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'History',
+                          l10n.historySheetTitle,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Close',
+                        tooltip: l10n.commonClose,
                         icon: const Icon(Icons.close),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
@@ -124,14 +128,16 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
                       if (snapshot.hasError) {
                         return _EmptyState(
                           icon: Icons.error_outline,
-                          text: 'Could not load history.\n${snapshot.error}',
+                          text: l10n.historyLoadError(
+                            snapshot.error.toString(),
+                          ),
                         );
                       }
                       final versions = snapshot.data ?? const [];
                       if (versions.isEmpty) {
-                        return const _EmptyState(
+                        return _EmptyState(
                           icon: Icons.history_toggle_off,
-                          text: 'No history yet',
+                          text: l10n.historyEmptyState,
                         );
                       }
                       return ListView.separated(
@@ -171,10 +177,11 @@ class _VersionTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final languageMap = ref.watch(languageMapProvider);
     final files = version.files;
-    final summary = _summary(files);
+    final summary = _summary(l10n, files);
 
     return Container(
       decoration: BoxDecoration(
@@ -193,7 +200,7 @@ class _VersionTile extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  _formatTimestamp(version.savedAt),
+                  _formatTimestamp(l10n, version.savedAt),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -208,7 +215,7 @@ class _VersionTile extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'Latest',
+                    l10n.historyLatestBadge,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.accent,
                       fontWeight: FontWeight.w700,
@@ -236,11 +243,11 @@ class _VersionTile extends ConsumerWidget {
             ],
             const SizedBox(height: 14),
             Align(
-              alignment: Alignment.centerRight,
+              alignment: AlignmentDirectional.centerEnd,
               child: FilledButton.tonalIcon(
                 onPressed: onRestore,
                 icon: const Icon(Icons.restore, size: 18),
-                label: const Text('Restore'),
+                label: Text(l10n.commonRestore),
               ),
             ),
           ],
@@ -249,12 +256,12 @@ class _VersionTile extends ConsumerWidget {
     );
   }
 
-  String _summary(List<SnippetFile> files) {
-    if (files.isEmpty) return 'No files';
+  String _summary(AppLocalizations l10n, List<SnippetFile> files) {
+    if (files.isEmpty) return l10n.historyNoFiles;
     final count = files.length;
-    final label = count == 1 ? '1 file' : '$count files';
+    final label = l10n.historyFileCount(count);
     final first = files.first.filename.trim();
-    return first.isEmpty ? label : '$label · $first';
+    return first.isEmpty ? label : l10n.historyFileSummary(label, first);
   }
 }
 
@@ -340,7 +347,7 @@ class _EmptyState extends StatelessWidget {
 
 /// Formats an epoch-ms (UTC) timestamp into a readable local date + time, e.g.
 /// "Jun 20, 2026 · 14:32".
-String _formatTimestamp(int epochMs) {
+String _formatTimestamp(AppLocalizations l10n, int epochMs) {
   final dt = DateTime.fromMillisecondsSinceEpoch(epochMs).toLocal();
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
@@ -349,5 +356,5 @@ String _formatTimestamp(int epochMs) {
   final month = months[dt.month - 1];
   final hh = dt.hour.toString().padLeft(2, '0');
   final mm = dt.minute.toString().padLeft(2, '0');
-  return '$month ${dt.day}, ${dt.year} · $hh:$mm';
+  return l10n.historyTimestampFormat(month, dt.day, dt.year, hh, mm);
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../application/workspace_providers.dart';
 
@@ -37,11 +38,12 @@ class _CreateWorkspaceDialogState
   }
 
   Future<void> _create() async {
+    final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
     if (name.isEmpty || _busy) return;
     final service = ref.read(workspaceServiceProvider);
     if (service == null) {
-      setState(() => _error = 'Sign in to create a team.');
+      setState(() => _error = l10n.createWorkspaceSignInError);
       return;
     }
     setState(() {
@@ -57,7 +59,7 @@ class _CreateWorkspaceDialogState
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = "Couldn't create the team — you may be offline.";
+          _error = l10n.createWorkspaceFailedError;
         });
       }
     }
@@ -65,9 +67,10 @@ class _CreateWorkspaceDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return AlertDialog(
-      title: const Text('New team'),
+      title: Text(l10n.createWorkspaceTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,7 +80,7 @@ class _CreateWorkspaceDialogState
             autofocus: true,
             enabled: !_busy,
             onSubmitted: (_) => _create(),
-            decoration: const InputDecoration(hintText: 'Team name'),
+            decoration: InputDecoration(hintText: l10n.createWorkspaceNameHint),
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
@@ -92,7 +95,7 @@ class _CreateWorkspaceDialogState
       actions: [
         TextButton(
           onPressed: _busy ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: _busy ? null : _create,
@@ -102,7 +105,7 @@ class _CreateWorkspaceDialogState
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Create'),
+              : Text(l10n.createWorkspaceCreateButton),
         ),
       ],
     );

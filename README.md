@@ -1,6 +1,6 @@
-# Snippet Manager
+# Snippeter
 
-A cross-platform manager for code snippets and AI prompts — **Windows, Linux, macOS, iOS, Android and Web** from one Flutter codebase. Local-first today, designed to add cloud sync later without a rewrite.
+**Snippeter** is a cross-platform manager for code snippets and AI prompts — **Windows, Linux, macOS, iOS, Android and Web** from one Flutter codebase. Local-first today, designed to add cloud sync later without a rewrite.
 
 ## Features
 
@@ -48,6 +48,19 @@ lib/
     sync/       deferred, unwired seam proving cloud sync is additive
     app_shell/  responsive navigation shell
 ```
+
+## Integrations
+
+First-party clients that talk to the same Supabase backend (sign in, browse/insert snippets, save a selection):
+
+- **VS Code** — [`integrations/vscode/`](integrations/vscode/) · TypeScript; `npm run compile`, then run/install the extension.
+- **JetBrains / IntelliJ** — [`integrations/jetbrains/`](integrations/jetbrains/) · Kotlin + Gradle; `gradle wrapper --gradle-version 8.10` once, then `./gradlew runIde`.
+- **Chrome** — [`integrations/chrome/`](integrations/chrome/) · Manifest V3, no build step; load unpacked from `chrome://extensions`.
+- **CLI** — [`integrations/cli/`](integrations/cli/) · `npm run build`, then the `snip` command.
+
+## Marketing site
+
+A one-page landing site lives in [`landing/`](landing/) (Next.js + Tailwind, fully static). Deploy to Vercel with **Root Directory = `landing`**.
 
 ## Tech
 

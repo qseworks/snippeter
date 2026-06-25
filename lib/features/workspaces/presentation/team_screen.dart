@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
 import '../../auth/application/auth_providers.dart';
@@ -37,6 +38,7 @@ class TeamScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final service = ref.watch(workspaceServiceProvider);
 
@@ -62,7 +64,7 @@ class TeamScreen extends ConsumerWidget {
 
     final title = workspace?.name.isNotEmpty == true
         ? workspace!.name
-        : 'Team';
+        : l10n.teamFallbackTitle;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -70,7 +72,7 @@ class TeamScreen extends ConsumerWidget {
       children: [
         // --- Header ----------------------------------------------------------
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 12, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 18, 12, 12),
           child: Row(
             children: [
               Icon(Icons.groups_outlined, size: 22, color: theme.colorScheme.primary),
@@ -86,7 +88,7 @@ class TeamScreen extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Team library',
+                      l10n.teamSubtitleLabel,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -95,7 +97,7 @@ class TeamScreen extends ConsumerWidget {
                 ),
               ),
               IconButton(
-                tooltip: 'Close',
+                tooltip: l10n.commonClose,
                 icon: const Icon(Icons.close),
                 onPressed: () => Navigator.of(context).maybePop(),
               ),
@@ -115,7 +117,7 @@ class TeamScreen extends ConsumerWidget {
                   ),
                   error: (e, _) => Padding(
                     padding: const EdgeInsets.all(24),
-                    child: _TeamError(message: friendlyWorkspaceError(e)),
+                    child: _TeamError(message: friendlyWorkspaceError(context, e)),
                   ),
                   data: (members) => _TeamBody(
                     workspaceId: workspaceId,
@@ -139,6 +141,7 @@ class _OfflineNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(32),
@@ -149,14 +152,13 @@ class _OfflineNotice extends StatelessWidget {
               size: 36, color: theme.colorScheme.onSurfaceVariant),
           const SizedBox(height: 16),
           Text(
-            'Team management is unavailable',
+            l10n.teamOfflineTitle,
             style: theme.textTheme.titleMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
-            'Sign in and reconnect to invite members, change roles, or '
-            'manage this team.',
+            l10n.teamOfflineBody,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -189,14 +191,15 @@ class _TeamBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+      padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 20),
       children: [
         // Members section.
         Text(
-          'MEMBERS',
+          l10n.teamMembersSectionHeader,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             letterSpacing: 1.1,
@@ -208,7 +211,7 @@ class _TeamBody extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
-              'No members yet.',
+              l10n.teamNoMembers,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -229,7 +232,7 @@ class _TeamBody extends StatelessWidget {
         if (canManage) ...[
           const SizedBox(height: 24),
           Text(
-            'INVITE',
+            l10n.teamInviteSectionHeader,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               letterSpacing: 1.1,
@@ -305,7 +308,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
     } catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text(friendlyWorkspaceError(e))),
+        SnackBar(content: Text(friendlyWorkspaceError(context, e))),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -313,24 +316,25 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
   }
 
   Future<void> _remove() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove member?'),
+        title: Text(l10n.teamRemoveMemberTitle),
         content: Text(
-          '${widget.member.email} will lose access to this team library.',
+          l10n.teamRemoveMemberBody(widget.member.email),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Remove'),
+            child: Text(l10n.commonRemove),
           ),
         ],
       ),
@@ -343,12 +347,12 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
       await widget.service.removeMember(widget.workspaceId, widget.member.userId);
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text('Removed ${widget.member.email}.')),
+        SnackBar(content: Text(l10n.teamRemovedMemberSnack(widget.member.email))),
       );
     } catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text(friendlyWorkspaceError(e))),
+        SnackBar(content: Text(friendlyWorkspaceError(context, e))),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -357,6 +361,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final member = widget.member;
 
@@ -380,7 +385,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
               children: [
                 Flexible(
                   child: Text(
-                    member.email.isEmpty ? '(unknown)' : member.email,
+                    member.email.isEmpty ? l10n.teamMemberUnknownEmail : member.email,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodyMedium,
@@ -389,7 +394,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
                 if (widget.isMe) ...[
                   const SizedBox(width: 6),
                   Text(
-                    '(you)',
+                    l10n.teamMemberYouLabel,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -414,7 +419,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
             RoleChip(role: member.role),
           if (_removable && !_busy)
             IconButton(
-              tooltip: 'Remove member',
+              tooltip: l10n.teamRemoveMemberTooltip,
               visualDensity: VisualDensity.compact,
               iconSize: 18,
               icon: const Icon(Icons.person_remove_outlined),
@@ -457,9 +462,10 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
   }
 
   Future<void> _invite() async {
+    final l10n = AppLocalizations.of(context);
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
-      setState(() => _error = 'Enter a valid email address.');
+      setState(() => _error = l10n.teamInviteInvalidEmail);
       return;
     }
     setState(() {
@@ -472,11 +478,11 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
       if (!mounted) return;
       _emailController.clear();
       messenger.showSnackBar(
-        SnackBar(content: Text('Invited $email as ${_role.wire}.')),
+        SnackBar(content: Text(l10n.teamInvitedSnack(email, _role.wire))),
       );
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = friendlyWorkspaceError(e));
+      setState(() => _error = friendlyWorkspaceError(context, e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -484,6 +490,7 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -497,9 +504,9 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _busy ? null : _invite(),
-                decoration: const InputDecoration(
-                  hintText: 'teammate@example.com',
-                  prefixIcon: Icon(Icons.mail_outline, size: 18),
+                decoration: InputDecoration(
+                  hintText: l10n.teamInviteEmailHint,
+                  prefixIcon: const Icon(Icons.mail_outline, size: 18),
                 ),
               ),
             ),
@@ -514,7 +521,7 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
         ),
         const SizedBox(height: 10),
         Align(
-          alignment: Alignment.centerRight,
+          alignment: AlignmentDirectional.centerEnd,
           child: FilledButton.icon(
             onPressed: _busy ? null : _invite,
             icon: _busy
@@ -524,7 +531,7 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.send_outlined, size: 18),
-            label: const Text('Invite'),
+            label: Text(l10n.teamInviteButton),
           ),
         ),
         if (_error != null) ...[
@@ -561,6 +568,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
     required String body,
     required String action,
   }) async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -569,7 +577,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -594,11 +602,11 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
   }
 
   Future<void> _leave() async {
+    final l10n = AppLocalizations.of(context);
     final ok = await _confirm(
-      title: 'Leave team?',
-      body: "You'll lose access to this team library until you're invited "
-          'again.',
-      action: 'Leave',
+      title: l10n.teamLeaveTitle,
+      body: l10n.teamLeaveBody,
+      action: l10n.teamLeaveAction,
     );
     if (!ok || !mounted) return;
     setState(() => _busy = true);
@@ -609,22 +617,22 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
       _resetActiveIfNeeded();
       if (!mounted) return;
       navigator.maybePop();
-      messenger.showSnackBar(const SnackBar(content: Text('Left the team.')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.teamLeftSnack)));
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
       messenger.showSnackBar(
-        SnackBar(content: Text(friendlyWorkspaceError(e))),
+        SnackBar(content: Text(friendlyWorkspaceError(context, e))),
       );
     }
   }
 
   Future<void> _delete() async {
+    final l10n = AppLocalizations.of(context);
     final ok = await _confirm(
-      title: 'Delete team?',
-      body: 'This permanently deletes the team library and its shared content '
-          'for everyone. This cannot be undone.',
-      action: 'Delete',
+      title: l10n.teamDeleteTitle,
+      body: l10n.teamDeleteBody,
+      action: l10n.commonDelete,
     );
     if (!ok || !mounted) return;
     setState(() => _busy = true);
@@ -635,18 +643,19 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
       _resetActiveIfNeeded();
       if (!mounted) return;
       navigator.maybePop();
-      messenger.showSnackBar(const SnackBar(content: Text('Team deleted.')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.teamDeletedSnack)));
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
       messenger.showSnackBar(
-        SnackBar(content: Text(friendlyWorkspaceError(e))),
+        SnackBar(content: Text(friendlyWorkspaceError(context, e))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     if (_busy) {
       return const Padding(
@@ -665,7 +674,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
         OutlinedButton.icon(
           onPressed: _leave,
           icon: const Icon(Icons.logout, size: 18),
-          label: const Text('Leave team'),
+          label: Text(l10n.teamLeaveButton),
           style: OutlinedButton.styleFrom(
             foregroundColor: theme.colorScheme.error,
             side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.5)),
@@ -676,7 +685,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
           TextButton.icon(
             onPressed: _delete,
             icon: const Icon(Icons.delete_outline, size: 18),
-            label: const Text('Delete team'),
+            label: Text(l10n.teamDeleteButton),
             style: TextButton.styleFrom(
               foregroundColor: theme.colorScheme.error,
             ),
@@ -705,7 +714,7 @@ class _RoleDropdown extends StatelessWidget {
           for (final role in WorkspaceRole.values)
             DropdownMenuItem<WorkspaceRole>(
               value: role,
-              child: Text(_roleLabel(role)),
+              child: Text(_roleLabel(context, role)),
             ),
         ],
       ),
@@ -731,7 +740,7 @@ class RoleChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        _roleLabel(role),
+        _roleLabel(context, role),
         style: theme.textTheme.labelSmall?.copyWith(
           color: color,
           fontWeight: FontWeight.w600,
@@ -772,16 +781,17 @@ class _TeamError extends StatelessWidget {
   }
 }
 
-String _roleLabel(WorkspaceRole role) {
+String _roleLabel(BuildContext context, WorkspaceRole role) {
+  final l10n = AppLocalizations.of(context);
   switch (role) {
     case WorkspaceRole.owner:
-      return 'Owner';
+      return l10n.teamRoleOwner;
     case WorkspaceRole.manager:
-      return 'Manager';
+      return l10n.teamRoleManager;
     case WorkspaceRole.member:
-      return 'Member';
+      return l10n.teamRoleMember;
     case WorkspaceRole.viewer:
-      return 'Viewer';
+      return l10n.teamRoleViewer;
   }
 }
 
@@ -801,7 +811,8 @@ Color _roleColor(WorkspaceRole role) {
 /// Maps a thrown error into a friendly, user-facing message. RLS denials
 /// (Postgres `42501` / PostgREST `PGRST301`/`401`/`403`) become "Only managers
 /// can do that"; network problems become a reconnect hint.
-String friendlyWorkspaceError(Object error) {
+String friendlyWorkspaceError(BuildContext context, Object error) {
+  final l10n = AppLocalizations.of(context);
   if (error is PostgrestException) {
     final code = error.code ?? '';
     final msg = error.message.toLowerCase();
@@ -812,7 +823,7 @@ String friendlyWorkspaceError(Object error) {
         msg.contains('row-level security') ||
         msg.contains('permission denied') ||
         msg.contains('policy')) {
-      return 'Only managers can do that.';
+      return l10n.teamErrorOnlyManagers;
     }
     return error.message;
   }
@@ -825,7 +836,7 @@ String friendlyWorkspaceError(Object error) {
       text.contains('network') ||
       text.contains('failed host lookup') ||
       text.contains('connection')) {
-    return 'Network unavailable. Reconnect and try again.';
+    return l10n.teamErrorNetworkUnavailable;
   }
-  return 'Something went wrong. Please try again.';
+  return l10n.teamErrorGeneric;
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../snippets/presentation/snippet_editor_modal.dart';
 import '../workspaces/application/workspace_providers.dart';
 import '../workspaces/domain/workspace.dart';
@@ -24,6 +25,7 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final wide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
 
     if (wide) {
@@ -51,7 +53,7 @@ class AppShell extends StatelessWidget {
           ],
         ),
       ),
-      appBar: AppBar(title: const Text('Snippets')),
+      appBar: AppBar(title: Text(l10n.shellSnippetsTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showSnippetEditor(context),
         child: const Icon(Icons.add),
@@ -74,6 +76,7 @@ class _WorkspaceRail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final active = ref.watch(activeWorkspaceProvider);
     final teams = ref.watch(workspacesProvider).value ?? const <Workspace>[];
     final canCreate = ref.watch(workspaceServiceProvider) != null;
@@ -112,7 +115,7 @@ class _WorkspaceRail extends ConsumerWidget {
               child: Column(
                 children: [
                   _WorkspaceTile(
-                    label: 'Personal',
+                    label: l10n.shellWorkspacePersonal,
                     icon: Icons.person_outline,
                     selected: active == null,
                     onTap: () => ref
@@ -137,7 +140,7 @@ class _WorkspaceRail extends ConsumerWidget {
             const _RailDivider(),
             const SizedBox(height: 8),
             _WorkspaceTile(
-              label: 'Create team',
+              label: l10n.shellCreateTeam,
               icon: Icons.add,
               selected: false,
               onTap: () => showCreateWorkspaceDialog(context),
@@ -234,8 +237,8 @@ class _WorkspaceTile extends StatelessWidget {
               height: size,
               decoration: BoxDecoration(
                 color: selected ? AppTheme.accent : Colors.transparent,
-                borderRadius: const BorderRadius.horizontal(
-                  right: Radius.circular(2),
+                borderRadius: const BorderRadiusDirectional.horizontal(
+                  end: Radius.circular(2),
                 ),
               ),
             ),
@@ -250,8 +253,8 @@ class _WorkspaceTile extends StatelessWidget {
                 children: [
                   avatar,
                   if (onManage != null)
-                    Positioned(
-                      right: -4,
+                    PositionedDirectional(
+                      end: -4,
                       bottom: -4,
                       child: _GearBadge(onTap: onManage!),
                     ),
@@ -273,8 +276,9 @@ class _GearBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Tooltip(
-      message: 'Manage team',
+      message: l10n.shellManageTeam,
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

@@ -14,7 +14,7 @@ import {
   type NewFileInput,
 } from "./snippets.js";
 
-const USAGE = `snip — Snippet Manager CLI
+const USAGE = `snip — Snippeter CLI
 
 Usage:
   snip login                                  Sign in (prompts for email + password) and save the session
@@ -261,7 +261,7 @@ async function cmdAdd(argv: string[]): Promise<void> {
   console.log(`Created snippet ${id} ("${title}") with ${files.length} file(s).`);
   if (visibility === "public") {
     console.log(
-      `Visibility: public. Share it from the Snippet Manager app to generate a public link.`,
+      `Visibility: public. Share it from the Snippeter app to generate a public link.`,
     );
   } else {
     console.log(

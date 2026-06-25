@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/routing/route_paths.dart';
 import '../application/snippet_providers.dart';
@@ -130,24 +131,24 @@ class _SortHeader extends StatelessWidget {
   final SnippetSort value;
   final ValueChanged<SnippetSort> onChanged;
 
-  static const _labels = {
-    SnippetSort.recent: 'Recently updated',
-    SnippetSort.created: 'Recently created',
-    SnippetSort.titleAsc: 'Title A–Z',
-    SnippetSort.relevance: 'Relevance',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final labels = {
+      SnippetSort.recent: l10n.listSortRecentlyUpdated,
+      SnippetSort.created: l10n.listSortRecentlyCreated,
+      SnippetSort.titleAsc: l10n.listSortTitleAsc,
+      SnippetSort.relevance: l10n.listSortRelevance,
+    };
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: PopupMenuButton<SnippetSort>(
         initialValue: value,
         onSelected: onChanged,
-        tooltip: 'Sort',
+        tooltip: l10n.listSortTooltip,
         itemBuilder: (context) => [
-          for (final entry in _labels.entries)
+          for (final entry in labels.entries)
             PopupMenuItem(value: entry.key, child: Text(entry.value)),
         ],
         child: Padding(
@@ -156,7 +157,7 @@ class _SortHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                _labels[value] ?? 'Sort',
+                labels[value] ?? l10n.listSortTooltip,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
@@ -211,13 +212,14 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TextField(
       controller: _controller,
       focusNode: ref.watch(searchFocusProvider),
       onChanged: _onChanged,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
-        hintText: 'Search snippets…',
+        hintText: l10n.listSearchHint,
         prefixIcon: const Icon(Icons.search),
         isDense: true,
         suffixIcon: _controller.text.isEmpty
@@ -250,13 +252,16 @@ class _ResultsArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return snippetsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child:
-              Text('Something went wrong:\n$error', textAlign: TextAlign.center),
+          child: Text(
+            l10n.listErrorGeneric(error.toString()),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
       data: (snippets) {
@@ -287,17 +292,18 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final (icon, title, subtitle) = filtered
         ? (
             Icons.search_off,
-            'No matching snippets',
-            'Try a different search or clear the filters.',
+            l10n.listEmptyFilteredTitle,
+            l10n.listEmptyFilteredSubtitle,
           )
         : (
             Icons.code_outlined,
-            'No snippets yet',
-            'Tap “New snippet” to create your first one.',
+            l10n.listEmptyTitle,
+            l10n.listEmptySubtitle,
           );
     final scheme = theme.colorScheme;
     return Center(

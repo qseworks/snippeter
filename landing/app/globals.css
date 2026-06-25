@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* offset for the sticky nav when jumping to anchors */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background-color: #0f1115;
+  color: #e6e9ef;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@layer base {
+  /* Visible, brand-tinted focus ring for keyboard users */
+  :focus-visible {
+    outline: 2px solid #16b378;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+  }
+
+  ::selection {
+    background-color: rgba(22, 179, 120, 0.3);
+    color: #e6e9ef;
+  }
+
+  /* Thin, themed scrollbars inside the faux app window */
+  .scroll-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background-color: #262b36;
+    border-radius: 9999px;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #16b378 0%, #12a594 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .border-hairline {
+    border-color: #262b36;
+  }
+
+  /* Faint dotted grid used behind the hero */
+  .bg-grid {
+    background-image: radial-gradient(
+      rgba(38, 43, 54, 0.7) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+  }
+}
+
+/* Respect users who prefer reduced motion: disable all animation & smooth scroll */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

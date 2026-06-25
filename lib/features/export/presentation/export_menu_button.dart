@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../snippets/application/snippet_providers.dart';
 import '../../snippets/domain/snippet.dart';
 import '../application/export_providers.dart';
@@ -26,51 +27,59 @@ class ExportMenuButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final language = ref.watch(languageMapProvider)[snippet.languageId];
     final data = exportDataFor(snippet, language);
 
     return PopupMenuButton<_ExportAction>(
-      tooltip: 'Export & share',
+      tooltip: l10n.exportMenuTooltip,
       icon: const Icon(Icons.ios_share),
       onSelected: (action) => _run(context, ref, action),
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.copy,
-          child: _MenuRow(icon: Icons.copy_all_outlined, label: 'Copy text'),
+          child: _MenuRow(
+              icon: Icons.copy_all_outlined, label: l10n.exportMenuCopyText),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.image,
-          child: _MenuRow(icon: Icons.image_outlined, label: 'Export as image…'),
+          child: _MenuRow(
+              icon: Icons.image_outlined, label: l10n.exportMenuExportAsImage),
         ),
         const PopupMenuDivider(),
         PopupMenuItem(
           value: _ExportAction.saveSource,
           child: _MenuRow(
             icon: Icons.description_outlined,
-            label: 'Save as ${data.fileExtension} file',
+            label: l10n.exportMenuSaveSourceFile(data.fileExtension),
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.saveTxt,
-          child: _MenuRow(icon: Icons.text_snippet_outlined, label: 'Save as .txt'),
+          child: _MenuRow(
+              icon: Icons.text_snippet_outlined, label: l10n.exportMenuSaveTxt),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.saveHtml,
-          child: _MenuRow(icon: Icons.html_outlined, label: 'Save as HTML'),
+          child: _MenuRow(
+              icon: Icons.html_outlined, label: l10n.exportMenuSaveHtml),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.savePdf,
           child: _MenuRow(
-              icon: Icons.picture_as_pdf_outlined, label: 'Save as PDF'),
+              icon: Icons.picture_as_pdf_outlined,
+              label: l10n.exportMenuSavePdf),
         ),
         const PopupMenuDivider(),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.shareText,
-          child: _MenuRow(icon: Icons.share_outlined, label: 'Share text'),
+          child: _MenuRow(
+              icon: Icons.share_outlined, label: l10n.exportMenuShareText),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _ExportAction.shareFile,
-          child: _MenuRow(icon: Icons.attach_file, label: 'Share as file'),
+          child: _MenuRow(
+              icon: Icons.attach_file, label: l10n.exportMenuShareFile),
         ),
       ],
     );
@@ -85,6 +94,7 @@ class ExportMenuButton extends ConsumerWidget {
     final data = exportDataFor(snippet, language);
     final export = ref.read(exportServiceProvider);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
 
     // Capture the share origin (iPad popover anchor) before any await.
     final box = context.findRenderObject() as RenderBox?;
@@ -97,31 +107,31 @@ class ExportMenuButton extends ConsumerWidget {
         case _ExportAction.copy:
           await export.copyText(data.body);
           messenger.showSnackBar(
-            const SnackBar(content: Text('Copied to clipboard')),
+            SnackBar(content: Text(l10n.exportMenuCopiedSnack)),
           );
         case _ExportAction.image:
           if (context.mounted) await showExportImageSheet(context, data);
         case _ExportAction.saveSource:
           await export.saveSourceFile(data);
           messenger.showSnackBar(
-            SnackBar(content: Text('Saved ${data.sourceFileName}')),
+            SnackBar(content: Text(l10n.exportMenuSavedSnack(data.sourceFileName))),
           );
         case _ExportAction.saveTxt:
           await export.savePlainText(data);
           messenger.showSnackBar(
-            SnackBar(content: Text('Saved ${data.baseName}.txt')),
+            SnackBar(content: Text(l10n.exportMenuSavedSnack('${data.baseName}.txt'))),
           );
         case _ExportAction.saveHtml:
           final rich = _richExportData(data);
           await export.exportHtml(rich, description: snippet.description);
           messenger.showSnackBar(
-            SnackBar(content: Text('Saved ${rich.baseName}.html')),
+            SnackBar(content: Text(l10n.exportMenuSavedSnack('${rich.baseName}.html'))),
           );
         case _ExportAction.savePdf:
           final rich = _richExportData(data);
           await export.exportPdf(rich, description: snippet.description);
           messenger.showSnackBar(
-            SnackBar(content: Text('Saved ${rich.baseName}.pdf')),
+            SnackBar(content: Text(l10n.exportMenuSavedSnack('${rich.baseName}.pdf'))),
           );
         case _ExportAction.shareText:
           await export.shareText(data.body,
@@ -130,7 +140,9 @@ class ExportMenuButton extends ConsumerWidget {
           await export.shareSourceFile(data, origin: origin);
       }
     } catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text('Export failed: $error')));
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.exportMenuExportFailedSnack('$error'))),
+      );
     }
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/highlight/code_themes.dart';
 import '../../../core/highlight/language_visuals.dart';
+import '../../../core/i18n/app_locales.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/data/auth_service.dart';
 import '../../snippets/application/snippet_providers.dart';
@@ -17,12 +19,13 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
     final languages = ref.watch(languagesProvider).value ?? const <Language>[];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 700),
@@ -30,32 +33,59 @@ class SettingsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             children: [
               if (ref.watch(authServiceProvider) != null) ...[
-                const _SectionHeader('Sync'),
+                _SectionHeader(l10n.settingsSectionSync),
                 const _SyncSection(),
               ],
-              const _SectionHeader('Appearance'),
+              _SectionHeader(l10n.settingsSectionAppearance),
               Card(
                 child: ListTile(
-                  title: const Text('Theme'),
+                  title: Text(l10n.settingsThemeLabel),
                   trailing: SegmentedButton<ThemeMode>(
-                    segments: const [
+                    segments: [
                       ButtonSegment(
-                          value: ThemeMode.system, label: Text('System')),
+                          value: ThemeMode.system,
+                          label: Text(l10n.settingsThemeSystem)),
                       ButtonSegment(
-                          value: ThemeMode.light, label: Text('Light')),
-                      ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+                          value: ThemeMode.light,
+                          label: Text(l10n.settingsThemeLight)),
+                      ButtonSegment(
+                          value: ThemeMode.dark,
+                          label: Text(l10n.settingsThemeDark)),
                     ],
                     selected: {settings.themeMode},
                     onSelectionChanged: (s) => controller.setThemeMode(s.first),
                   ),
                 ),
               ),
-              const _SectionHeader('Export defaults'),
+              Card(
+                child: ListTile(
+                  title: Text(l10n.settingsAppLanguageLabel),
+                  trailing: DropdownButton<Locale?>(
+                    value: ref.watch(localeProvider),
+                    // Native autonym for each language, so the option reads
+                    // naturally to a speaker of that language. null = follow the
+                    // system locale.
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text(l10n.settingsLanguageSystemDefault),
+                      ),
+                      for (final lang in kSupportedLanguages)
+                        DropdownMenuItem(
+                          value: lang.locale,
+                          child: Text(lang.nativeName),
+                        ),
+                    ],
+                    onChanged: controller.setLocale,
+                  ),
+                ),
+              ),
+              _SectionHeader(l10n.settingsSectionExportDefaults),
               Card(
                 child: Column(
                   children: [
                     ListTile(
-                      title: const Text('Default image theme'),
+                      title: Text(l10n.settingsDefaultImageTheme),
                       trailing: DropdownButton<String>(
                         value: CodeThemes.exportThemeNames
                                 .contains(settings.exportTheme)
@@ -71,7 +101,7 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                     SwitchListTile(
-                      title: const Text('Show watermark on image exports'),
+                      title: Text(l10n.settingsShowWatermark),
                       value: settings.exportWatermark,
                       onChanged: (v) =>
                           controller.setExportWatermark(value: v),
@@ -79,16 +109,17 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const _SectionHeader('Editor defaults'),
+              _SectionHeader(l10n.settingsSectionEditorDefaults),
               Card(
                 child: ListTile(
-                  title: const Text('Default language for new snippets'),
+                  title: Text(l10n.settingsDefaultLanguage),
                   trailing: DropdownButton<String?>(
                     value: languages.any((l) => l.id == settings.defaultLanguageId)
                         ? settings.defaultLanguageId
                         : null,
                     items: [
-                      const DropdownMenuItem(value: null, child: Text('None')),
+                      DropdownMenuItem(
+                          value: null, child: Text(l10n.commonNone)),
                       for (final l in languages)
                         DropdownMenuItem(
                           value: l.id,
@@ -106,12 +137,12 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const _SectionHeader('About'),
-              const Card(
+              _SectionHeader(l10n.settingsSectionAbout),
+              Card(
                 child: ListTile(
-                  leading: Icon(Icons.bookmarks_outlined),
-                  title: Text('Snippet Manager'),
-                  subtitle: Text('Local-first • sync-ready • all your platforms'),
+                  leading: const Icon(Icons.bookmarks_outlined),
+                  title: Text(l10n.settingsAppName),
+                  subtitle: Text(l10n.settingsAboutTagline),
                 ),
               ),
             ],
@@ -131,7 +162,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 8),
       child: Text(
         title.toUpperCase(),
         style: theme.textTheme.labelMedium?.copyWith(
@@ -200,7 +231,7 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
       if (mounted) {
-        setState(() => _error = 'Something went wrong. Please try again.');
+        setState(() => _error = AppLocalizations.of(context).settingsGenericError);
       }
     } finally {
       if (mounted) setState(() => _pending = false);
@@ -222,12 +253,14 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
         // Supabase requires email confirmation by default; the user won't be
         // signed in immediately, so guide them to their inbox.
         if (mounted) {
-          setState(() => _info = 'Check your email to confirm your account.');
+          setState(() =>
+              _info = AppLocalizations.of(context).settingsConfirmEmailInfo);
         }
       });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -235,7 +268,7 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Sign in to sync your snippets across devices.',
+            l10n.settingsSyncBlurb,
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
@@ -245,9 +278,9 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
             keyboardType: TextInputType.emailAddress,
             autocorrect: false,
             autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.settingsEmailLabel,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -257,9 +290,9 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
             obscureText: true,
             autofillHints: const [AutofillHints.password],
             onSubmitted: (_) => _signIn(),
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.settingsPasswordLabel,
+              border: const OutlineInputBorder(),
             ),
           ),
           if (_error != null) ...[
@@ -286,14 +319,14 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
                   onPressed: _pending ? null : _signIn,
                   child: _pending
                       ? const _ButtonSpinner()
-                      : const Text('Sign in'),
+                      : Text(l10n.settingsSignIn),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: OutlinedButton(
                   onPressed: _pending ? null : _signUp,
-                  child: const Text('Create account'),
+                  child: Text(l10n.settingsCreateAccount),
                 ),
               ),
             ],
@@ -351,7 +384,8 @@ class _SignedInPanelState extends ConsumerState<_SignedInPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final email = widget.user.email ?? 'Signed in';
+    final l10n = AppLocalizations.of(context);
+    final email = widget.user.email ?? l10n.settingsSignedInFallback;
     final lastSynced = _lastSyncedAt();
     final busy = _syncing || _signingOut;
     return Column(
@@ -362,12 +396,12 @@ class _SignedInPanelState extends ConsumerState<_SignedInPanel> {
           title: Text(email),
           subtitle: Text(
             lastSynced == null
-                ? 'Not synced yet'
-                : 'Last synced ${_relativeTime(lastSynced)}',
+                ? l10n.settingsNotSyncedYet
+                : l10n.settingsLastSynced(_relativeTime(context, lastSynced)),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
           child: Row(
             children: [
               Expanded(
@@ -376,7 +410,7 @@ class _SignedInPanelState extends ConsumerState<_SignedInPanel> {
                   icon: _syncing
                       ? const _ButtonSpinner()
                       : const Icon(Icons.sync),
-                  label: const Text('Sync now'),
+                  label: Text(l10n.settingsSyncNow),
                 ),
               ),
               const SizedBox(width: 12),
@@ -385,7 +419,7 @@ class _SignedInPanelState extends ConsumerState<_SignedInPanel> {
                   onPressed: busy ? null : _signOut,
                   child: _signingOut
                       ? const _ButtonSpinner()
-                      : const Text('Sign out'),
+                      : Text(l10n.settingsSignOut),
                 ),
               ),
             ],
@@ -411,10 +445,11 @@ class _ButtonSpinner extends StatelessWidget {
 }
 
 /// Compact relative time like "just now", "5m ago", "3h ago", "2d ago".
-String _relativeTime(DateTime time) {
+String _relativeTime(BuildContext context, DateTime time) {
+  final l10n = AppLocalizations.of(context);
   final diff = DateTime.now().difference(time);
-  if (diff.inSeconds < 60) return 'just now';
-  if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-  if (diff.inHours < 24) return '${diff.inHours}h ago';
-  return '${diff.inDays}d ago';
+  if (diff.inSeconds < 60) return l10n.settingsRelativeJustNow;
+  if (diff.inMinutes < 60) return l10n.settingsRelativeMinutesAgo(diff.inMinutes);
+  if (diff.inHours < 24) return l10n.settingsRelativeHoursAgo(diff.inHours);
+  return l10n.settingsRelativeDaysAgo(diff.inDays);
 }

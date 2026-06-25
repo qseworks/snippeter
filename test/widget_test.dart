@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,5 +91,32 @@ void main() {
     expect(find.text('All Snippets'), findsWidgets);
     expect(find.text('Starred'), findsWidgets);
     expect(find.text('No snippets yet'), findsOneWidget);
+  });
+
+  testWidgets('Boots right-to-left and localized when the locale is Arabic',
+      (tester) async {
+    // Persisted UI language drives localeProvider -> MaterialApp.locale.
+    SharedPreferences.setMockInitialValues({'localeCode': 'ar'});
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          snippetRepositoryProvider.overrideWithValue(_FakeRepo()),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+        child: const SnippetManagerApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The whole UI flips to RTL (Flutter resolves direction from the locale).
+    final dir = tester.widget<Directionality>(find.byType(Directionality).first);
+    expect(dir.textDirection, TextDirection.rtl);
+
+    // And it resolved to Arabic — so the English chrome is gone.
+    final ctx = tester.element(find.byType(Scaffold).first);
+    expect(Localizations.localeOf(ctx).languageCode, 'ar');
+    expect(find.text('All Snippets'), findsNothing);
+    expect(find.text('No snippets yet'), findsNothing);
   });
 }

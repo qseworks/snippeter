@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/app_localizations.dart';
 import 'features/settings/application/settings_providers.dart';
 import 'features/sync/application/sync_providers.dart';
 import 'features/snippets/application/snippet_providers.dart';
@@ -18,14 +19,21 @@ class SnippetManagerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(settingsProvider).themeMode;
+    // Selected UI language; null follows the system locale. Flutter resolves
+    // text direction (RTL for Arabic/Urdu) from this locale via the global
+    // localizations delegates below — no manual Directionality needed.
+    final locale = ref.watch(localeProvider);
     // Start the auth -> sync lifecycle bridge (no-op when offline/signed out).
     ref.watch(syncBootstrapProvider);
     return MaterialApp.router(
-      title: 'Snippet Manager',
+      title: 'Snippeter',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       routerConfig: router,
       // Wrap every route in global keyboard shortcuts. The builder runs below
       // the Navigator/Overlay, so `showSnippetEditor` gets a valid context that
@@ -42,13 +50,45 @@ class SnippetManagerApp extends ConsumerWidget {
 ///
 /// Uses [CallbackShortcuts] with both `meta` (macOS) and `control` (everywhere
 /// else) activators so the shortcuts work across platforms.
-class _GlobalShortcuts extends ConsumerWidget {
+class _GlobalShortcuts extends ConsumerStatefulWidget {
   const _GlobalShortcuts({required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_GlobalShortcuts> createState() => _GlobalShortcutsState();
+}
+
+class _GlobalShortcutsState extends ConsumerState<_GlobalShortcuts> {
+  // A root focus node so the global shortcuts below receive key events without
+  // the user having to click into the app first.
+  //
+  // We request focus *after the first frame* instead of using `autofocus: true`.
+  // On Flutter web, an autofocus at the app root acquires focus during the
+  // first frame; the engine then round-trips a view-focus change back into
+  // `FocusTraversalPolicy.findFirstFocus`, which sorts every focusable
+  // descendant by its `rect`. Mid-first-frame, some descendants aren't laid out
+  // yet, so reading `rect` throws the `RenderBox was not laid out` (`hasSize`)
+  // assertion. Deferring to a post-frame callback guarantees the tree is laid
+  // out before focus traversal runs.
+  final FocusNode _rootFocusNode = FocusNode(debugLabel: 'GlobalShortcutsRoot');
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _rootFocusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _rootFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     void newSnippet() => showSnippetEditor(context);
     void focusSearch() => ref.read(searchFocusProvider).requestFocus();
 
@@ -61,7 +101,7 @@ class _GlobalShortcuts extends ConsumerWidget {
         const SingleActivator(LogicalKeyboardKey.keyF, control: true):
             focusSearch,
       },
-      child: Focus(autofocus: true, child: child),
+      child: Focus(focusNode: _rootFocusNode, child: widget.child),
     );
   }
 }

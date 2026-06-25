@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snippeter</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <!-- Header -->
+      <header class="header">
+        <div class="brand">
+          <span class="logo" aria-hidden="true">&lt;/&gt;</span>
+          <span class="brand-name">Snippeter</span>
+        </div>
+        <button
+          id="signOutBtn"
+          class="ghost-btn"
+          type="button"
+          hidden
+          title="Sign out"
+        >
+          Sign out
+        </button>
+      </header>
+
+      <!-- Sign-in view -->
+      <section id="authView" class="view" hidden>
+        <p class="tagline">A fast, local-first manager for code snippets &amp; AI prompts.</p>
+        <form id="signInForm" class="auth-form" autocomplete="on">
+          <label class="field">
+            <span class="field-label">Email</span>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="username"
+              placeholder="you@example.com"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="field-label">Password</span>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+              required
+            />
+          </label>
+          <button id="signInBtn" class="primary-btn" type="submit">
+            Sign in
+          </button>
+          <p id="authError" class="error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <!-- Snippets view -->
+      <section id="listView" class="view" hidden>
+        <div class="search-row">
+          <input
+            id="search"
+            class="search"
+            type="search"
+            placeholder="Search snippets…"
+            autocomplete="off"
+            aria-label="Search snippets"
+          />
+          <button id="refreshBtn" class="ghost-btn" type="button" title="Refresh">
+            ↻
+          </button>
+        </div>
+
+        <div id="status" class="status" hidden></div>
+
+        <ul id="snippetList" class="snippet-list" aria-label="Your snippets"></ul>
+
+        <div id="emptyState" class="empty" hidden>
+          <p class="empty-title">No snippets yet</p>
+          <p class="empty-sub">
+            Select text on any page, right-click, and choose
+            “Save selection to Snippeter”.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -93,7 +93,7 @@ async function ensureSignedIn(
     return true;
   }
   vscode.window.showWarningMessage(
-    "Snippet Manager: Please sign in first (run \"Snippet Manager: Sign In\")."
+    "Snippeter: Please sign in first (run \"Snippeter: Sign In\")."
   );
   return false;
 }
@@ -104,7 +104,7 @@ async function ensureSignedIn(
 
 async function signIn(context: vscode.ExtensionContext): Promise<void> {
   const email = await vscode.window.showInputBox({
-    prompt: "Snippet Manager email",
+    prompt: "Snippeter email",
     placeHolder: "you@example.com",
     ignoreFocusOut: true,
   });
@@ -113,7 +113,7 @@ async function signIn(context: vscode.ExtensionContext): Promise<void> {
   }
 
   const password = await vscode.window.showInputBox({
-    prompt: "Snippet Manager password",
+    prompt: "Snippeter password",
     password: true,
     ignoreFocusOut: true,
   });
@@ -128,7 +128,7 @@ async function signIn(context: vscode.ExtensionContext): Promise<void> {
     });
     if (error || !data.session) {
       vscode.window.showErrorMessage(
-        `Snippet Manager: Sign in failed - ${error?.message ?? "no session returned"}`
+        `Snippeter: Sign in failed - ${error?.message ?? "no session returned"}`
       );
       return;
     }
@@ -137,11 +137,11 @@ async function signIn(context: vscode.ExtensionContext): Promise<void> {
       JSON.stringify(data.session)
     );
     vscode.window.showInformationMessage(
-      `Snippet Manager: Signed in as ${data.user?.email ?? email}.`
+      `Snippeter: Signed in as ${data.user?.email ?? email}.`
     );
   } catch (err) {
     vscode.window.showErrorMessage(
-      `Snippet Manager: Sign in error - ${errorMessage(err)}`
+      `Snippeter: Sign in error - ${errorMessage(err)}`
     );
   }
 }
@@ -154,7 +154,7 @@ async function insertSnippet(context: vscode.ExtensionContext): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showWarningMessage(
-      "Snippet Manager: Open a file to insert a snippet into."
+      "Snippeter: Open a file to insert a snippet into."
     );
     return;
   }
@@ -174,13 +174,13 @@ async function insertSnippet(context: vscode.ExtensionContext): Promise<void> {
     snippets = (data ?? []) as SnippetRow[];
   } catch (err) {
     vscode.window.showErrorMessage(
-      `Snippet Manager: Failed to load snippets - ${errorMessage(err)}`
+      `Snippeter: Failed to load snippets - ${errorMessage(err)}`
     );
     return;
   }
 
   if (snippets.length === 0) {
-    vscode.window.showInformationMessage("Snippet Manager: No snippets found.");
+    vscode.window.showInformationMessage("Snippeter: No snippets found.");
     return;
   }
 
@@ -212,7 +212,7 @@ async function insertSnippet(context: vscode.ExtensionContext): Promise<void> {
     files = (data ?? []) as SnippetFileRow[];
   } catch (err) {
     vscode.window.showErrorMessage(
-      `Snippet Manager: Failed to load snippet files - ${errorMessage(err)}`
+      `Snippeter: Failed to load snippet files - ${errorMessage(err)}`
     );
     return;
   }
@@ -245,11 +245,11 @@ async function insertSnippet(context: vscode.ExtensionContext): Promise<void> {
   });
   if (ok) {
     vscode.window.showInformationMessage(
-      `Snippet Manager: Inserted "${picked.snippet.title || "(untitled)"}".`
+      `Snippeter: Inserted "${picked.snippet.title || "(untitled)"}".`
     );
   } else {
     vscode.window.showErrorMessage(
-      "Snippet Manager: Failed to insert snippet into the editor."
+      "Snippeter: Failed to insert snippet into the editor."
     );
   }
 }
@@ -262,7 +262,7 @@ async function saveSelection(context: vscode.ExtensionContext): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showWarningMessage(
-      "Snippet Manager: Open a file with content to save as a snippet."
+      "Snippeter: Open a file with content to save as a snippet."
     );
     return;
   }
@@ -274,7 +274,7 @@ async function saveSelection(context: vscode.ExtensionContext): Promise<void> {
 
   if (content.trim().length === 0) {
     vscode.window.showWarningMessage(
-      "Snippet Manager: Nothing to save (selection/document is empty)."
+      "Snippeter: Nothing to save (selection/document is empty)."
     );
     return;
   }
@@ -306,7 +306,9 @@ async function saveSelection(context: vscode.ExtensionContext): Promise<void> {
       id: snippetId,
       title,
       body: content,
-      type: "snippet",
+      // App snippet types are 'code' | 'text' | 'ai_prompt'; a saved code
+      // selection is 'code' (also the server default).
+      type: "code",
       language_id: languageId,
       visibility: "private",
       is_favorite: false,
@@ -333,11 +335,11 @@ async function saveSelection(context: vscode.ExtensionContext): Promise<void> {
     }
 
     vscode.window.showInformationMessage(
-      `Snippet Manager: Saved "${title}".`
+      `Snippeter: Saved "${title}".`
     );
   } catch (err) {
     vscode.window.showErrorMessage(
-      `Snippet Manager: Failed to save snippet - ${errorMessage(err)}`
+      `Snippeter: Failed to save snippet - ${errorMessage(err)}`
     );
   }
 }

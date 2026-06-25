@@ -1,0 +1,59 @@
+<idea-plugin>
+    <id>io.snippeter.jetbrains</id>
+    <name>Snippeter</name>
+    <version>1.0.0</version>
+    <vendor email="hello@snippeter.io" url="https://snippeter.io">Snippeter</vendor>
+
+    <description><![CDATA[
+        <p><b>Snippeter</b> is a fast, local-first manager for code snippets and AI prompts.
+        This plugin brings your Snippeter library into JetBrains IDEs so you can pull a
+        snippet into the editor at the caret, or push a selection straight back to your
+        library — without leaving your code.</p>
+        <ul>
+            <li><b>Sign In</b> — authenticate with your Snippeter email and password; tokens are stored in the IDE's PasswordSafe.</li>
+            <li><b>Insert Snippet</b> — pick a snippet (and a file, when it has more than one) and drop it at the caret.</li>
+            <li><b>Save Selection as Snippet</b> — turn the current selection (or whole file) into a new snippet.</li>
+        </ul>
+        <p>All actions live under <i>Tools &gt; Snippeter</i>.</p>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <ul>
+            <li>1.0.0 — Initial release: sign in, insert snippet, and save selection.</li>
+        </ul>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Snippeter" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <group
+            id="io.snippeter.jetbrains.SnippeterGroup"
+            text="Snippeter"
+            description="Snippeter snippet manager actions"
+            popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+
+            <action
+                id="io.snippeter.jetbrains.SignIn"
+                class="io.snippeter.jetbrains.actions.SignInAction"
+                text="Sign In"
+                description="Sign in to your Snippeter account"/>
+
+            <action
+                id="io.snippeter.jetbrains.InsertSnippet"
+                class="io.snippeter.jetbrains.actions.InsertSnippetAction"
+                text="Insert Snippet"
+                description="Insert a snippet from your Snippeter library at the caret"/>
+
+            <action
+                id="io.snippeter.jetbrains.SaveSelection"
+                class="io.snippeter.jetbrains.actions.SaveSelectionAction"
+                text="Save Selection as Snippet"
+                description="Save the current selection to your Snippeter library"/>
+        </group>
+    </actions>
+</idea-plugin>

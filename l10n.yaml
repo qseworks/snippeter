@@ -1,0 +1,17 @@
+# Configuration for `flutter gen-l10n`.
+#
+# Source ARB files live in lib/l10n. `app_en.arb` is the template (the source of
+# truth for keys, placeholders and ICU plural forms); every other app_<code>.arb
+# supplies translations for the same keys. The generated `AppLocalizations`
+# class is emitted into lib/l10n (the synthetic flutter_gen package was removed
+# in Flutter 3.x) and imported as:
+#   import 'package:snippet_manager/l10n/app_localizations.dart';
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+
+# Emit a getter that lists every supported locale, and keep untranslated keys
+# falling back to the template (English) instead of throwing.
+nullable-getter: false
+untranslated-messages-file: l10n_untranslated.json

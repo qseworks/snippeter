@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/highlight/code_themes.dart';
 import '../../settings/application/settings_providers.dart';
@@ -89,26 +90,32 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _busy = true);
     try {
       if (_dirty || _bytes == null) await _render();
       final bytes = _bytes;
       if (bytes == null || !mounted) {
-        _toast('Could not render the image');
+        _toast(l10n.exportImageRenderError);
         return;
       }
       await ref
           .read(exportServiceProvider)
           .saveBytes(bytes, widget.data.baseName, '.png');
-      if (mounted) _toast('Saved ${widget.data.baseName}.png');
+      if (mounted) {
+        _toast(l10n.exportImageSavedNamed(widget.data.baseName));
+      }
     } catch (e) {
-      if (mounted) _toast('Save failed: $e');
+      if (mounted) {
+        _toast(l10n.exportImageSaveFailed(e.toString()));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _share() async {
+    final l10n = AppLocalizations.of(context);
     final origin = _origin();
     // Render only if the cache is stale; otherwise call share directly so the
     // gesture's transient activation survives (Web Share API).
@@ -128,7 +135,9 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
             origin: origin,
           );
     } catch (e) {
-      if (mounted) _toast('Share failed: $e');
+      if (mounted) {
+        _toast(l10n.exportImageShareFailed(e.toString()));
+      }
     }
   }
 
@@ -140,14 +149,15 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 20),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Export as image', style: theme.textTheme.titleLarge),
+            Text(l10n.exportImageTitle, style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
             Center(
               child: ConstrainedBox(
@@ -164,7 +174,7 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
             const SizedBox(height: 20),
             Row(
               children: [
-                const SizedBox(width: 80, child: Text('Theme')),
+                SizedBox(width: 80, child: Text(l10n.exportImageThemeLabel)),
                 Expanded(
                   child: DropdownButton<String>(
                     isExpanded: true,
@@ -180,7 +190,7 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
               ],
             ),
             const SizedBox(height: 8),
-            const Text('Background'),
+            Text(l10n.exportImageBackgroundLabel),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -196,7 +206,7 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Watermark'),
+              title: Text(l10n.exportImageWatermarkLabel),
               value: _watermark,
               onChanged: (v) => _onOptionChanged(() => _watermark = v),
             ),
@@ -213,7 +223,7 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.download),
-                    label: const Text('Save PNG'),
+                    label: Text(l10n.exportImageSavePng),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -221,7 +231,7 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
                   child: OutlinedButton.icon(
                     onPressed: _busy ? null : _share,
                     icon: const Icon(Icons.ios_share),
-                    label: const Text('Share'),
+                    label: Text(l10n.commonShare),
                   ),
                 ),
               ],

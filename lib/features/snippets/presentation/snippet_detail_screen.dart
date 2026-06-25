@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/config/supabase_config.dart';
 import '../../../core/highlight/language_visuals.dart';
@@ -29,24 +30,25 @@ class SnippetDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) => Scaffold(
         appBar: AppBar(),
-        body: Center(child: Text('Error: $error')),
+        body: Center(child: Text(l10n.commonError(error.toString()))),
       ),
       data: (snippet) {
         if (snippet == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Snippet not found')),
+            body: Center(child: Text(l10n.detailSnippetNotFound)),
           );
         }
         return Scaffold(
           appBar: AppBar(
-            title: Text(snippet.title.isEmpty ? 'Untitled' : snippet.title),
+            title: Text(snippet.title.isEmpty ? l10n.detailUntitledTitle : snippet.title),
             actions: snippetActions(
               context,
               ref,
@@ -75,21 +77,22 @@ class InlineSnippetDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text('Error: $error')),
+      error: (error, _) => Center(child: Text(l10n.commonError(error.toString()))),
       data: (snippet) {
         if (snippet == null) {
-          return const _PaneMessage(
+          return _PaneMessage(
             icon: Icons.search_off,
-            text: 'This snippet is no longer available.',
+            text: l10n.detailSnippetUnavailable,
           );
         }
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: Text(snippet.title.isEmpty ? 'Untitled' : snippet.title),
+            title: Text(snippet.title.isEmpty ? l10n.detailUntitledTitle : snippet.title),
             actions: snippetActions(
               context,
               ref,
@@ -110,10 +113,13 @@ class DetailPanePlaceholder extends StatelessWidget {
   const DetailPanePlaceholder({super.key});
 
   @override
-  Widget build(BuildContext context) => const _PaneMessage(
-        icon: Icons.touch_app_outlined,
-        text: 'Select a snippet to view it here.',
-      );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _PaneMessage(
+      icon: Icons.touch_app_outlined,
+      text: l10n.detailSelectSnippetPlaceholder,
+    );
+  }
 }
 
 /// Shared AppBar actions for both the routed and inline detail views.
@@ -123,20 +129,21 @@ List<Widget> snippetActions(
   Snippet snippet, {
   required VoidCallback onAfterDelete,
 }) {
+  final l10n = AppLocalizations.of(context);
   Future<void> confirmDelete() async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete snippet?'),
-        content: Text('“${snippet.title}” will be removed.'),
+        title: Text(l10n.detailDeleteSnippetTitle),
+        content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
@@ -150,7 +157,9 @@ List<Widget> snippetActions(
 
   return [
     IconButton(
-      tooltip: snippet.isFavorite ? 'Unfavorite' : 'Favorite',
+      tooltip: snippet.isFavorite
+          ? l10n.detailUnfavoriteTooltip
+          : l10n.detailFavoriteTooltip,
       icon: Icon(snippet.isFavorite ? Icons.star : Icons.star_border,
           color: snippet.isFavorite ? Colors.amber : null),
       onPressed: () => ref
@@ -158,18 +167,18 @@ List<Widget> snippetActions(
           .setFavorite(snippet.id, value: !snippet.isFavorite),
     ),
     IconButton(
-      tooltip: 'History',
+      tooltip: l10n.detailHistoryTooltip,
       icon: const Icon(Icons.history),
       onPressed: () => showSnippetHistory(context, snippetId: snippet.id),
     ),
     ExportMenuButton(snippet: snippet),
     IconButton(
-      tooltip: 'Edit',
+      tooltip: l10n.commonEdit,
       icon: const Icon(Icons.edit_outlined),
       onPressed: () => showSnippetEditor(context, snippetId: snippet.id),
     ),
     IconButton(
-      tooltip: 'Delete',
+      tooltip: l10n.detailDeleteTooltip,
       icon: const Icon(Icons.delete_outline),
       onPressed: confirmDelete,
     ),
@@ -269,6 +278,7 @@ class _AttachmentsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final attachments =
         ref.watch(attachmentsProvider(snippetId)).value ?? const [];
@@ -279,7 +289,7 @@ class _AttachmentsSection extends ConsumerWidget {
       children: [
         const SizedBox(height: 24),
         Text(
-          'Attachments (${attachments.length})',
+          l10n.detailAttachmentsHeader(attachments.length),
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -306,6 +316,7 @@ class _AttachmentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isImage = attachment.mimeType.startsWith('image/');
     return Container(
@@ -361,7 +372,7 @@ class _AttachmentTile extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           IconButton(
-            tooltip: 'Delete attachment',
+            tooltip: l10n.detailDeleteAttachmentTooltip,
             visualDensity: VisualDensity.compact,
             iconSize: 18,
             onPressed: onDelete,
@@ -500,6 +511,7 @@ class _MetaLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final muted = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
@@ -508,11 +520,15 @@ class _MetaLine extends StatelessWidget {
         snippet.id.length > 8 ? snippet.id.substring(0, 8) : snippet.id;
     return Row(
       children: [
-        Text('#$shortId', style: muted),
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Text('#$shortId', style: muted),
+        ),
         const SizedBox(width: 8),
         Text('·', style: muted),
         const SizedBox(width: 8),
-        Text('Updated ${_shortDate(snippet.updatedAt)}', style: muted),
+        Text(l10n.detailUpdatedLabel(_shortDate(snippet.updatedAt)),
+            style: muted),
       ],
     );
   }
@@ -525,9 +541,10 @@ class _LabelsAffordance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Tooltip(
-      message: 'Manage labels — coming soon',
+      message: l10n.detailManageLabelsTooltip,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -538,7 +555,7 @@ class _LabelsAffordance extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'LABELS',
+              l10n.detailLabelsAffordance,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w700,
@@ -564,13 +581,14 @@ class _ShareRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     // Public snippets get a real share URL (served by the `share` edge
     // function); private ones show a hint instead.
     final isPublic = snippet.visibility == SnippetVisibility.public;
     final link = isPublic
         ? SupabaseConfig.shareUrl(snippet.id)
-        : 'Set to Public to get a shareable link';
+        : l10n.detailShareSetPublicHint;
     return Row(
       children: [
         Expanded(
@@ -586,14 +604,27 @@ class _ShareRow extends StatelessWidget {
                     size: 16, color: theme.colorScheme.onSurfaceVariant),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    link,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontFamily: isPublic ? AppTheme.monoFamily : null,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                  child: isPublic
+                      // The share link is a URL/path that must stay LTR even
+                      // when the app is in an RTL locale.
+                      ? Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Text(
+                            link,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontFamily: AppTheme.monoFamily,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          link,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                 ),
                 if (isPublic) _LinkCopyButton(text: link),
               ],
@@ -631,9 +662,10 @@ class _LinkCopyButtonState extends State<_LinkCopyButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return IconButton(
-      tooltip: 'Copy link',
+      tooltip: l10n.detailCopyLinkTooltip,
       visualDensity: VisualDensity.compact,
       iconSize: 16,
       onPressed: _copy,
@@ -654,6 +686,7 @@ class _VisibilityPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isPrivate = visibility == SnippetVisibility.private;
     final fg = isPrivate ? theme.colorScheme.onSurfaceVariant : AppTheme.accent;
@@ -673,7 +706,7 @@ class _VisibilityPill extends StatelessWidget {
               size: 14, color: fg),
           const SizedBox(width: 6),
           Text(
-            isPrivate ? 'Private' : 'Public',
+            isPrivate ? l10n.detailVisibilityPrivate : l10n.detailVisibilityPublic,
             style: theme.textTheme.labelMedium?.copyWith(
               color: fg,
               fontWeight: FontWeight.w600,
@@ -695,22 +728,23 @@ class _FilesHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Row(
       children: [
         Text(
-          'Files ($count)',
+          l10n.detailFilesHeader(count),
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
         ),
         const Spacer(),
         Tooltip(
-          message: 'History',
+          message: l10n.detailHistoryTooltip,
           child: TextButton.icon(
             onPressed: () => showSnippetHistory(context, snippetId: snippetId),
             icon: const Icon(Icons.history, size: 16),
-            label: const Text('HISTORY'),
+            label: Text(l10n.detailHistoryButton),
             style: TextButton.styleFrom(
               foregroundColor: AppTheme.accent,
               textStyle: theme.textTheme.labelSmall?.copyWith(
@@ -724,11 +758,11 @@ class _FilesHeader extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Tooltip(
-          message: 'Add file',
+          message: l10n.detailAddFileTooltip,
           child: TextButton.icon(
             onPressed: () => showSnippetEditor(context, snippetId: snippetId),
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('ADD FILE'),
+            label: Text(l10n.detailAddFileButton),
             style: TextButton.styleFrom(
               foregroundColor: AppTheme.accent,
               textStyle: theme.textTheme.labelSmall?.copyWith(
@@ -752,33 +786,38 @@ class _PromptMetaView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final meta = snippet.promptMeta!;
     final rows = <Widget>[
-      if (meta.modelProvider != null) _kv('Provider', meta.modelProvider!),
-      if (meta.targetModel != null) _kv('Model', meta.targetModel!),
+      if (meta.modelProvider != null)
+        _kv(l10n.detailPromptProviderLabel, meta.modelProvider!),
+      if (meta.targetModel != null)
+        _kv(l10n.detailPromptModelLabel, meta.targetModel!),
       if (meta.temperature != null)
-        _kv('Temperature', meta.temperature!.toString()),
-      if (meta.maxTokens != null) _kv('Max tokens', meta.maxTokens!.toString()),
+        _kv(l10n.detailPromptTemperatureLabel, meta.temperature!.toString()),
+      if (meta.maxTokens != null)
+        _kv(l10n.detailPromptMaxTokensLabel, meta.maxTokens!.toString()),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
-        Text('Prompt settings', style: theme.textTheme.titleMedium),
+        Text(l10n.detailPromptSettingsHeader, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         ...rows,
         if (meta.systemPrompt != null &&
             meta.systemPrompt!.trim().isNotEmpty) ...[
           const SizedBox(height: 8),
-          Text('System prompt', style: theme.textTheme.labelLarge),
+          Text(l10n.detailPromptSystemPromptLabel,
+              style: theme.textTheme.labelLarge),
           const SizedBox(height: 4),
           Text(meta.systemPrompt!, style: theme.textTheme.bodyMedium),
         ],
         if (meta.variables.isNotEmpty) ...[
           const SizedBox(height: 12),
-          Text('Variables', style: theme.textTheme.labelLarge),
+          Text(l10n.detailPromptVariablesLabel, style: theme.textTheme.labelLarge),
           const SizedBox(height: 4),
           Wrap(
             spacing: 6,

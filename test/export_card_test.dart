@@ -38,7 +38,7 @@ void main() {
       // The card and its window frame render (vector decorations).
       expect(find.byType(DecoratedBox), findsWidgets);
       // The watermark text is present.
-      expect(find.textContaining('Snippet Manager'), findsOneWidget);
+      expect(find.textContaining('Snippeter'), findsOneWidget);
     },
   );
 
@@ -65,6 +65,6 @@ void main() {
     );
     await tester.pump();
     expect(find.byType(Image), findsNothing);
-    expect(find.textContaining('Snippet Manager'), findsNothing);
+    expect(find.textContaining('Snippeter'), findsNothing);
   });
 }

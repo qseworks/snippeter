@@ -1,7 +1,7 @@
 {
   "name": "snippet-manager",
-  "displayName": "Snippet Manager",
-  "description": "Browse, insert, and save code snippets from your Snippet Manager account directly in VS Code.",
+  "displayName": "Snippeter",
+  "description": "Browse, insert, and save code snippets from your Snippeter account directly in VS Code.",
   "version": "0.1.0",
   "publisher": "snippet-manager",
   "engines": {
@@ -21,15 +21,15 @@
     "commands": [
       {
         "command": "snippetManager.signIn",
-        "title": "Snippet Manager: Sign In"
+        "title": "Snippeter: Sign In"
       },
       {
         "command": "snippetManager.insertSnippet",
-        "title": "Snippet Manager: Insert Snippet"
+        "title": "Snippeter: Insert Snippet"
       },
       {
         "command": "snippetManager.saveSelection",
-        "title": "Snippet Manager: Save Selection as Snippet"
+        "title": "Snippeter: Save Selection as Snippet"
       }
     ]
   },

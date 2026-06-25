@@ -17,6 +17,23 @@ class AppTheme {
   /// Monospace typeface used wherever code is displayed or exported.
   static const String monoFamily = 'JetBrains Mono';
 
+  /// Glyph fallback chain for scripts Inter doesn't cover (Arabic/Urdu, CJK,
+  /// Devanagari, Bengali). Flutter walks this list when the primary family is
+  /// missing a glyph; unknown family names are skipped, so listing the common
+  /// system fonts across Apple/Windows/Android plus the Noto families keeps
+  /// non-Latin UI text legible instead of rendering tofu (□). On web, CanvasKit
+  /// additionally auto-fetches Noto fallbacks for any glyph still unresolved.
+  static const List<String> uiFontFallback = <String>[
+    // Apple (macOS/iOS)
+    'PingFang SC', 'Hiragino Sans', 'Geeza Pro',
+    'Devanagari Sangam MN', 'Bangla Sangam MN', 'Noto Nastaliq Urdu',
+    // Windows
+    'Microsoft YaHei', 'Segoe UI', 'Nirmala UI',
+    // Android / bundled Noto
+    'Noto Sans', 'Noto Sans CJK SC', 'Noto Sans Arabic',
+    'Noto Sans Devanagari', 'Noto Sans Bengali', 'Arial Unicode MS',
+  ];
+
   /// Corner radius vocabulary used across components.
   static const double radiusXs = 8;
   static const double radiusSm = 10;
@@ -76,7 +93,7 @@ class AppTheme {
 
     final baseText = (isDark ? Typography.material2021().white
             : Typography.material2021().black)
-        .apply(fontFamily: uiFamily);
+        .apply(fontFamily: uiFamily, fontFamilyFallback: uiFontFallback);
 
     // A compact, desktop-first type scale. Sizes run roughly 10–15% below the
     // Material defaults and headings carry tight negative tracking — the dense,

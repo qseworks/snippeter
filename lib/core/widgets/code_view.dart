@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../highlight/code_highlighter.dart';
 import '../highlight/code_themes.dart';
 import '../highlight/language_visuals.dart';
@@ -124,6 +125,7 @@ class CodeBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final brightness = Theme.of(context).brightness;
     final themeMap = CodeThemes.forBrightness(brightness);
     final background = codeBackgroundFor(themeMap, brightness);
@@ -151,14 +153,16 @@ class CodeBlock extends StatelessWidget {
           )
         : null;
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: baseColor.withValues(alpha: 0.10)),
-      ),
-      child: Column(
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: baseColor.withValues(alpha: 0.10)),
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Header bar.
@@ -174,7 +178,7 @@ class CodeBlock extends StatelessWidget {
                 LanguageBadge(languageId: languageId, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  languageName ?? 'Plain text',
+                  languageName ?? l10n.codeViewPlainText,
                   style: TextStyle(
                     color: baseColor.withValues(alpha: 0.85),
                     fontFamily: AppTheme.uiFamily,
@@ -184,7 +188,7 @@ class CodeBlock extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  '$lineCount ${lineCount == 1 ? 'line' : 'lines'}',
+                  l10n.codeViewLineCount(lineCount),
                   style: TextStyle(color: muted, fontSize: 11.5),
                 ),
                 const SizedBox(width: 4),
@@ -209,6 +213,7 @@ class CodeBlock extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -238,8 +243,9 @@ class _CopyButtonState extends State<_CopyButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return IconButton(
-      tooltip: 'Copy code',
+      tooltip: l10n.codeViewCopyTooltip,
       visualDensity: VisualDensity.compact,
       iconSize: 18,
       onPressed: _copy,

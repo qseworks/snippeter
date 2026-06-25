@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/all.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/highlight/code_themes.dart';
 import '../../../core/highlight/language_detect.dart';
@@ -233,10 +234,11 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a title')),
+        SnackBar(content: Text(l10n.editorTitleRequiredSnack)),
       );
       return;
     }
@@ -294,8 +296,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     } catch (error) {
       if (mounted) {
         setState(() => _saving = false);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not save: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(l10n.editorCouldNotSaveSnack(error.toString()))));
       }
     }
   }
@@ -312,6 +314,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   /// Only callable when editing an existing snippet — attachments need a
   /// snippet id to hang off of.
   Future<void> _attachFiles() async {
+    final l10n = AppLocalizations.of(context);
     final snippetId = widget.snippetId;
     if (snippetId == null) return;
 
@@ -323,8 +326,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       result = await FilePicker.pickFiles();
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not pick files: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(l10n.editorCouldNotPickFilesSnack(error.toString()))));
       }
       return;
     }
@@ -345,7 +348,9 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       } catch (error) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not attach ${file.name}: $error')),
+            SnackBar(
+                content: Text(l10n.editorCouldNotAttachSnack(
+                    file.name, error.toString()))),
           );
         }
       }
@@ -353,7 +358,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     if (mounted && added > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(added == 1 ? 'Attached 1 file' : 'Attached $added files'),
+          content: Text(l10n.editorAttachedFilesSnack(added)),
         ),
       );
     }
@@ -363,25 +368,28 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     final controller = TextEditingController();
     final name = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('New collection'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Name'),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(l10n.editorNewCollectionDialogTitle),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(labelText: l10n.commonName),
+            onSubmitted: (v) => Navigator.pop(context, v),
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Create'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: Text(l10n.commonCreate),
+            ),
+          ],
+        );
+      },
     );
     if (name != null && name.trim().isNotEmpty) {
       final id =
@@ -441,6 +449,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     if (_loading) {
       const indicator = Center(child: CircularProgressIndicator());
@@ -468,34 +477,34 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          hintText: 'Title',
+          hintText: l10n.editorTitleHint,
           hintStyle: theme.textTheme.headlineSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
         ),
       ),
       const Divider(height: 18),
-      const _SectionHeader(title: 'TYPE'),
+      _SectionHeader(title: l10n.editorSectionType),
       const SizedBox(height: 8),
       Align(
-        alignment: Alignment.centerLeft,
+        alignment: AlignmentDirectional.centerStart,
         child: SegmentedButton<SnippetType>(
           showSelectedIcon: false,
-          segments: const [
+          segments: [
             ButtonSegment(
               value: SnippetType.code,
-              label: Text('Code'),
-              icon: Icon(Icons.code),
+              label: Text(l10n.editorTypeCode),
+              icon: const Icon(Icons.code),
             ),
             ButtonSegment(
               value: SnippetType.aiPrompt,
-              label: Text('AI Prompt'),
-              icon: Icon(Icons.smart_toy_outlined),
+              label: Text(l10n.editorTypeAiPrompt),
+              icon: const Icon(Icons.smart_toy_outlined),
             ),
             ButtonSegment(
               value: SnippetType.text,
-              label: Text('Text'),
-              icon: Icon(Icons.notes),
+              label: Text(l10n.editorTypeText),
+              icon: const Icon(Icons.notes),
             ),
           ],
           selected: {_type},
@@ -513,9 +522,9 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       ),
       const SizedBox(height: 16),
       _SectionHeader(
-        title: 'DESCRIPTION',
+        title: l10n.editorSectionDescription,
         trailing: Text(
-          'Markdown supported',
+          l10n.editorMarkdownSupportedLabel,
           style: theme.textTheme.labelSmall
               ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
@@ -538,8 +547,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         minLines: 2,
         maxLines: 6,
         style: theme.textTheme.bodyMedium,
-        decoration: const InputDecoration(
-          hintText: 'Describe this snippet… (Markdown supported)',
+        decoration: InputDecoration(
+          hintText: l10n.editorDescriptionHint,
         ),
       ),
       const SizedBox(height: 16),
@@ -567,7 +576,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           ),
           const SizedBox(width: 8),
           IconButton.filledTonal(
-            tooltip: 'New collection',
+            tooltip: l10n.editorNewCollectionTooltip,
             onPressed: _createCollection,
             icon: const Icon(Icons.create_new_folder_outlined),
           ),
@@ -586,8 +595,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       if (_type == SnippetType.aiPrompt) ...[
         const SizedBox(height: 16),
         Text(
-          'Tip: use {{variable}} placeholders — they are detected '
-          'automatically.',
+          l10n.editorAiVariableTip('{{variable}}'),
           style: theme.textTheme.bodySmall,
         ),
         const SizedBox(height: 12),
@@ -603,7 +611,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
     // ---------- FILES ----------
     final filesHeader = _SectionHeader(
-      title: 'FILES',
+      title: l10n.editorSectionFiles,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -611,8 +619,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           // snippet exists (needs an id); disabled with a tooltip otherwise.
           Tooltip(
             message: widget.isEditing
-                ? 'Attach files'
-                : 'Save the snippet first, then you can attach files',
+                ? l10n.editorAttachFilesTooltip
+                : l10n.editorAttachFilesDisabledTooltip,
             child: TextButton.icon(
               onPressed: widget.isEditing ? _attachFiles : null,
               style: TextButton.styleFrom(
@@ -620,7 +628,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
               icon: const Icon(Icons.attach_file, size: 18),
-              label: const Text('Attach'),
+              label: Text(l10n.editorAttachButton),
             ),
           ),
           const SizedBox(width: 4),
@@ -631,7 +639,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add file'),
+            label: Text(l10n.editorAddFileButton),
           ),
         ],
       ),
@@ -723,7 +731,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           const Spacer(),
           TextButton(
             onPressed: _saving ? null : _discard,
-            child: const Text('Discard'),
+            child: Text(l10n.commonDiscard),
           ),
           const SizedBox(width: 8),
           FilledButton.icon(
@@ -735,7 +743,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.check),
-            label: const Text('Save'),
+            label: Text(l10n.commonSave),
           ),
         ],
       ),
@@ -790,7 +798,9 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     return _withSaveShortcut(
       Scaffold(
         appBar: AppBar(
-          title: Text(widget.isEditing ? 'Edit snippet' : 'New snippet'),
+          title: Text(widget.isEditing
+              ? l10n.editorAppBarEditTitle
+              : l10n.editorAppBarNewTitle),
         ),
         body: Column(
           children: [
@@ -868,6 +878,7 @@ class _ModalHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 14),
       child: Row(
@@ -896,13 +907,15 @@ class _ModalHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isEditing ? 'Edit snippet' : 'New snippet',
+                  isEditing
+                      ? l10n.editorModalHeaderEditTitle
+                      : l10n.editorModalHeaderNewTitle,
                   style: theme.textTheme.titleLarge,
                 ),
                 Text(
                   isEditing
-                      ? 'Update the details and save your changes.'
-                      : 'Save code, a prompt, or a note to your library.',
+                      ? l10n.editorModalHeaderEditSubtitle
+                      : l10n.editorModalHeaderNewSubtitle,
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
@@ -911,7 +924,7 @@ class _ModalHeader extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           IconButton(
-            tooltip: 'Close',
+            tooltip: l10n.commonClose,
             onPressed: onClose,
             icon: const Icon(Icons.close),
           ),
@@ -979,6 +992,7 @@ class _MarkdownToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     Widget button(IconData icon, String tooltip, VoidCallback onPressed) {
       return IconButton(
@@ -1008,17 +1022,21 @@ class _MarkdownToolbar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            button(Icons.title, 'Heading', onHeading),
-            button(Icons.format_bold, 'Bold', onBold),
-            button(Icons.format_italic, 'Italic', onItalic),
+            button(Icons.title, l10n.editorMarkdownHeadingTooltip, onHeading),
+            button(Icons.format_bold, l10n.editorMarkdownBoldTooltip, onBold),
+            button(
+                Icons.format_italic, l10n.editorMarkdownItalicTooltip, onItalic),
             sep(),
-            button(Icons.format_quote, 'Quote', onQuote),
-            button(Icons.code, 'Inline code', onCode),
-            button(Icons.link, 'Link', onLink),
+            button(Icons.format_quote, l10n.editorMarkdownQuoteTooltip, onQuote),
+            button(Icons.code, l10n.editorMarkdownInlineCodeTooltip, onCode),
+            button(Icons.link, l10n.editorMarkdownLinkTooltip, onLink),
             sep(),
-            button(Icons.format_list_bulleted, 'Bullet list', onBullet),
-            button(Icons.format_list_numbered, 'Numbered list', onNumbered),
-            button(Icons.checklist, 'Checklist', onChecklist),
+            button(Icons.format_list_bulleted,
+                l10n.editorMarkdownBulletListTooltip, onBullet),
+            button(Icons.format_list_numbered,
+                l10n.editorMarkdownNumberedListTooltip, onNumbered),
+            button(Icons.checklist, l10n.editorMarkdownChecklistTooltip,
+                onChecklist),
           ],
         ),
       ),
@@ -1036,6 +1054,7 @@ class _VisibilityToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final isPrivate = value == SnippetVisibility.private;
     return TextButton.icon(
       onPressed: () => onChanged(
@@ -1049,7 +1068,7 @@ class _VisibilityToggle extends StatelessWidget {
             : theme.colorScheme.onSurfaceVariant,
       ),
       label: Text(
-        isPrivate ? 'Private' : 'Public',
+        isPrivate ? l10n.editorVisibilityPrivate : l10n.editorVisibilityPublic,
         style: theme.textTheme.labelLarge?.copyWith(
           color: isPrivate
               ? theme.colorScheme.primary
@@ -1093,6 +1112,7 @@ class _FileEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final value =
         languages.any((l) => l.id == file.languageId) ? file.languageId : null;
     return Column(
@@ -1106,10 +1126,10 @@ class _FileEditor extends StatelessWidget {
               child: TextField(
                 controller: file.filenameController,
                 onChanged: onFilenameChanged,
-                decoration: const InputDecoration(
-                  labelText: 'Filename',
-                  hintText: 'e.g. main.dart',
-                  prefixIcon: Icon(Icons.insert_drive_file_outlined),
+                decoration: InputDecoration(
+                  labelText: l10n.editorFilenameLabel,
+                  hintText: l10n.editorFilenameHint,
+                  prefixIcon: const Icon(Icons.insert_drive_file_outlined),
                 ),
               ),
             ),
@@ -1126,7 +1146,7 @@ class _FileEditor extends StatelessWidget {
             if (canRemove) ...[
               const SizedBox(width: 4),
               IconButton(
-                tooltip: 'Remove file',
+                tooltip: l10n.editorRemoveFileTooltip,
                 onPressed: onRemove,
                 icon: const Icon(Icons.delete_outline),
               ),
@@ -1194,6 +1214,7 @@ class _BodyEditorState extends State<_BodyEditor> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final colorScheme = theme.colorScheme;
     final themeMap = CodeThemes.forBrightness(theme.brightness);
     final language =
@@ -1203,7 +1224,11 @@ class _BodyEditorState extends State<_BodyEditor> {
     final codeBackground = themeMap['root']?.backgroundColor;
     final codeForeground = themeMap['root']?.color ?? colorScheme.onSurface;
 
-    final codeEditor = CodeEditor(
+    // Keep the code editor (body, line-number gutter, and chunk indicator)
+    // left-to-right even in an RTL locale so code reads correctly.
+    final codeEditor = Directionality(
+      textDirection: TextDirection.ltr,
+      child: CodeEditor(
       controller: widget.controller,
       findController: _findController,
       wordWrap: _wordWrap,
@@ -1260,6 +1285,7 @@ class _BodyEditorState extends State<_BodyEditor> {
           theme: themeMap,
         ),
       ),
+    ),
     );
 
     return Container(
@@ -1273,7 +1299,7 @@ class _BodyEditorState extends State<_BodyEditor> {
         children: [
           // Editor toolbar: language badge + name, with wrap + find controls.
           Container(
-            padding: const EdgeInsets.fromLTRB(12, 2, 4, 2),
+            padding: const EdgeInsetsDirectional.fromSTEB(12, 2, 4, 2),
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHigh,
               border: Border(
@@ -1285,7 +1311,7 @@ class _BodyEditorState extends State<_BodyEditor> {
                 LanguageBadge(languageId: widget.languageId, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  language?.name ?? 'Plain text',
+                  language?.name ?? l10n.editorPlainTextLanguage,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
@@ -1293,7 +1319,9 @@ class _BodyEditorState extends State<_BodyEditor> {
                 ),
                 const Spacer(),
                 IconButton(
-                  tooltip: _wordWrap ? 'Disable line wrap' : 'Wrap lines',
+                  tooltip: _wordWrap
+                      ? l10n.editorDisableLineWrapTooltip
+                      : l10n.editorWrapLinesTooltip,
                   isSelected: _wordWrap,
                   visualDensity: VisualDensity.compact,
                   iconSize: 18,
@@ -1301,7 +1329,7 @@ class _BodyEditorState extends State<_BodyEditor> {
                   icon: const Icon(Icons.wrap_text),
                 ),
                 IconButton(
-                  tooltip: 'Find / replace',
+                  tooltip: l10n.editorFindReplaceTooltip,
                   visualDensity: VisualDensity.compact,
                   iconSize: 18,
                   onPressed: _findController.findMode,
@@ -1334,6 +1362,7 @@ class _LanguageDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     // Searchable combobox: type to filter the (potentially long) language list.
     return DropdownMenu<String?>(
       initialSelection: value,
@@ -1341,8 +1370,8 @@ class _LanguageDropdown extends StatelessWidget {
       enableFilter: true,
       expandedInsets: EdgeInsets.zero,
       menuHeight: 320,
-      label: const Text('Language'),
-      hintText: 'Search languages…',
+      label: Text(l10n.editorLanguageDropdownLabel),
+      hintText: l10n.editorLanguageSearchHint,
       inputDecorationTheme: Theme.of(context).inputDecorationTheme,
       leadingIcon: value == null
           ? const Icon(Icons.translate)
@@ -1352,7 +1381,8 @@ class _LanguageDropdown extends StatelessWidget {
             ),
       onSelected: onChanged,
       dropdownMenuEntries: [
-        const DropdownMenuEntry<String?>(value: null, label: 'No language'),
+        DropdownMenuEntry<String?>(
+            value: null, label: l10n.editorNoLanguageOption),
         for (final l in languages)
           DropdownMenuEntry<String?>(
             value: l.id,
@@ -1379,15 +1409,16 @@ class _PurposeDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final applicable = purposes.where((p) => p.appliesTo(typeWire)).toList();
     return DropdownButtonFormField<String?>(
       // Guard against the FILTERED list: the value must be one of the items,
       // or the inner DropdownButton asserts.
       initialValue: applicable.any((p) => p.id == value) ? value : null,
       isExpanded: true,
-      decoration: const InputDecoration(labelText: 'Purpose'),
+      decoration: InputDecoration(labelText: l10n.editorPurposeLabel),
       items: [
-        const DropdownMenuItem(value: null, child: Text('No purpose')),
+        DropdownMenuItem(value: null, child: Text(l10n.editorNoPurposeOption)),
         for (final p in applicable)
           DropdownMenuItem(value: p.id, child: Text(p.label)),
       ],
@@ -1409,12 +1440,14 @@ class _CollectionDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DropdownButtonFormField<String?>(
       initialValue: value,
       isExpanded: true,
-      decoration: const InputDecoration(labelText: 'Collection'),
+      decoration: InputDecoration(labelText: l10n.editorCollectionLabel),
       items: [
-        const DropdownMenuItem(value: null, child: Text('No collection')),
+        DropdownMenuItem(
+            value: null, child: Text(l10n.editorNoCollectionOption)),
         for (final c in collections)
           DropdownMenuItem(value: c.id, child: Text(c.name)),
       ],
@@ -1440,10 +1473,11 @@ class _PromptSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Prompt settings (optional)',
+        Text(l10n.editorPromptSettingsHeader,
             style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 12),
         Row(
@@ -1451,9 +1485,9 @@ class _PromptSettings extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: providerController,
-                decoration: const InputDecoration(
-                  labelText: 'Provider',
-                  hintText: 'e.g. Anthropic',
+                decoration: InputDecoration(
+                  labelText: l10n.editorPromptProviderLabel,
+                  hintText: l10n.editorPromptProviderHint,
                 ),
               ),
             ),
@@ -1461,9 +1495,9 @@ class _PromptSettings extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: modelController,
-                decoration: const InputDecoration(
-                  labelText: 'Model',
-                  hintText: 'e.g. claude-opus-4-8',
+                decoration: InputDecoration(
+                  labelText: l10n.editorPromptModelLabel,
+                  hintText: l10n.editorPromptModelHint,
                 ),
               ),
             ),
@@ -1477,7 +1511,8 @@ class _PromptSettings extends StatelessWidget {
                 controller: temperatureController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Temperature'),
+                decoration:
+                    InputDecoration(labelText: l10n.editorPromptTemperatureLabel),
               ),
             ),
             const SizedBox(width: 12),
@@ -1485,7 +1520,8 @@ class _PromptSettings extends StatelessWidget {
               child: TextField(
                 controller: maxTokensController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Max tokens'),
+                decoration:
+                    InputDecoration(labelText: l10n.editorPromptMaxTokensLabel),
               ),
             ),
           ],
@@ -1495,7 +1531,8 @@ class _PromptSettings extends StatelessWidget {
           controller: systemPromptController,
           minLines: 2,
           maxLines: 5,
-          decoration: const InputDecoration(labelText: 'System prompt'),
+          decoration:
+              InputDecoration(labelText: l10n.editorPromptSystemPromptLabel),
         ),
       ],
     );

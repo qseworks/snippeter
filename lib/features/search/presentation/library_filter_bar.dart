@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/highlight/language_visuals.dart';
 import '../../snippets/application/snippet_providers.dart';
@@ -16,6 +17,7 @@ class LibraryFilterBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final query = ref.watch(libraryQueryProvider);
     final controller = ref.read(libraryQueryProvider.notifier);
     final languages = ref.watch(languagesProvider).value ?? const <Language>[];
@@ -32,7 +34,7 @@ class LibraryFilterBar extends ConsumerWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+        padding: const EdgeInsetsDirectional.fromSTEB(12, 10, 12, 8),
         child: Column(
           children: [
             Row(
@@ -46,18 +48,19 @@ class LibraryFilterBar extends ConsumerWidget {
             // Wrap (not a horizontal scroller) so every filter — including the
             // Labels chip — stays fully visible on narrow layouts.
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerStart,
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
                   _FilterChipMenu<SnippetType?>(
                     icon: Icons.category_outlined,
-                    label: query.type?.label ?? 'Type',
+                    label: query.type?.label ?? l10n.filterTypeChipDefault,
                     active: query.type != null,
                     value: query.type,
                     items: [
-                      const PopupMenuItem(value: null, child: Text('All types')),
+                      PopupMenuItem(
+                          value: null, child: Text(l10n.filterAllTypes)),
                       for (final t in SnippetType.values)
                         PopupMenuItem(value: t, child: Text(t.label)),
                     ],
@@ -65,15 +68,16 @@ class LibraryFilterBar extends ConsumerWidget {
                   ),
                   _FilterChipMenu<String?>(
                     icon: Icons.translate,
-                    label: _nameOf(languages, query.languageId) ?? 'Language',
+                    label: _nameOf(languages, query.languageId) ??
+                        l10n.filterLanguageChipDefault,
                     active: query.languageId != null,
                     value: query.languageId,
                     leading: query.languageId == null
                         ? null
                         : LanguageBadge(languageId: query.languageId, size: 16),
                     items: [
-                      const PopupMenuItem(
-                          value: null, child: Text('All languages')),
+                      PopupMenuItem(
+                          value: null, child: Text(l10n.filterAllLanguages)),
                       for (final l in languages)
                         PopupMenuItem(value: l.id, child: Text(l.name)),
                     ],
@@ -82,12 +86,12 @@ class LibraryFilterBar extends ConsumerWidget {
                   _FilterChipMenu<String?>(
                     icon: Icons.folder_outlined,
                     label: _collectionName(collections, query.collectionId) ??
-                        'Collection',
+                        l10n.filterCollectionChipDefault,
                     active: query.collectionId != null,
                     value: query.collectionId,
                     items: [
-                      const PopupMenuItem(
-                          value: null, child: Text('All collections')),
+                      PopupMenuItem(
+                          value: null, child: Text(l10n.filterAllCollections)),
                       for (final c in collections)
                         PopupMenuItem(value: c.id, child: Text(c.name)),
                     ],
@@ -105,7 +109,7 @@ class LibraryFilterBar extends ConsumerWidget {
                   if (query.hasFilters)
                     ActionChip(
                       avatar: const Icon(Icons.clear, size: 16),
-                      label: const Text('Clear'),
+                      label: Text(l10n.filterClearChip),
                       onPressed: controller.clearFilters,
                     ),
                 ],
@@ -161,12 +165,13 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TextField(
       controller: _controller,
       onChanged: _onChanged,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
-        hintText: 'Search snippets…',
+        hintText: l10n.filterSearchHint,
         prefixIcon: const Icon(Icons.search),
         isDense: true,
         suffixIcon: _controller.text.isEmpty
@@ -190,22 +195,23 @@ class _SortButton extends StatelessWidget {
   final SnippetSort value;
   final ValueChanged<SnippetSort> onChanged;
 
-  static const _labels = {
-    SnippetSort.recent: 'Recently updated',
-    SnippetSort.created: 'Recently created',
-    SnippetSort.titleAsc: 'Title A–Z',
-    SnippetSort.relevance: 'Relevance',
-  };
+  static Map<SnippetSort, String> _labels(AppLocalizations l10n) => {
+        SnippetSort.recent: l10n.filterSortRecentlyUpdated,
+        SnippetSort.created: l10n.filterSortRecentlyCreated,
+        SnippetSort.titleAsc: l10n.filterSortTitleAsc,
+        SnippetSort.relevance: l10n.filterSortRelevance,
+      };
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PopupMenuButton<SnippetSort>(
-      tooltip: 'Sort',
+      tooltip: l10n.commonSort,
       icon: const Icon(Icons.sort),
       initialValue: value,
       onSelected: onChanged,
       itemBuilder: (context) => [
-        for (final entry in _labels.entries)
+        for (final entry in _labels(l10n).entries)
           PopupMenuItem(value: entry.key, child: Text(entry.value)),
       ],
     );
@@ -259,28 +265,33 @@ class _LabelsChip extends StatelessWidget {
   final void Function(List<String> ids, bool matchAll) onApply;
 
   Future<void> _open(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final chosen = {...selected};
     var all = matchAll;
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Filter by labels'),
+          title: Text(l10n.filterByLabelsDialogTitle),
           content: SizedBox(
             width: 320,
             child: labels.isEmpty
-                ? const Text('No labels yet.')
+                ? Text(l10n.filterNoLabelsYet)
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
                         children: [
-                          const Text('Match'),
+                          Text(l10n.filterMatchLabel),
                           const SizedBox(width: 8),
                           SegmentedButton<bool>(
-                            segments: const [
-                              ButtonSegment(value: false, label: Text('Any')),
-                              ButtonSegment(value: true, label: Text('All')),
+                            segments: [
+                              ButtonSegment(
+                                  value: false,
+                                  label: Text(l10n.filterMatchAny)),
+                              ButtonSegment(
+                                  value: true,
+                                  label: Text(l10n.filterMatchAll)),
                             ],
                             selected: {all},
                             onSelectionChanged: (s) =>
@@ -315,11 +326,11 @@ class _LabelsChip extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Apply'),
+              child: Text(l10n.commonApply),
             ),
           ],
         ),
@@ -330,7 +341,10 @@ class _LabelsChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = selected.isEmpty ? 'Labels' : 'Labels (${selected.length})';
+    final l10n = AppLocalizations.of(context);
+    final label = selected.isEmpty
+        ? l10n.filterLabelsChipDefault
+        : l10n.filterLabelsChipWithCount(selected.length);
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => _open(context),

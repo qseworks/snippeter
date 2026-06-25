@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/i18n/app_locales.dart';
 import '../domain/app_settings.dart';
 
 /// Overridden in main() with the loaded instance.
@@ -13,6 +14,7 @@ const _kThemeMode = 'themeMode';
 const _kExportTheme = 'exportTheme';
 const _kExportWatermark = 'exportWatermark';
 const _kDefaultLanguage = 'defaultLanguageId';
+const _kLocale = 'localeCode';
 
 class SettingsController extends Notifier<AppSettings> {
   @override
@@ -23,6 +25,7 @@ class SettingsController extends Notifier<AppSettings> {
       exportTheme: prefs.getString(_kExportTheme) ?? 'atom-one-dark',
       exportWatermark: prefs.getBool(_kExportWatermark) ?? true,
       defaultLanguageId: prefs.getString(_kDefaultLanguage),
+      localeCode: prefs.getString(_kLocale),
     );
   }
 
@@ -53,6 +56,18 @@ class SettingsController extends Notifier<AppSettings> {
     }
   }
 
+  /// Set the UI language. Pass null to follow the system locale.
+  void setLocale(Locale? locale) {
+    if (locale == null) {
+      _prefs.remove(_kLocale);
+      state = state.copyWith(clearLocale: true);
+    } else {
+      final code = languageForLocale(locale).code;
+      _prefs.setString(_kLocale, code);
+      state = state.copyWith(localeCode: code);
+    }
+  }
+
   static ThemeMode _parseThemeMode(String? value) => switch (value) {
         'light' => ThemeMode.light,
         'dark' => ThemeMode.dark,
@@ -62,3 +77,10 @@ class SettingsController extends Notifier<AppSettings> {
 
 final settingsProvider =
     NotifierProvider<SettingsController, AppSettings>(SettingsController.new);
+
+/// The resolved UI [Locale], or null to follow the system locale. Fed directly
+/// into `MaterialApp.locale`.
+final localeProvider = Provider<Locale?>((ref) {
+  final code = ref.watch(settingsProvider.select((s) => s.localeCode));
+  return localeFromCode(code);
+});
