@@ -1,0 +1,12 @@
+-- Local-only seed data, loaded after migrations on `supabase start` /
+-- `supabase db reset`. Safe to leave empty.
+--
+-- You normally don't need a seeded user: the local stack has email
+-- confirmations turned OFF, so you can just sign up inside the app and log in
+-- immediately (any "confirmation" email is captured by Mailpit at
+-- http://127.0.0.1:54324 — it is never actually sent).
+--
+-- To pre-load snippets/labels/etc. for a specific user, sign up once, grab your
+-- user id from Studio (http://127.0.0.1:54323 → Authentication), then add
+-- `insert into public.snippets (...) values (...)` statements below. Row-Level
+-- Security is bypassed here because the seed runs as the postgres superuser.

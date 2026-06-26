@@ -2,8 +2,13 @@
 
 Backend for the snippet manager (P2). Project ref: `xxxxxxxxxxxxxxxxxxxx`
 (region ap-south-1). The Postgres schema (snippets/files/labels/collections/
-prompt-meta/attachments/versions + workspaces/members/invites) was applied via
-migrations through the Supabase MCP, with per-user/RLS and Realtime enabled.
+prompt-meta/attachments/versions + workspaces/members/invites) is defined by the
+migrations in `supabase/migrations/` — per-user RLS + Realtime enabled — and the
+hosted project mirrors them 1:1 (same version numbers).
+
+> 💡 **Develop for free, offline.** You don't need the paid hosted project during
+> development — run the whole Supabase stack locally in Docker. See
+> [`../docs/local-dev.md`](../docs/local-dev.md).
 
 ## Edge functions
 
