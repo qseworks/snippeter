@@ -28,6 +28,25 @@ flutter run -d macos
 Build for web (CanvasKit baseline): `flutter build web`. The matching `web/sqlite3.wasm` and
 `web/drift_worker.dart.js` are committed and must stay in lockstep with the `sqlite3` / `drift` versions.
 
+## Backend (Supabase)
+
+The app is **offline-first** — local Drift is always the source of truth and Supabase is the optional
+sync / accounts / team backend. You don't need the paid hosted project to develop: run the whole
+Supabase stack locally in Docker, for free.
+
+```bash
+supabase start                 # Postgres + Auth + Storage + Edge Functions + Studio (in Docker)
+scripts/dev-local.sh -d macos  # run the app against the local stack (also -d chrome)
+supabase stop                  # stop when done
+```
+
+`supabase/migrations/` is the schema source of truth and mirrors the hosted project 1:1. Studio runs at
+<http://127.0.0.1:55323>, captured emails at <http://127.0.0.1:55324>. To target the hosted project
+instead, use `scripts/dev-remote.sh` (or plain `flutter run`, which uses the compiled-in defaults).
+
+Full guide — start/stop, accounts, per-platform networking, schema changes, switching back to the
+cloud — in [`docs/local-dev.md`](docs/local-dev.md); backend details in [`supabase/README.md`](supabase/README.md).
+
 ## Architecture
 
 Feature-first folders with clean layering (UI → state → domain ← data). The `SnippetRepository`
