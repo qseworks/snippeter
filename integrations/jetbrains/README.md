@@ -69,6 +69,11 @@ Plugin from Disk…** and pick the zip from `build/distributions/`.
 - Auth uses Supabase GoTrue's email + password grant. The publishable (anon) key
   is embedded in the client, which is safe by design; row-level security scopes
   every row to the signed-in user and their team workspaces.
+- **Backend** defaults to the local dev stack (`supabase start`, see
+  [`../../docs/local-dev.md`](../../docs/local-dev.md)). Target a hosted project
+  with a JVM system property (`-Dsnippeter.supabaseUrl=…`,
+  `-Dsnippeter.supabaseAnonKey=…`) or the `SNIPPET_SUPABASE_URL` /
+  `SNIPPET_SUPABASE_ANON_KEY` environment variables.
 - Creating a snippet writes a `snippets` row whose `body` mirrors the first
   file's content, then a `snippet_files` row at `position: 0`. `owner_id` is never
   sent on insert — the server default plus RLS bind it to you.

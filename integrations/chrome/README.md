@@ -39,10 +39,15 @@ and password you use in the Snippeter app.
 
 ## How it talks to the backend
 
-All requests go to the Supabase project at
-`https://xxxxxxxxxxxxxxxxxxxx.supabase.co` using the **publishable (anon) key**,
-which is safe to embed in clients. Row-Level Security scopes every row to the
-signed-in user and their team workspaces.
+All requests go to the Supabase backend configured in **`config.js`** using the
+**publishable (anon) key**, which is safe to embed in clients. Row-Level Security
+scopes every row to the signed-in user and their team workspaces.
+
+By default `config.js` points at the **local dev stack** (`supabase start`, see
+[`../../docs/local-dev.md`](../../docs/local-dev.md)). To use a hosted project,
+set `SUPABASE_URL` to `https://<your-project-ref>.supabase.co` and `ANON_KEY` to
+its publishable key — no manifest edit needed, since `host_permissions` already
+allow `http://127.0.0.1/*` and `https://*.supabase.co/*`.
 
 - Auth: `POST /auth/v1/token?grant_type=password` (sign in),
   `grant_type=refresh_token` (refresh).

@@ -27,8 +27,8 @@ Usage:
   snip --help                                 Show this help
 
 Config (overridable via environment):
-  SNIPPET_SUPABASE_URL        default https://xxxxxxxxxxxxxxxxxxxx.supabase.co
-  SNIPPET_SUPABASE_ANON_KEY   default <baked-in publishable key>
+  SNIPPET_SUPABASE_URL        default http://127.0.0.1:55321 (local dev stack)
+  SNIPPET_SUPABASE_ANON_KEY   default <local stack anon key>
 
 The session is saved to ~/.config/snippet-manager/credentials.json (chmod 600).`;
 

@@ -24,7 +24,9 @@
     "notifications"
   ],
   "host_permissions": [
-    "https://xxxxxxxxxxxxxxxxxxxx.supabase.co/*"
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://*.supabase.co/*"
   ],
   "icons": {
     "16": "icons/icon16.png",

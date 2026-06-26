@@ -36,7 +36,22 @@
         "command": "snippetManager.saveSelection",
         "title": "Snippeter: Save Selection as Snippet"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Snippeter",
+      "properties": {
+        "snippetManager.supabaseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:55321",
+          "markdownDescription": "Supabase project URL. Defaults to the local dev stack (`supabase start`). For a hosted project use `https://<your-project-ref>.supabase.co`."
+        },
+        "snippetManager.supabaseAnonKey": {
+          "type": "string",
+          "default": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+          "markdownDescription": "Supabase anon / publishable key. Safe to store — all access is gated by Row Level Security. Defaults to the local dev stack's anon key."
+        }
+      }
+    }
   },
   "scripts": {
     "compile": "tsc -p ./",

@@ -1,6 +1,6 @@
 # Snippeter — VS Code Extension
 
-Browse, insert, and save code snippets from your [Snippeter](https://xxxxxxxxxxxxxxxxxxxx.supabase.co) account directly inside VS Code. The extension talks to the Supabase REST API (PostgREST) using `@supabase/supabase-js`; Row Level Security on the server scopes everything to your account and your team workspaces.
+Browse, insert, and save code snippets from your Snippeter account directly inside VS Code. The extension talks to the Supabase REST API (PostgREST) using `@supabase/supabase-js`; Row Level Security on the server scopes everything to your account and your team workspaces.
 
 This folder is **self-contained** — it does not touch the Flutter app.
 
@@ -51,7 +51,14 @@ Then in VS Code: **Extensions** view > `…` menu > **Install from VSIX…** and
 
 ## Configuration
 
-The Supabase project URL and the anonymous/publishable key are baked into `src/supabase.ts`. The publishable key is safe to ship in clients — all access is gated by Supabase Auth + Row Level Security.
+The extension defaults to the **local dev stack** (`supabase start`, see [`../../docs/local-dev.md`](../../docs/local-dev.md)). To point it at a hosted project, set these in VS Code **Settings** (search "Snippeter"):
+
+| Setting | Default |
+| --- | --- |
+| `snippetManager.supabaseUrl` | `http://127.0.0.1:55321` |
+| `snippetManager.supabaseAnonKey` | local stack anon key |
+
+The publishable/anon key is safe to store in settings — all access is gated by Supabase Auth + Row Level Security.
 
 ## Branding
 

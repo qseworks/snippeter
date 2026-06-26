@@ -2,9 +2,8 @@
 // Dependency-free ES module. Talks to Supabase directly via fetch.
 // Session (access_token / refresh_token) is persisted in chrome.storage.local.
 
-const SUPABASE_URL = "https://xxxxxxxxxxxxxxxxxxxx.supabase.co";
-// Publishable / anon key — safe to embed in clients.
-const ANON_KEY = "sb_publishable_REDACTED";
+// Backend URL + key live in ../config.js (edit there to switch backends).
+import { SUPABASE_URL, ANON_KEY } from "../config.js";
 
 const REST_BASE = `${SUPABASE_URL}/rest/v1`;
 const AUTH_BASE = `${SUPABASE_URL}/auth/v1`;

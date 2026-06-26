@@ -41,12 +41,23 @@ class SnippeterException(message: String) : Exception(message)
  */
 object SnippeterClient {
 
-    // Live backend — the publishable (anon) key is safe to embed in clients.
-    private const val SUPABASE_URL = "https://xxxxxxxxxxxxxxxxxxxx.supabase.co"
-    private const val ANON_KEY = "sb_publishable_REDACTED"
+    // Backend connection. Defaults to the local dev stack (`supabase start`, see
+    // docs/local-dev.md). Point at a hosted project via a JVM system property or
+    // an environment variable (system property wins):
+    //   -Dsnippeter.supabaseUrl=https://<ref>.supabase.co   or  SNIPPET_SUPABASE_URL
+    //   -Dsnippeter.supabaseAnonKey=<publishable-key>        or  SNIPPET_SUPABASE_ANON_KEY
+    // The publishable (anon) key is safe to embed in clients.
+    private val SUPABASE_URL: String =
+        System.getProperty("snippeter.supabaseUrl")
+            ?: System.getenv("SNIPPET_SUPABASE_URL")
+            ?: "http://127.0.0.1:55321"
+    private val ANON_KEY: String =
+        System.getProperty("snippeter.supabaseAnonKey")
+            ?: System.getenv("SNIPPET_SUPABASE_ANON_KEY")
+            ?: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
 
-    private const val REST_BASE = "$SUPABASE_URL/rest/v1"
-    private const val AUTH_BASE = "$SUPABASE_URL/auth/v1"
+    private val REST_BASE = "$SUPABASE_URL/rest/v1"
+    private val AUTH_BASE = "$SUPABASE_URL/auth/v1"
 
     private const val SNIPPET_SELECT =
         "id,title,body,type,language_id,description,visibility,is_favorite,created_at,updated_at,workspace_id"

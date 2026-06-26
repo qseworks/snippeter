@@ -79,13 +79,20 @@ snip add a.sql b.sql --title "Migration pair" --public
 
 ## Configuration
 
-The Supabase URL and anon (publishable) key are baked in as defaults and can be
-overridden via environment variables:
+By default the CLI talks to the **local dev stack** (`supabase start`, see
+[`../../docs/local-dev.md`](../../docs/local-dev.md)). Point it at a hosted
+project by overriding these environment variables:
 
 | Variable                     | Default                                          |
 | ---------------------------- | ------------------------------------------------ |
-| `SNIPPET_SUPABASE_URL`       | `https://xxxxxxxxxxxxxxxxxxxx.supabase.co`       |
-| `SNIPPET_SUPABASE_ANON_KEY`  | baked-in publishable key                         |
+| `SNIPPET_SUPABASE_URL`       | `http://127.0.0.1:55321` (local stack)           |
+| `SNIPPET_SUPABASE_ANON_KEY`  | local stack anon key                             |
+
+```bash
+# e.g. target a hosted project
+export SNIPPET_SUPABASE_URL=https://<your-project-ref>.supabase.co
+export SNIPPET_SUPABASE_ANON_KEY=<its-publishable-key>
+```
 
 ## Session storage
 
