@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/highlight/language_visuals.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../snippets/application/snippet_providers.dart';
 import '../../snippets/domain/snippet_query.dart';
 import '../../snippets/domain/snippet_type.dart';
 import '../../snippets/domain/value_objects.dart';
+import '../../snippets/presentation/type_visuals.dart';
 
 /// Search field + filter chips + sort for the Library tab. All controls drive
 /// [libraryQueryProvider]; the list rebuilds reactively.
@@ -55,14 +57,16 @@ class LibraryFilterBar extends ConsumerWidget {
                 children: [
                   _FilterChipMenu<SnippetType?>(
                     icon: Icons.category_outlined,
-                    label: query.type?.label ?? l10n.filterTypeChipDefault,
+                    label: query.type == null
+                        ? l10n.filterTypeChipDefault
+                        : labelForType(l10n, query.type!),
                     active: query.type != null,
                     value: query.type,
                     items: [
                       PopupMenuItem(
                           value: null, child: Text(l10n.filterAllTypes)),
                       for (final t in SnippetType.values)
-                        PopupMenuItem(value: t, child: Text(t.label)),
+                        PopupMenuItem(value: t, child: Text(labelForType(l10n, t))),
                     ],
                     onSelected: controller.setType,
                   ),
@@ -106,12 +110,21 @@ class LibraryFilterBar extends ConsumerWidget {
                       controller.setLabelsMatchAll(all: matchAll);
                     },
                   ),
-                  if (query.hasFilters)
-                    ActionChip(
-                      avatar: const Icon(Icons.clear, size: 16),
-                      label: Text(l10n.filterClearChip),
-                      onPressed: controller.clearFilters,
-                    ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 150),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeOut,
+                    transitionBuilder: (child, animation) =>
+                        ScaleTransition(scale: animation, child: child),
+                    child: query.hasFilters
+                        ? ActionChip(
+                            key: const ValueKey('clear-filters'),
+                            avatar: const Icon(Icons.clear, size: 16),
+                            label: Text(l10n.filterClearChip),
+                            onPressed: controller.clearFilters,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                 ],
               ),
             ),
@@ -174,16 +187,27 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
         hintText: l10n.filterSearchHint,
         prefixIcon: const Icon(Icons.search),
         isDense: true,
-        suffixIcon: _controller.text.isEmpty
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  _controller.clear();
-                  _onChanged('');
-                  setState(() {});
-                },
-              ),
+        // Zero-min so the empty state reserves no space; the animated close
+        // button keeps its own tap target when present.
+        suffixIconConstraints: const BoxConstraints(),
+        suffixIcon: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 150),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeOut,
+          transitionBuilder: (child, animation) =>
+              ScaleTransition(scale: animation, child: child),
+          child: _controller.text.isEmpty
+              ? const SizedBox.shrink()
+              : IconButton(
+                  key: const ValueKey('clear-search'),
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    _controller.clear();
+                    _onChanged('');
+                    setState(() {});
+                  },
+                ),
+        ),
       ),
     );
   }
@@ -346,7 +370,7 @@ class _LabelsChip extends StatelessWidget {
         ? l10n.filterLabelsChipDefault
         : l10n.filterLabelsChipWithCount(selected.length);
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
       onTap: () => _open(context),
       child: _ChipFace(
         icon: Icons.label_outline,
@@ -377,13 +401,15 @@ class _ChipFace extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final fg = active ? scheme.primary : scheme.onSurfaceVariant;
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
       padding: const EdgeInsets.fromLTRB(10, 6, 6, 6),
       decoration: BoxDecoration(
         color: active
             ? scheme.primary.withValues(alpha: 0.12)
             : scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(
           color:
               active ? scheme.primary.withValues(alpha: 0.45) : scheme.outlineVariant,

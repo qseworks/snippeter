@@ -38,46 +38,49 @@ class SettingsScreen extends ConsumerWidget {
               ],
               _SectionHeader(l10n.settingsSectionAppearance),
               Card(
-                child: ListTile(
-                  title: Text(l10n.settingsThemeLabel),
-                  trailing: SegmentedButton<ThemeMode>(
-                    segments: [
-                      ButtonSegment(
-                          value: ThemeMode.system,
-                          label: Text(l10n.settingsThemeSystem)),
-                      ButtonSegment(
-                          value: ThemeMode.light,
-                          label: Text(l10n.settingsThemeLight)),
-                      ButtonSegment(
-                          value: ThemeMode.dark,
-                          label: Text(l10n.settingsThemeDark)),
-                    ],
-                    selected: {settings.themeMode},
-                    onSelectionChanged: (s) => controller.setThemeMode(s.first),
-                  ),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  title: Text(l10n.settingsAppLanguageLabel),
-                  trailing: DropdownButton<Locale?>(
-                    value: ref.watch(localeProvider),
-                    // Native autonym for each language, so the option reads
-                    // naturally to a speaker of that language. null = follow the
-                    // system locale.
-                    items: [
-                      DropdownMenuItem(
-                        value: null,
-                        child: Text(l10n.settingsLanguageSystemDefault),
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(l10n.settingsThemeLabel),
+                      trailing: SegmentedButton<ThemeMode>(
+                        segments: [
+                          ButtonSegment(
+                              value: ThemeMode.system,
+                              label: Text(l10n.settingsThemeSystem)),
+                          ButtonSegment(
+                              value: ThemeMode.light,
+                              label: Text(l10n.settingsThemeLight)),
+                          ButtonSegment(
+                              value: ThemeMode.dark,
+                              label: Text(l10n.settingsThemeDark)),
+                        ],
+                        selected: {settings.themeMode},
+                        onSelectionChanged: (s) =>
+                            controller.setThemeMode(s.first),
                       ),
-                      for (final lang in kSupportedLanguages)
-                        DropdownMenuItem(
-                          value: lang.locale,
-                          child: Text(lang.nativeName),
-                        ),
-                    ],
-                    onChanged: controller.setLocale,
-                  ),
+                    ),
+                    ListTile(
+                      title: Text(l10n.settingsAppLanguageLabel),
+                      trailing: DropdownButton<Locale?>(
+                        value: ref.watch(localeProvider),
+                        // Native autonym for each language, so the option reads
+                        // naturally to a speaker of that language. null = follow
+                        // the system locale.
+                        items: [
+                          DropdownMenuItem(
+                            value: null,
+                            child: Text(l10n.settingsLanguageSystemDefault),
+                          ),
+                          for (final lang in kSupportedLanguages)
+                            DropdownMenuItem(
+                              value: lang.locale,
+                              child: Text(lang.nativeName),
+                            ),
+                        ],
+                        onChanged: controller.setLocale,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               _SectionHeader(l10n.settingsSectionExportDefaults),
@@ -280,7 +283,6 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
             autofillHints: const [AutofillHints.email],
             decoration: InputDecoration(
               labelText: l10n.settingsEmailLabel,
-              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -292,7 +294,6 @@ class _SignedOutFormState extends ConsumerState<_SignedOutForm> {
             onSubmitted: (_) => _signIn(),
             decoration: InputDecoration(
               labelText: l10n.settingsPasswordLabel,
-              border: const OutlineInputBorder(),
             ),
           ),
           if (_error != null) ...[

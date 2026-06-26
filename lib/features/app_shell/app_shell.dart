@@ -237,9 +237,12 @@ class _WorkspaceTile extends StatelessWidget {
                 children: [
                   avatar,
                   if (onManage != null)
+                    // Offsets account for _GearBadge's transparent hit padding
+                    // so the visible 16px gear stays pinned to the avatar's
+                    // bottom-end corner while the tap target spans ~40px.
                     PositionedDirectional(
-                      end: -4,
-                      bottom: -4,
+                      end: -16,
+                      bottom: -16,
                       child: _GearBadge(onTap: onManage!),
                     ),
                 ],
@@ -253,31 +256,44 @@ class _WorkspaceTile extends StatelessWidget {
 }
 
 /// Small gear affordance overlaid on a team avatar to open team management.
+/// The badge stays a crisp 16px, but a transparent [_hitSize]px hit area keeps
+/// it comfortably tappable.
 class _GearBadge extends StatelessWidget {
   const _GearBadge({required this.onTap});
 
   final VoidCallback onTap;
+
+  static const double _badgeSize = 16;
+  static const double _hitSize = 40;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Tooltip(
       message: l10n.shellManageTeam,
-      child: InkWell(
+      child: InkResponse(
         onTap: onTap,
+        radius: _hitSize / 2,
+        containedInkWell: false,
         customBorder: const CircleBorder(),
-        child: Container(
-          width: 16,
-          height: 16,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: AppTheme.sidebarRailBg,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.settings,
-            size: 11,
-            color: AppTheme.sidebarMuted,
+        child: SizedBox(
+          width: _hitSize,
+          height: _hitSize,
+          child: Center(
+            child: Container(
+              width: _badgeSize,
+              height: _badgeSize,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: AppTheme.sidebarRailBg,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.settings,
+                size: 11,
+                color: AppTheme.sidebarMuted,
+              ),
+            ),
           ),
         ),
       ),

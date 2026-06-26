@@ -390,7 +390,7 @@
       }
     }
   },
-  "detailManageLabelsTooltip": "Manage labels — coming soon",
+  "detailManageLabelsTooltip": "Manage labels",
   "@detailManageLabelsTooltip": {
     "description": "Tooltip message on the LABELS affordance"
   },

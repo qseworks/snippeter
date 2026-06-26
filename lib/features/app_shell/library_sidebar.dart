@@ -41,7 +41,8 @@ class LibrarySidebar extends ConsumerWidget {
     final stats = ref.watch(libraryStatsProvider);
     final query = ref.watch(libraryQueryProvider);
     final controller = ref.read(libraryQueryProvider.notifier);
-    final labels = ref.watch(labelsProvider).value ?? const <Label>[];
+    final labelsAsync = ref.watch(labelsProvider);
+    final labels = labelsAsync.value ?? const <Label>[];
     final languageMap = ref.watch(languageMapProvider);
 
     // Derive which nav item / filter is active from the current query.
@@ -157,6 +158,32 @@ class LibrarySidebar extends ConsumerWidget {
                       onTap: () => _showCreateLabelDialog(context, ref),
                     ),
                   ),
+                  // A stream error otherwise collapses the list to empty with no
+                  // signal; surface a tiny inline retry that re-subscribes.
+                  if (labelsAsync.hasError)
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(19, 2, 12, 4),
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Tooltip(
+                          message: l10n.commonRetry,
+                          child: InkWell(
+                            onTap: () => ref.invalidate(labelsProvider),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusXxs),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6),
+                              child: Icon(
+                                Icons.refresh,
+                                size: 16,
+                                color: AppTheme.sidebarMuted,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   _LabelTree(
                     labels: labels,
                     stats: stats,
@@ -216,18 +243,8 @@ class LibrarySidebar extends ConsumerWidget {
       for (final l in labels)
         if (l.parentId == null) l,
     ];
-    // A small Snippet-like palette to choose from.
-    const palette = [
-      Color(0xFF16B378),
-      Color(0xFFE5484D),
-      Color(0xFF8E4EC6),
-      Color(0xFFFFB224),
-      Color(0xFF12A594),
-      Color(0xFF3E63DD),
-      Color(0xFFE93D82),
-      Color(0xFF5753C6),
-    ];
-    var selectedColor = palette.first;
+    // The single source-of-truth label palette (shared with chips/role badges).
+    var selectedColor = AppTheme.labelPalette.first;
     String? selectedParentId;
 
     final created = await showDialog<bool>(
@@ -283,20 +300,45 @@ class LibrarySidebar extends ConsumerWidget {
                 spacing: 10,
                 runSpacing: 10,
                 children: [
-                  for (final c in palette)
-                    GestureDetector(
-                      onTap: () => setState(() => selectedColor = c),
-                      child: Container(
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          color: c,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: selectedColor == c
-                                ? Theme.of(context).colorScheme.onSurface
-                                : Colors.transparent,
-                            width: 2,
+                  for (final c in AppTheme.labelPalette)
+                    Semantics(
+                      button: true,
+                      selected: selectedColor == c,
+                      child: InkResponse(
+                        onTap: () => setState(() => selectedColor = c),
+                        radius: 24,
+                        customBorder: const CircleBorder(),
+                        // 26px circle inside a >=40px focusable/keyboard tap area.
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: c,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: selectedColor == c
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            // Non-color selected indicator (contrasts the swatch).
+                            child: selectedColor == c
+                                ? Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: ThemeData.estimateBrightnessForColor(
+                                                c) ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  )
+                                : null,
                           ),
                         ),
                       ),
@@ -383,7 +425,7 @@ class _SyncIndicator extends ConsumerWidget {
       message: tooltip,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
         hoverColor: AppTheme.sidebarHover,
         child: Padding(
           padding: const EdgeInsets.all(6),
@@ -532,18 +574,30 @@ class _LabelTreeState extends State<_LabelTree> {
               : null,
         ),
       );
-      if (hasChildren && expanded) {
-        for (final child in children) {
-          rows.add(
-            _LabelRow(
-              label: child,
-              count: widget.stats.byLabelId[child.id] ?? 0,
-              selected: widget.active.isLabel(child.id),
-              onTap: () => widget.onSelect(child.id),
-              depth: 1,
-            ),
-          );
-        }
+      if (hasChildren) {
+        // Grow/shrink the child group instead of inserting/removing instantly.
+        rows.add(
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: expanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final child in children)
+                        _LabelRow(
+                          label: child,
+                          count: widget.stats.byLabelId[child.id] ?? 0,
+                          selected: widget.active.isLabel(child.id),
+                          onTap: () => widget.onSelect(child.id),
+                          depth: 1,
+                        ),
+                    ],
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
+        );
       }
     }
 
@@ -586,21 +640,30 @@ class _LabelRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fg = selected ? AppTheme.sidebarText : AppTheme.sidebarMuted;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     // Reserve a fixed-width slot for the chevron so dots align across rows.
     final Widget chevron = SizedBox(
       width: 18,
       child: hasChildren
-          ? InkWell(
-              onTap: onToggleExpand,
-              borderRadius: BorderRadius.circular(4),
-              child: Icon(
-                expanded
-                    ? Icons.expand_more
-                    : (Directionality.of(context) == TextDirection.rtl
-                        ? Icons.chevron_left
-                        : Icons.chevron_right),
-                size: 16,
-                color: AppTheme.sidebarMuted,
+          ? Semantics(
+              button: true,
+              child: InkWell(
+                onTap: onToggleExpand,
+                borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: AnimatedRotation(
+                    // 0.25 turn rotates the resting chevron to point down.
+                    turns: expanded ? (isRtl ? -0.25 : 0.25) : 0,
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeOutCubic,
+                    child: Icon(
+                      isRtl ? Icons.chevron_left : Icons.chevron_right,
+                      size: 16,
+                      color: AppTheme.sidebarMuted,
+                    ),
+                  ),
+                ),
               ),
             )
           : null,
@@ -694,25 +757,32 @@ class _SidebarRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-      child: Material(
-        color: selected ? AppTheme.sidebarSelected : Colors.transparent,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        child: InkWell(
-          onTap: onTap,
+      // Fade the selected fill + accent bar in/out instead of snapping
+      // (mirrors the snippet card's selected treatment).
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.sidebarSelected : Colors.transparent,
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          hoverColor: AppTheme.sidebarHover,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              border: BorderDirectional(
-                start: BorderSide(
-                  color: selected ? AppTheme.accent : Colors.transparent,
-                  width: 3,
-                ),
-              ),
+          border: BorderDirectional(
+            start: BorderSide(
+              color: selected ? AppTheme.accent : Colors.transparent,
+              width: 3,
             ),
-            padding: const EdgeInsetsDirectional.fromSTEB(11, 9, 12, 9),
-            child: child,
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            hoverColor: AppTheme.sidebarHover,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(11, 9, 12, 9),
+              child: child,
+            ),
           ),
         ),
       ),
@@ -731,7 +801,7 @@ class _CountBadge extends StatelessWidget {
     return Text(
       '$count',
       style: TextStyle(
-        color: selected ? AppTheme.sidebarText : AppTheme.sidebarSection,
+        color: selected ? AppTheme.sidebarText : AppTheme.sidebarMuted,
         fontSize: 11,
         fontWeight: FontWeight.w600,
       ),
@@ -755,7 +825,7 @@ class _SectionHeader extends StatelessWidget {
             child: Text(
               title,
               style: const TextStyle(
-                color: AppTheme.sidebarSection,
+                color: AppTheme.sidebarMuted,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.2,
@@ -786,7 +856,7 @@ class _SectionAction extends StatelessWidget {
       message: tooltip,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
         child: Padding(
           padding: const EdgeInsets.all(2),
           child: Icon(icon, size: 16, color: AppTheme.sidebarMuted),

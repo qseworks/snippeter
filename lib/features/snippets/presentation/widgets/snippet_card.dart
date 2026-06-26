@@ -40,13 +40,16 @@ class SnippetCard extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Material(
-        color: selected ? scheme.surfaceContainerHigh : Colors.transparent,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
             decoration: BoxDecoration(
+              color: selected ? scheme.surfaceContainerHigh : Colors.transparent,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               border: BorderDirectional(
                 start: BorderSide(
@@ -85,17 +88,30 @@ class SnippetCard extends ConsumerWidget {
                       style: theme.textTheme.labelSmall
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
+                    const SizedBox(width: 4),
                     IconButton(
                       visualDensity: VisualDensity.compact,
                       iconSize: 18,
                       padding: const EdgeInsetsDirectional.only(start: 4),
-                      constraints: const BoxConstraints(),
+                      constraints:
+                          const BoxConstraints(minWidth: 40, minHeight: 40),
                       tooltip: snippet.isFavorite
                           ? l10n.cardUnfavorite
                           : l10n.cardFavorite,
-                      icon: Icon(
-                        snippet.isFavorite ? Icons.star : Icons.star_border,
-                        color: snippet.isFavorite ? Colors.amber : null,
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeOut,
+                        transitionBuilder: (child, animation) => ScaleTransition(
+                          scale: animation,
+                          child:
+                              FadeTransition(opacity: animation, child: child),
+                        ),
+                        child: Icon(
+                          snippet.isFavorite ? Icons.star : Icons.star_border,
+                          key: ValueKey(snippet.isFavorite),
+                          color: snippet.isFavorite ? Colors.amber : null,
+                        ),
                       ),
                       onPressed: () => ref
                           .read(snippetRepositoryProvider)

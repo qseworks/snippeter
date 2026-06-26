@@ -249,9 +249,19 @@ class _CopyButtonState extends State<_CopyButton> {
       visualDensity: VisualDensity.compact,
       iconSize: 18,
       onPressed: _copy,
-      icon: Icon(
-        _copied ? Icons.check_rounded : Icons.copy_rounded,
-        color: _copied ? const Color(0xFF27C93F) : widget.color,
+      icon: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeOut,
+        transitionBuilder: (child, animation) => ScaleTransition(
+          scale: animation,
+          child: FadeTransition(opacity: animation, child: child),
+        ),
+        child: Icon(
+          _copied ? Icons.check_rounded : Icons.copy_rounded,
+          key: ValueKey<bool>(_copied),
+          color: _copied ? const Color(0xFF27C93F) : widget.color,
+        ),
       ),
     );
   }

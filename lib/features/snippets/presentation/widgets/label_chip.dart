@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/value_objects.dart';
-
-/// A fixed, Snippet-like palette used to give labels stable, distinct colors when
-/// the user hasn't picked one explicitly.
-const List<Color> _labelPalette = [
-  Color(0xFF16B378), // green
-  Color(0xFFE5484D), // red
-  Color(0xFF8E4EC6), // purple
-  Color(0xFFFFB224), // amber
-  Color(0xFF12A594), // teal
-  Color(0xFF3E63DD), // blue
-  Color(0xFFE93D82), // pink
-  Color(0xFF5753C6), // indigo
-];
 
 /// Parses a hex color string like `#16B378`, `16B378`, or `#FF16B378`.
 /// Returns null when the string isn't a usable hex color.
@@ -32,12 +20,12 @@ Color? _parseHexColor(String? value) {
 /// Stable color derived from an arbitrary name via the fixed palette.
 Color labelColorByName(String name) {
   final key = name.trim().toLowerCase();
-  if (key.isEmpty) return _labelPalette.first;
+  if (key.isEmpty) return AppTheme.labelPalette.first;
   var hash = 0;
   for (final unit in key.codeUnits) {
     hash = (hash * 31 + unit) & 0x7fffffff;
   }
-  return _labelPalette[hash % _labelPalette.length];
+  return AppTheme.labelPalette[hash % AppTheme.labelPalette.length];
 }
 
 /// The effective display color for a label: its explicit hex color if parseable,
@@ -99,7 +87,7 @@ class LabelChip extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(7, 3, 9, 3),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
@@ -122,7 +110,7 @@ class LabelChip extends StatelessWidget {
     if (onTap == null) return chip;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
       child: chip,
     );
   }

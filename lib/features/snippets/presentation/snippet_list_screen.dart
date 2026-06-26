@@ -6,10 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/routing/route_paths.dart';
+import '../../../core/widgets/async_states.dart';
 import '../application/snippet_providers.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_query.dart';
 import 'snippet_detail_screen.dart';
+import 'snippet_editor_modal.dart';
 import 'widgets/snippet_card.dart';
 
 /// The bare library body rendered inside the Snippet shell (no Scaffold / AppBar
@@ -74,9 +76,19 @@ class _TwoPaneLibrary extends ConsumerWidget {
         ),
         const VerticalDivider(width: 1),
         Expanded(
-          child: selectedId == null
-              ? const DetailPanePlaceholder()
-              : InlineSnippetDetail(snippetId: selectedId),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeOut,
+            transitionBuilder: (child, animation) =>
+                FadeTransition(opacity: animation, child: child),
+            child: selectedId == null
+                ? const DetailPanePlaceholder(key: ValueKey('placeholder'))
+                : InlineSnippetDetail(
+                    key: ValueKey(selectedId),
+                    snippetId: selectedId,
+                  ),
+          ),
         ),
       ],
     );
@@ -237,7 +249,7 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
   }
 }
 
-class _ResultsArea extends StatelessWidget {
+class _ResultsArea extends ConsumerWidget {
   const _ResultsArea({
     required this.snippetsAsync,
     required this.isFiltered,
@@ -251,24 +263,39 @@ class _ResultsArea extends StatelessWidget {
   final String? selectedId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    return snippetsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            l10n.listErrorGeneric(error.toString()),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-      data: (snippets) {
-        if (snippets.isEmpty) {
-          return _EmptyState(filtered: isFiltered);
-        }
-        return ListView.builder(
+
+    // Discriminator drives the cross-fade: it changes between
+    // loading/error/empty/data and, for data, with the result identity so a
+    // new result set fades in instead of swapping hard.
+    final String discriminator;
+    final Widget child;
+
+    if (snippetsAsync.isLoading && !snippetsAsync.hasValue) {
+      // First load only — once we have a value we keep it visible while the
+      // query-keyed family refetches, so sort/filter/search never blanks.
+      discriminator = 'loading';
+      child = const AppLoader();
+    } else if (snippetsAsync.hasError && !snippetsAsync.hasValue) {
+      discriminator = 'error';
+      child = AppErrorState(
+        message: l10n.settingsGenericError,
+        onRetry: () {
+          final query = ref.read(libraryQueryProvider);
+          ref.invalidate(snippetListProvider(query));
+          ref.invalidate(allSnippetsProvider);
+        },
+      );
+    } else {
+      final snippets = snippetsAsync.value ?? const <Snippet>[];
+      if (snippets.isEmpty) {
+        discriminator = 'empty';
+        child = _EmptyState(filtered: isFiltered);
+      } else {
+        discriminator =
+            'data:${snippets.length}:${snippets.first.id}:${snippets.last.id}';
+        child = ListView.builder(
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
           itemCount: snippets.length,
           itemBuilder: (context, index) {
@@ -280,18 +307,25 @@ class _ResultsArea extends StatelessWidget {
             );
           },
         );
-      },
+      }
+    }
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 180),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeOut,
+      child: KeyedSubtree(key: ValueKey(discriminator), child: child),
     );
   }
 }
 
-class _EmptyState extends StatelessWidget {
+class _EmptyState extends ConsumerWidget {
   const _EmptyState({this.filtered = false});
 
   final bool filtered;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final (icon, title, subtitle) = filtered
@@ -306,6 +340,28 @@ class _EmptyState extends StatelessWidget {
             l10n.listEmptySubtitle,
           );
     final scheme = theme.colorScheme;
+
+    // CTA: an empty library offers "New snippet"; a filtered-empty result
+    // offers to clear the active filters (only when filters — not just search
+    // text — are in play, matching the filter bar's own Clear chip).
+    final Widget? action;
+    if (!filtered) {
+      action = FilledButton.icon(
+        onPressed: () => showSnippetEditor(context),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.sidebarNewSnippetButton),
+      );
+    } else if (ref.watch(libraryQueryProvider).hasFilters) {
+      action = TextButton.icon(
+        onPressed: () =>
+            ref.read(libraryQueryProvider.notifier).clearFilters(),
+        icon: const Icon(Icons.clear, size: 18),
+        label: Text(l10n.filterClearChip),
+      );
+    } else {
+      action = null;
+    }
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -343,6 +399,10 @@ class _EmptyState extends StatelessWidget {
               style: theme.textTheme.bodyMedium
                   ?.copyWith(color: scheme.onSurfaceVariant),
             ),
+            if (action != null) ...[
+              const SizedBox(height: 22),
+              action,
+            ],
           ],
         ),
       ),

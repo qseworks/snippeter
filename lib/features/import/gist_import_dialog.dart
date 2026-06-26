@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../snippets/application/snippet_providers.dart';
 import '../snippets/domain/snippet.dart';
 import 'gist_import.dart';
@@ -415,7 +416,7 @@ class _ErrorBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: scheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

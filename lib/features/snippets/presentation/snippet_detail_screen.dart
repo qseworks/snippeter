@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/config/supabase_config.dart';
@@ -10,6 +11,7 @@ import '../../../core/highlight/language_visuals.dart';
 import '../../../core/notebook/ipynb.dart';
 import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/async_states.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../export/presentation/export_menu_button.dart';
 import '../application/snippet_providers.dart';
@@ -37,7 +39,10 @@ class SnippetDetailScreen extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) => Scaffold(
         appBar: AppBar(),
-        body: Center(child: Text(l10n.commonError(error.toString()))),
+        body: AppErrorState(
+          message: l10n.settingsGenericError,
+          onRetry: () => ref.invalidate(snippetProvider(snippetId)),
+        ),
       ),
       data: (snippet) {
         if (snippet == null) {
@@ -81,7 +86,10 @@ class InlineSnippetDetail extends ConsumerWidget {
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text(l10n.commonError(error.toString()))),
+      error: (error, _) => AppErrorState(
+        message: l10n.settingsGenericError,
+        onRetry: () => ref.invalidate(snippetProvider(snippetId)),
+      ),
       data: (snippet) {
         if (snippet == null) {
           return _PaneMessage(
@@ -194,6 +202,7 @@ class SnippetDetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final languageMap = ref.watch(languageMapProvider);
     final language = languageMap[snippet.languageId];
     final collection = ref.watch(collectionMapProvider)[snippet.collectionId];
@@ -218,7 +227,9 @@ class SnippetDetailBody extends ConsumerWidget {
               runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _Meta(icon: iconForType(snippet.type), label: snippet.type.label),
+                _Meta(
+                    icon: iconForType(snippet.type),
+                    label: labelForType(l10n, snippet.type)),
                 if (language != null)
                   LanguagePill(
                     languageId: snippet.languageId,
@@ -229,7 +240,7 @@ class SnippetDetailBody extends ConsumerWidget {
                 if (collection != null)
                   _Meta(icon: Icons.folder_outlined, label: collection.name),
                 for (final label in snippet.labels) LabelChip(label: label),
-                const _LabelsAffordance(),
+                _LabelsAffordance(snippetId: snippet.id),
               ],
             ),
             const SizedBox(height: 14),
@@ -487,19 +498,12 @@ class _FileBlock extends StatelessWidget {
   }
 }
 
-/// A compact relative/short date from an epoch-ms timestamp (e.g. "Jun 20" or
-/// "Mar 3, 2024").
-String _shortDate(int epochMs) {
+/// A compact, locale-aware short date from an epoch-ms timestamp
+/// (e.g. "Jun 20, 2024"), formatted with intl for the active locale.
+String _shortDate(BuildContext context, int epochMs) {
   final date = DateTime.fromMillisecondsSinceEpoch(epochMs);
-  final now = DateTime.now();
-  const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-  final month = months[date.month - 1];
-  return date.year == now.year
-      ? '$month ${date.day}'
-      : '$month ${date.day}, ${date.year}';
+  final locale = Localizations.localeOf(context).toString();
+  return DateFormat.yMMMd(locale).format(date);
 }
 
 /// The Snippet-style meta line under the title: a short snippet id + the date
@@ -527,7 +531,7 @@ class _MetaLine extends StatelessWidget {
         const SizedBox(width: 8),
         Text('·', style: muted),
         const SizedBox(width: 8),
-        Text(l10n.detailUpdatedLabel(_shortDate(snippet.updatedAt)),
+        Text(l10n.detailUpdatedLabel(_shortDate(context, snippet.updatedAt)),
             style: muted),
       ],
     );
@@ -537,7 +541,9 @@ class _MetaLine extends StatelessWidget {
 /// A non-interactive "LABELS ▾" affordance sitting alongside the label chips,
 /// echoing Snippet's label dropdown trigger.
 class _LabelsAffordance extends StatelessWidget {
-  const _LabelsAffordance();
+  const _LabelsAffordance({required this.snippetId});
+
+  final String snippetId;
 
   @override
   Widget build(BuildContext context) {
@@ -545,27 +551,31 @@ class _LabelsAffordance extends StatelessWidget {
     final theme = Theme.of(context);
     return Tooltip(
       message: l10n.detailManageLabelsTooltip,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: theme.colorScheme.outlineVariant),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              l10n.detailLabelsAffordance,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.6,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        onTap: () => showSnippetEditor(context, snippetId: snippetId),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.detailLabelsAffordance,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                ),
               ),
-            ),
-            const SizedBox(width: 2),
-            Icon(Icons.arrow_drop_down,
-                size: 16, color: theme.colorScheme.onSurfaceVariant),
-          ],
+              const SizedBox(width: 2),
+              Icon(Icons.arrow_drop_down,
+                  size: 16, color: theme.colorScheme.onSurfaceVariant),
+            ],
+          ),
         ),
       ),
     );
@@ -669,9 +679,19 @@ class _LinkCopyButtonState extends State<_LinkCopyButton> {
       visualDensity: VisualDensity.compact,
       iconSize: 16,
       onPressed: _copy,
-      icon: Icon(
-        _copied ? Icons.check_rounded : Icons.copy_rounded,
-        color: _copied ? AppTheme.accent : theme.colorScheme.onSurfaceVariant,
+      icon: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeOut,
+        transitionBuilder: (child, animation) => ScaleTransition(
+          scale: animation,
+          child: FadeTransition(opacity: animation, child: child),
+        ),
+        child: Icon(
+          _copied ? Icons.check_rounded : Icons.copy_rounded,
+          key: ValueKey<bool>(_copied),
+          color: _copied ? AppTheme.accent : theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
@@ -697,7 +717,7 @@ class _VisibilityPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -732,31 +752,16 @@ class _FilesHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Text(
-          l10n.detailFilesHeader(count),
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const Spacer(),
-        Tooltip(
-          message: l10n.detailHistoryTooltip,
-          child: TextButton.icon(
-            onPressed: () => showSnippetHistory(context, snippetId: snippetId),
-            icon: const Icon(Icons.history, size: 16),
-            label: Text(l10n.detailHistoryButton),
-            style: TextButton.styleFrom(
-              foregroundColor: AppTheme.accent,
-              textStyle: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.6,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              visualDensity: VisualDensity.compact,
+        Flexible(
+          child: Text(
+            l10n.detailFilesHeader(count),
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        const SizedBox(width: 4),
+        const Spacer(),
         Tooltip(
           message: l10n.detailAddFileTooltip,
           child: TextButton.icon(
@@ -852,10 +857,11 @@ class _Meta extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

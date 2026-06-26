@@ -106,7 +106,7 @@ class LanguagePill extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(4, 3, 9, 3),
       decoration: BoxDecoration(
         color: visual.color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: visual.color.withValues(alpha: 0.28)),
       ),
       child: Row(

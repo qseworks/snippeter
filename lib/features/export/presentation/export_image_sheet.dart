@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/highlight/code_themes.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../settings/application/settings_providers.dart';
 import '../application/export_providers.dart';
 import '../domain/snippet_export_data.dart';
@@ -165,7 +166,7 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                     child: _card(),
                   ),
                 ),

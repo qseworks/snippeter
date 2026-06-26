@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/highlight/code_highlighter.dart';
 import '../../../core/highlight/code_themes.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/code_view.dart';
 import '../domain/snippet_export_data.dart';
 import 'export_background.dart';
@@ -68,7 +69,7 @@ class CodeImageCard extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: codeBackground,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.35),

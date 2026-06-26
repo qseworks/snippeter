@@ -38,12 +38,17 @@ class _FileEditState {
 
   final TextEditingController filenameController;
   final CodeLineEditingController contentController;
+
+  /// Focus node for the filename field, so a freshly-added file can grab the
+  /// caret (see [_SnippetEditorScreenState._addFile]).
+  final FocusNode filenameFocusNode = FocusNode();
   String? languageId;
   bool overridden;
 
   void dispose() {
     filenameController.dispose();
     contentController.dispose();
+    filenameFocusNode.dispose();
   }
 }
 
@@ -76,6 +81,11 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
   /// One entry per file; always at least one.
   final List<_FileEditState> _files = [_FileEditState()];
+
+  /// Drives the scrolling file list so adding a file can reveal it (see
+  /// [_addFile]). Shared across layouts; only one files scroll view is mounted
+  /// at a time, so it is never attached to two positions simultaneously.
+  final ScrollController _filesScrollController = ScrollController();
 
   // Prompt-only controllers.
   final _modelController = TextEditingController();
@@ -178,6 +188,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     _systemPromptController.dispose();
     _temperatureController.dispose();
     _maxTokensController.dispose();
+    _filesScrollController.dispose();
     super.dispose();
   }
 
@@ -200,6 +211,19 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       _files.add(_FileEditState(
         languageId: ref.read(settingsProvider).defaultLanguageId,
       ));
+    });
+    // After the new editor is laid out, scroll it into view (when the list is
+    // scrollable) and drop the caret in its filename field for quick typing.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (_filesScrollController.hasClients) {
+        _filesScrollController.animateTo(
+          _filesScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+        );
+      }
+      _files.last.filenameFocusNode.requestFocus();
     });
   }
 
@@ -468,6 +492,9 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       // Big Snippet-style title field.
       TextField(
         controller: _titleController,
+        // Fresh snippet: drop the caret in the title straight away; when editing
+        // an existing snippet, leave focus alone.
+        autofocus: !widget.isEditing,
         textInputAction: TextInputAction.next,
         style: theme.textTheme.headlineSmall,
         decoration: InputDecoration(
@@ -590,23 +617,37 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       ),
     ];
 
-    // AI-only tip + prompt settings; rendered alongside the metadata.
+    // AI-only tip + prompt settings; rendered alongside the metadata. Wrapped in
+    // an AnimatedSize so the block eases in/out as the type switches instead of
+    // popping.
     final aiChildren = <Widget>[
-      if (_type == SnippetType.aiPrompt) ...[
-        const SizedBox(height: 16),
-        Text(
-          l10n.editorAiVariableTip('{{variable}}'),
-          style: theme.textTheme.bodySmall,
-        ),
-        const SizedBox(height: 12),
-        _PromptSettings(
-          providerController: _providerController,
-          modelController: _modelController,
-          systemPromptController: _systemPromptController,
-          temperatureController: _temperatureController,
-          maxTokensController: _maxTokensController,
-        ),
-      ],
+      AnimatedSize(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.hardEdge,
+        child: _type == SnippetType.aiPrompt
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.editorAiVariableTip('{{variable}}'),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 12),
+                  _PromptSettings(
+                    providerController: _providerController,
+                    modelController: _modelController,
+                    systemPromptController: _systemPromptController,
+                    temperatureController: _temperatureController,
+                    maxTokensController: _maxTokensController,
+                  ),
+                ],
+              )
+            : const SizedBox(width: double.infinity),
+      ),
     ];
 
     // ---------- FILES ----------
@@ -659,43 +700,84 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       );
     }
 
-    // Stacked, fixed-height file editors (single-column layouts).
+    // Stacked, fixed-height file editors (single-column layouts). The editors
+    // live inside an AnimatedSize so adding/removing a file eases the column's
+    // height instead of popping.
     List<Widget> filesColumn() => [
           filesHeader,
           const SizedBox(height: 8),
-          for (var i = 0; i < _files.length; i++) ...[
-            fileEditorAt(i, editorHeight: 360),
-            const SizedBox(height: 16),
-          ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            clipBehavior: Clip.hardEdge,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < _files.length; i++) ...[
+                  fileEditorAt(i, editorHeight: 360),
+                  const SizedBox(height: 16),
+                ],
+              ],
+            ),
+          ),
         ];
 
-    // Right pane for the wide modal: a single file fills the pane (no scroll);
-    // multiple files scroll within it.
+    // Right pane for the wide modal. The editors share the available height when
+    // they each still get a comfortable amount of room (so the first editor no
+    // longer abruptly shrinks the moment a second file is added); once they
+    // would be squeezed below that, fall back to fixed-height scrolling.
     Widget filesPane() {
-      if (_files.length == 1) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            filesHeader,
-            const SizedBox(height: 8),
-            Expanded(child: fileEditorAt(0, expand: true)),
-          ],
-        );
-      }
+      const minSharedHeight = 280.0;
+      const gap = 16.0;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           filesHeader,
           const SizedBox(height: 8),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                for (var i = 0; i < _files.length; i++) ...[
-                  fileEditorAt(i, editorHeight: 320),
-                  const SizedBox(height: 16),
-                ],
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final count = _files.length;
+                final perEditor =
+                    (constraints.maxHeight - gap * (count - 1)) / count;
+                if (perEditor >= minSharedHeight) {
+                  // Editors fill the pane and share the height — no scroll, no
+                  // lurch when going from one file to a few.
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var i = 0; i < count; i++) ...[
+                        Expanded(child: fileEditorAt(i, expand: true)),
+                        if (i < count - 1) const SizedBox(height: gap),
+                      ],
+                    ],
+                  );
+                }
+                // Too many files to share comfortably: fixed-height editors that
+                // scroll, easing height changes as files come and go.
+                return SingleChildScrollView(
+                  controller: _filesScrollController,
+                  padding: EdgeInsets.zero,
+                  child: AnimatedSize(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topCenter,
+                    clipBehavior: Clip.hardEdge,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var i = 0; i < count; i++) ...[
+                          fileEditorAt(i, editorHeight: 320),
+                          const SizedBox(height: gap),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -704,6 +786,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
     // One scrolling column — used by the non-modal route and the narrow modal.
     Widget singleColumn() => ListView(
+          controller: _filesScrollController,
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
           children: [
             ...metaChildren,
@@ -724,9 +807,13 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
       child: Row(
         children: [
-          _VisibilityToggle(
-            value: _visibility,
-            onChanged: (v) => setState(() => _visibility = v),
+          // Flexible so a long visibility label ellipsizes instead of pushing
+          // Discard/Save off the edge on a narrow footer.
+          Flexible(
+            child: _VisibilityToggle(
+              value: _visibility,
+              onChanged: (v) => setState(() => _visibility = v),
+            ),
           ),
           const Spacer(),
           TextButton(
@@ -898,7 +985,21 @@ class _ModalHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(iconForType(type), size: 19, color: Colors.white),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeOut,
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation,
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: Icon(
+                iconForType(type),
+                key: ValueKey(type),
+                size: 19,
+                color: Colors.white,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -947,12 +1048,15 @@ class _SectionHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Text(
-          title,
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.0,
-            color: theme.colorScheme.onSurfaceVariant,
+        Flexible(
+          child: Text(
+            title,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         if (trailing != null) ...[
@@ -1069,6 +1173,8 @@ class _VisibilityToggle extends StatelessWidget {
       ),
       label: Text(
         isPrivate ? l10n.editorVisibilityPrivate : l10n.editorVisibilityPublic,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: theme.textTheme.labelLarge?.copyWith(
           color: isPrivate
               ? theme.colorScheme.primary
@@ -1125,6 +1231,7 @@ class _FileEditor extends StatelessWidget {
               flex: 3,
               child: TextField(
                 controller: file.filenameController,
+                focusNode: file.filenameFocusNode,
                 onChanged: onFilenameChanged,
                 decoration: InputDecoration(
                   labelText: l10n.editorFilenameLabel,
@@ -1148,6 +1255,8 @@ class _FileEditor extends StatelessWidget {
               IconButton(
                 tooltip: l10n.editorRemoveFileTooltip,
                 onPressed: onRemove,
+                visualDensity: VisualDensity.compact,
+                iconSize: 20,
                 icon: const Icon(Icons.delete_outline),
               ),
             ],
@@ -1310,11 +1419,15 @@ class _BodyEditorState extends State<_BodyEditor> {
               children: [
                 LanguageBadge(languageId: widget.languageId, size: 18),
                 const SizedBox(width: 8),
-                Text(
-                  language?.name ?? l10n.editorPlainTextLanguage,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    language?.name ?? l10n.editorPlainTextLanguage,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const Spacer(),
@@ -1373,8 +1486,13 @@ class _LanguageDropdown extends StatelessWidget {
       label: Text(l10n.editorLanguageDropdownLabel),
       hintText: l10n.editorLanguageSearchHint,
       inputDecorationTheme: Theme.of(context).inputDecorationTheme,
+      // Both states use the same 18px-in-8px-padding leading box so the field
+      // text doesn't shift when a language is picked.
       leadingIcon: value == null
-          ? const Icon(Icons.translate)
+          ? const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(Icons.translate, size: 18),
+            )
           : Padding(
               padding: const EdgeInsets.all(8),
               child: LanguageBadge(languageId: value, size: 18),

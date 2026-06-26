@@ -61,31 +61,40 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
     if (controller.value == null) {
       return const SizedBox(width: 0, height: 0);
     }
-    return Container(
-      margin: margin,
-      alignment: AlignmentDirectional.topEnd,
-      height: preferredSize.height,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Material(
-          elevation: 2,
-          borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).colorScheme.surfaceContainerHigh,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            child: SizedBox(
-              width: _kPanelWidth,
-              child: Column(
-                children: [
-                  _buildFindInputView(context),
-                  if (controller.value!.replaceMode)
-                    _buildReplaceInputView(context),
-                ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Shrink the panel to fit a narrow editor instead of overflowing its
+        // right edge; the subtracted slack covers the container margin plus the
+        // Material's horizontal padding.
+        final available = constraints.maxWidth - margin.horizontal - 12;
+        final panelWidth = min(_kPanelWidth, max(0.0, available));
+        return Container(
+          margin: margin,
+          alignment: AlignmentDirectional.topEnd,
+          height: preferredSize.height,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Material(
+              elevation: 2,
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: SizedBox(
+                  width: panelWidth,
+                  child: Column(
+                    children: [
+                      _buildFindInputView(context),
+                      if (controller.value!.replaceMode)
+                        _buildReplaceInputView(context),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/async_states.dart';
 import '../../../../core/widgets/code_view.dart';
 import '../../application/snippet_providers.dart';
 import '../../domain/snippet.dart';
@@ -126,11 +127,10 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (snapshot.hasError) {
-                        return _EmptyState(
-                          icon: Icons.error_outline,
-                          text: l10n.historyLoadError(
-                            snapshot.error.toString(),
-                          ),
+                        return AppErrorState(
+                          message: l10n.historyLoadError('').trim(),
+                          onRetry: () =>
+                              setState(() => _future = _load()),
                         );
                       }
                       final versions = snapshot.data ?? const [];
@@ -212,7 +212,7 @@ class _VersionTile extends ConsumerWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppTheme.accent.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                   ),
                   child: Text(
                     l10n.historyLatestBadge,

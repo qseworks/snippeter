@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snippet_manager/core/theme/app_theme.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
@@ -404,27 +405,38 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
             ),
           ),
           const SizedBox(width: 8),
-          if (_busy)
-            const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          else if (_roleEditable)
-            _RoleDropdown(
-              value: member.role,
-              onChanged: (r) => r == null ? null : _setRole(r),
-            )
-          else
-            RoleChip(role: member.role),
-          if (_removable && !_busy)
-            IconButton(
-              tooltip: l10n.teamRemoveMemberTooltip,
-              visualDensity: VisualDensity.compact,
-              iconSize: 18,
-              icon: const Icon(Icons.person_remove_outlined),
-              onPressed: _remove,
-            ),
+          // Fixed footprint so an editable row's dropdown and a static row's
+          // chip occupy the same slot and adjacent rows keep an even height.
+          Container(
+            constraints: const BoxConstraints(minWidth: 88, minHeight: 40),
+            alignment: AlignmentDirectional.centerEnd,
+            child: _busy
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : _roleEditable
+                    ? _RoleDropdown(
+                        value: member.role,
+                        onChanged: (r) => r == null ? null : _setRole(r),
+                      )
+                    : RoleChip(role: member.role),
+          ),
+          // Reserve the remove-button slot on every row so the right edges line
+          // up even when a member can't be removed.
+          SizedBox(
+            width: 40,
+            child: (_removable && !_busy)
+                ? IconButton(
+                    tooltip: l10n.teamRemoveMemberTooltip,
+                    visualDensity: VisualDensity.compact,
+                    iconSize: 18,
+                    icon: const Icon(Icons.person_remove_outlined),
+                    onPressed: _remove,
+                  )
+                : null,
+          ),
         ],
       ),
     );
@@ -669,7 +681,12 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
         ),
       );
     }
-    return Row(
+    // Wrap (not Row) so the Delete action drops to a second line on narrow
+    // phones / long locales instead of overflowing.
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.spaceBetween,
       children: [
         OutlinedButton.icon(
           onPressed: _leave,
@@ -680,7 +697,6 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
             side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.5)),
           ),
         ),
-        const Spacer(),
         if (widget.amOwner)
           TextButton.icon(
             onPressed: _delete,
@@ -709,7 +725,7 @@ class _RoleDropdown extends StatelessWidget {
         value: value,
         onChanged: onChanged,
         isDense: true,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         items: [
           for (final role in WorkspaceRole.values)
             DropdownMenuItem<WorkspaceRole>(
@@ -737,7 +753,7 @@ class RoleChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
       ),
       child: Text(
         _roleLabel(context, role),
@@ -762,7 +778,7 @@ class _TeamError extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: scheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -798,13 +814,13 @@ String _roleLabel(BuildContext context, WorkspaceRole role) {
 Color _roleColor(WorkspaceRole role) {
   switch (role) {
     case WorkspaceRole.owner:
-      return const Color(0xFF8E4EC6); // purple
+      return AppTheme.labelPalette[2]; // purple
     case WorkspaceRole.manager:
-      return const Color(0xFF3E63DD); // blue
+      return AppTheme.labelPalette[5]; // blue
     case WorkspaceRole.member:
-      return const Color(0xFF16B378); // green
+      return AppTheme.accent; // green
     case WorkspaceRole.viewer:
-      return const Color(0xFF98A1B0); // grey
+      return AppTheme.sidebarMuted; // grey
   }
 }
 
@@ -825,11 +841,11 @@ String friendlyWorkspaceError(BuildContext context, Object error) {
         msg.contains('policy')) {
       return l10n.teamErrorOnlyManagers;
     }
-    return error.message;
+    return l10n.teamErrorGeneric;
   }
   if (error is StateError) {
     // e.g. "Must be signed in to invite".
-    return error.message;
+    return l10n.teamErrorSignInRequired;
   }
   final text = error.toString().toLowerCase();
   if (text.contains('socket') ||
