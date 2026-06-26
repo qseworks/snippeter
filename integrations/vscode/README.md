@@ -53,6 +53,12 @@ Then in VS Code: **Extensions** view > `…` menu > **Install from VSIX…** and
 
 The Supabase project URL and the anonymous/publishable key are baked into `src/supabase.ts`. The publishable key is safe to ship in clients — all access is gated by Supabase Auth + Row Level Security.
 
+## Branding
+
+The marketplace icon is `icon.png` (128×128). The Snippeter accent is the brand
+green **`#65EA92`** (the block caret); the dark tile / gallery banner background is
+**`#0D0E11`**. See `package.json` (`icon`, `galleryBanner`) for the published values.
+
 ## How data maps
 
 - A snippet (`snippets`) has 1..N files in `snippet_files`, ordered by `position`.

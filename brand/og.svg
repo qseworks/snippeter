@@ -1,0 +1,44 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Snippeter">
+  <!-- Social / OpenGraph card (1200x630). -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0E0F13"/>
+      <stop offset="1" stop-color="#08090B"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="600" cy="250" r="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#65EA92" stop-opacity="0.14"/>
+      <stop offset="0.75" stop-color="#65EA92" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tile" x1="147.8" y1="24" x2="364.2" y2="488" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1C1F27"/>
+      <stop offset="1" stop-color="#111319"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="328" cy="246" r="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#65EA92" stop-opacity="0.18"/>
+      <stop offset="0.72" stop-color="#65EA92" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="caret" x1="0" y1="0" x2="0" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CF5A2"/>
+      <stop offset="1" stop-color="#5EE38B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#halo)"/>
+
+  <!-- icon tile 168x168 centered-left of the wordmark -->
+  <g transform="translate(316 168) scale(0.328125)">
+    <rect width="512" height="512" rx="114" fill="url(#tile)"/>
+    <rect width="512" height="512" rx="114" fill="url(#glow)"/>
+    <rect x="1.5" y="1.5" width="509" height="509" rx="112.5" fill="none" stroke="#24272F" stroke-width="3"/>
+    <g transform="translate(173.02 173.02) scale(4.881)">
+      <path d="M0 0 L17 17 L0 34" fill="none" stroke="#EDEEF2" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="27" y="0" width="11" height="34" rx="4" fill="url(#caret)"/>
+    </g>
+  </g>
+
+  <text x="520" y="252" dominant-baseline="central" font-family="'Space Grotesk SemiBold','Space Grotesk','Inter',sans-serif" font-weight="600" font-size="120" letter-spacing="-3" fill="#EDEEF2">Snippeter</text>
+
+  <text x="600" y="430" text-anchor="middle" font-family="'Space Grotesk Medium','Space Grotesk','Inter',sans-serif" font-weight="500" font-size="40" letter-spacing="-0.5" fill="#A8ABB4">Snippets &amp; AI prompts, everywhere.</text>
+  <text x="600" y="512" text-anchor="middle" font-family="'JetBrains Mono','SFMono-Regular',monospace" font-size="21" letter-spacing="0.5" fill="#6B6E77"><tspan fill="#65EA92">●</tspan>  local-first · full-text search · code-to-image · encrypted sync</text>
+</svg>

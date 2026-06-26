@@ -1,0 +1,30 @@
+<svg width="760" height="200" viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Snippeter">
+  <!-- Horizontal lockup on dark: icon tile + Space Grotesk wordmark + caret. -->
+  <defs>
+    <linearGradient id="tile" x1="147.8" y1="24" x2="364.2" y2="488" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1C1F27"/>
+      <stop offset="1" stop-color="#111319"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="328" cy="246" r="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#65EA92" stop-opacity="0.16"/>
+      <stop offset="0.72" stop-color="#65EA92" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="caret" x1="0" y1="0" x2="0" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CF5A2"/>
+      <stop offset="1" stop-color="#5EE38B"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(32 40) scale(0.234375)">
+    <rect width="512" height="512" rx="114" fill="url(#tile)"/>
+    <rect width="512" height="512" rx="114" fill="url(#glow)"/>
+    <rect x="1.5" y="1.5" width="509" height="509" rx="112.5" fill="none" stroke="#24272F" stroke-width="3"/>
+    <g transform="translate(173.02 173.02) scale(4.881)">
+      <path d="M0 0 L17 17 L0 34" fill="none" stroke="#EDEEF2" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="27" y="0" width="11" height="34" rx="4" fill="url(#caret)"/>
+    </g>
+  </g>
+
+  <text x="186" y="100" dominant-baseline="central" font-family="'Space Grotesk SemiBold','Space Grotesk','Inter',sans-serif" font-weight="600" font-size="82" letter-spacing="-1.6" fill="#EDEEF2">Snippeter</text>
+  <rect x="612" y="62" width="14" height="74" rx="4" fill="#65EA92"/>
+</svg>

@@ -19,7 +19,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-brand-gradient text-bg shadow-[0_8px_30px_-8px_rgba(22,179,120,0.6)] hover:shadow-[0_12px_40px_-8px_rgba(22,179,120,0.75)] hover:-translate-y-0.5 active:translate-y-0",
+    "bg-brand-gradient text-[#0B0C0F] shadow-[0_8px_30px_-8px_rgba(101,234,146,0.6)] hover:shadow-[0_12px_40px_-8px_rgba(101,234,146,0.75)] hover:-translate-y-0.5 active:translate-y-0",
   secondary:
     "border border-hairline bg-surface-elevated text-ink hover:border-accent/50 hover:bg-surface-elevated/80 hover:-translate-y-0.5 active:translate-y-0",
   ghost: "text-ink hover:text-accent",

@@ -10,7 +10,7 @@ or CDN assets (the product mock and logo are drawn with inline SVG/CSS).
 - Next.js 14 (App Router)
 - TypeScript
 - Tailwind CSS
-- `next/font` for the Inter typeface
+- `next/font` for the Inter body typeface and the Space Grotesk wordmark
 
 ## Local development
 
@@ -38,8 +38,8 @@ npm run lint    # next lint
 landing/
 ├─ app/
 │  ├─ globals.css        # Tailwind layers + theme/base styles
-│  ├─ icon.svg           # favicon (the </> logo mark)
-│  ├─ layout.tsx         # Inter font, metadata, OpenGraph, theme-color
+│  ├─ icon.svg           # favicon (the prompt ">▍" logo mark)
+│  ├─ layout.tsx         # Inter + Space Grotesk fonts, metadata, OpenGraph, theme-color
 │  └─ page.tsx           # composes all sections
 ├─ components/
 │  ├─ Nav.tsx
@@ -97,16 +97,23 @@ vercel --prod     # promote to production
 
 The brand palette is defined in `tailwind.config.ts`:
 
-| Token              | Hex       | Tailwind class            |
-| ------------------ | --------- | ------------------------- |
-| Accent green       | `#16B378` | `accent` / `accent-green` |
-| Teal               | `#12A594` | `accent-teal`             |
-| Background         | `#0F1115` | `bg`                      |
-| Surface            | `#161A21` | `surface`                 |
-| Elevated surface   | `#1C212B` | `surface-elevated`        |
-| Hairline border    | `#262B36` | `hairline`                |
-| Text               | `#E6E9EF` | `ink`                     |
-| Muted text         | `#8A93A2` | `muted`                   |
+| Token                 | Hex       | Tailwind class            |
+| --------------------- | --------- | ------------------------- |
+| Brand green (accent)  | `#65EA92` | `accent` / `accent-green` |
+| Green deep            | `#5EE38B` | `accent-teal`             |
+| Green light (gradient)| `#7CF5A2` | via `brand-gradient`      |
+| Background            | `#0F1115` | `bg`                      |
+| Surface               | `#161A21` | `surface`                 |
+| Elevated surface      | `#1C212B` | `surface-elevated`        |
+| Hairline border       | `#262B36` | `hairline`                |
+| Text                  | `#E6E9EF` | `ink`                     |
+| Muted text            | `#8A93A2` | `muted`                   |
+
+The brand mark is the "prompt" glyph — a terminal chevron `>` plus a green block
+caret (`>▍`) on a dark rounded tile (see `LogoMark.tsx` / `app/icon.svg`). The
+**Snippeter** wordmark is set in **Space Grotesk SemiBold** (`font-display`); the
+green CTA/pill gradient (`#7CF5A2 → #5EE38B`) is bright, so text on top of it uses
+dark ink (`#0B0C0F`) for contrast.
 
 ## Accessibility & performance notes
 

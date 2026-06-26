@@ -1,8 +1,9 @@
 /* Snippeter popup — brand palette, dark theme. */
 
 :root {
-  --accent: #16b378;
-  --teal: #12a594;
+  --accent: #65ea92;
+  --teal: #5ee38b;
+  --ink-dark: #0b0c0f;
   --bg: #0f1115;
   --surface: #161a21;
   --elevated: #1c212b;
@@ -67,15 +68,14 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: linear-gradient(135deg, var(--accent), var(--teal));
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: -0.5px;
-  font-family: "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  width: 24px;
+  height: 24px;
+}
+
+.logo-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .brand-name {
@@ -138,13 +138,13 @@ input::placeholder {
 input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(22, 179, 120, 0.16);
+  box-shadow: 0 0 0 3px rgba(101, 234, 146, 0.16);
 }
 
 .primary-btn {
   margin-top: 2px;
   background: linear-gradient(135deg, var(--accent), var(--teal));
-  color: #ffffff;
+  color: var(--ink-dark);
   border: none;
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -183,7 +183,7 @@ input:focus {
 .ghost-btn:hover {
   color: var(--text);
   border-color: var(--accent);
-  background: rgba(22, 179, 120, 0.08);
+  background: rgba(101, 234, 146, 0.08);
 }
 
 .error {
@@ -255,7 +255,7 @@ input:focus {
 }
 
 .snippet-item:hover {
-  border-color: rgba(22, 179, 120, 0.55);
+  border-color: rgba(101, 234, 146, 0.55);
   background: var(--elevated);
 }
 
@@ -287,8 +287,8 @@ input:focus {
   font-size: 10.5px;
   font-weight: 600;
   color: var(--teal);
-  background: rgba(18, 165, 148, 0.12);
-  border: 1px solid rgba(18, 165, 148, 0.28);
+  background: rgba(94, 227, 139, 0.12);
+  border: 1px solid rgba(94, 227, 139, 0.28);
   border-radius: 999px;
   padding: 2px 8px;
   text-transform: lowercase;
@@ -320,7 +320,7 @@ input:focus {
 .snippet-actions .ghost-btn.is-flash {
   color: var(--accent);
   border-color: var(--accent);
-  background: rgba(22, 179, 120, 0.12);
+  background: rgba(101, 234, 146, 0.12);
 }
 
 /* ---------------------------------------------------------------- Empty */

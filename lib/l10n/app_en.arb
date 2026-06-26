@@ -694,7 +694,7 @@
   "@settingsSectionAbout": {
     "description": "Section header for the about card"
   },
-  "settingsAppName": "Snippet Manager",
+  "settingsAppName": "Snippeter",
   "@settingsAppName": {
     "description": "App name shown as the about ListTile title; may be a brand name kept untranslated - included as it is user-facing"
   },

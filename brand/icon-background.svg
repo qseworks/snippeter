@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Snippeter background">
+  <!-- Android adaptive-icon BACKGROUND: opaque dark machined tile, no glyph. -->
+  <defs>
+    <linearGradient id="tile" x1="147.8" y1="24" x2="364.2" y2="488" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1C1F27"/>
+      <stop offset="1" stop-color="#111319"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="328" cy="246" r="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#65EA92" stop-opacity="0.16"/>
+      <stop offset="0.72" stop-color="#65EA92" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#13151A"/>
+  <rect width="512" height="512" fill="url(#tile)"/>
+  <rect width="512" height="512" fill="url(#glow)"/>
+</svg>

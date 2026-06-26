@@ -1,0 +1,14 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Snippeter">
+  <!-- Android adaptive-icon FOREGROUND: transparent, glyph only, kept inside the
+       66dp safe zone. Pairs with icon-background.svg. -->
+  <defs>
+    <linearGradient id="caret" x1="0" y1="0" x2="0" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CF5A2"/>
+      <stop offset="1" stop-color="#5EE38B"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(189.7 189.7) scale(3.901)">
+    <path d="M0 0 L17 17 L0 34" fill="none" stroke="#EDEEF2" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="27" y="0" width="11" height="34" rx="4" fill="url(#caret)"/>
+  </g>
+</svg>

@@ -1,4 +1,4 @@
-import LogoMark from "./LogoMark";
+import Logo from "./Logo";
 
 const columns: { heading: string; links: { label: string; href: string; external?: boolean }[] }[] =
   [
@@ -41,12 +41,8 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <a
-              href="#top"
-              className="inline-flex items-center gap-2.5 font-semibold tracking-tight"
-            >
-              <LogoMark size={30} />
-              <span className="text-lg">Snippeter</span>
+            <a href="#top" className="inline-flex rounded-lg">
+              <Logo size={30} idSuffix="footer" />
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
               A fast, local-first manager for code snippets and AI prompts.

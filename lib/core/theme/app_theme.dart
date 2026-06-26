@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 /// App-wide Material 3 themes. Export-card themes (carbon-style) live separately
 /// in the export feature; these are only the chrome of the app itself.
 ///
-/// Design language: a Snippet-style green identity, bundled type (Inter for UI,
-/// JetBrains Mono for code), soft 16px geometry, hairline borders instead of
-/// shadows, and tonal "container" surfaces for depth.
+/// Design language: the Snippeter "prompt" identity — a terminal prompt chevron
+/// `>` plus a green block caret on a dark machined tile (see [brandGradient] and
+/// `lib/core/brand/snippeter_mark.dart`) — bundled type (Inter for UI, JetBrains
+/// Mono for code), soft 16px geometry, hairline borders instead of shadows, and
+/// tonal "container" surfaces for depth.
 class AppTheme {
   AppTheme._();
 
@@ -51,22 +53,29 @@ class AppTheme {
   static const Color sidebarHover = Color(0xFF272D37);
   static const Color accent = Color(0xFF16B378);
 
+  // --- Snippeter brand identity (the "prompt" mark) ------------------------
+  // Used only by the logo mark (`SnippeterMark`) — not the Material scheme.
+  static const Color brandGreen = Color(0xFF65EA92);
+  static const Color brandGreenLight = Color(0xFF7CF5A2);
+  static const Color brandGreenDeep = Color(0xFF5EE38B);
+  static const Color brandTileTop = Color(0xFF1C1F27);
+  static const Color brandTileBottom = Color(0xFF111319);
+  static const Color brandInk = Color(0xFFEDEEF2);
+
   static ThemeData light() => _build(Brightness.light);
   static ThemeData dark() => _build(Brightness.dark);
 
-  /// A subtle brand gradient used for accents (app mark, hero chips).
+  /// The Snippeter caret gradient (the green block caret of the logo mark).
+  ///
+  /// Identical for both brightnesses — it only ever paints the brand glyph, not
+  /// a Material surface, so it must not track the light/dark scheme. The
+  /// [brightness] argument is retained for call-site compatibility.
   static LinearGradient brandGradient(Brightness brightness) {
-    return brightness == Brightness.dark
-        ? const LinearGradient(
-            colors: [Color(0xFF1FD18C), Color(0xFF12996A)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-        : const LinearGradient(
-            colors: [Color(0xFF16B378), Color(0xFF0E8F5E)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          );
+    return const LinearGradient(
+      colors: [brandGreenLight, brandGreenDeep],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
   }
 
   static ThemeData _build(Brightness brightness) {

@@ -122,7 +122,7 @@ function PricingCard({ tier }: { tier: Tier }) {
       }`}
     >
       {tier.highlighted && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-gradient px-3 py-1 text-xs font-semibold text-bg">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-gradient px-3 py-1 text-xs font-semibold text-[#0B0C0F]">
           Most popular
         </span>
       )}

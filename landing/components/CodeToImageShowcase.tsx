@@ -7,7 +7,7 @@ function ExportedCard() {
   return (
     <div className="relative mx-auto w-full max-w-lg">
       {/* The colorful gradient frame that carbon-style exports sit on */}
-      <div className="rounded-2xl bg-[linear-gradient(135deg,#16B378_0%,#12A594_55%,#0d8f86_100%)] p-5 shadow-[0_30px_80px_-30px_rgba(22,179,120,0.6)] sm:p-8">
+      <div className="rounded-2xl bg-[linear-gradient(135deg,#7CF5A2_0%,#5EE38B_55%,#259F56_100%)] p-5 shadow-[0_30px_80px_-30px_rgba(101,234,146,0.6)] sm:p-8">
         <div className="overflow-hidden rounded-xl border border-black/30 bg-[#0c0e12] shadow-2xl">
           {/* Window chrome */}
           <div className="flex items-center gap-1.5 border-b border-white/5 px-4 py-3">
@@ -102,7 +102,7 @@ function ExportedCard() {
             </code>
           </pre>
         </div>
-        <p className="mt-3 text-center text-[11px] font-medium text-white/70">
+        <p className="mt-3 text-center text-[11px] font-medium text-[#0B0C0F]/75">
           snippeter · Dracula theme · PNG @2x
         </p>
       </div>
@@ -112,7 +112,7 @@ function ExportedCard() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path
             d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
-            stroke="#16B378"
+            stroke="#65EA92"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

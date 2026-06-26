@@ -64,7 +64,7 @@ integrations/chrome/
 ├─ lib/
 │  └─ api.js            REST client (GoTrue + PostgREST) + session storage
 ├─ icons/
-│  └─ icon.svg          Logo mark — "</>" on a green→teal gradient
+│  └─ icon.svg          Logo mark — prompt chevron + green caret on a dark tile
 └─ README.md            This file
 ```
 
@@ -96,7 +96,8 @@ Then point `manifest.json` `"icons"` (and `action.default_icon`) at the PNGs.
 
 ## Brand
 
-Accent green `#16B378`, teal `#12A594`, dark background `#0F1115`, surface
+Accent green `#65EA92`, deep green `#5EE38B`, dark background `#0F1115`, surface
 `#161A21`, elevated `#1C212B`, hairline border `#262B36`, text `#E6E9EF`, muted
-`#8A93A2`. Typeface Inter. Logo mark: `</>` in white inside a rounded square with
-a green→teal gradient.
+`#8A93A2`. Typeface Inter (wordmark Space Grotesk SemiBold). Logo mark: a terminal
+prompt chevron `>` plus a green block caret on a dark rounded tile (the "prompt"
+awaiting a snippet).

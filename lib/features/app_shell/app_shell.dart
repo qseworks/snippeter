@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/brand/snippeter_mark.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../snippets/presentation/snippet_editor_modal.dart';
@@ -66,7 +67,7 @@ class AppShell extends StatelessWidget {
 /// The far-left dark workspace rail: a brand mark at the top, then the library
 /// switcher — a "Personal" button plus one circular avatar per team library
 /// from [workspacesProvider]. The active library shows a green ring/bar (via
-/// [AppTheme.accent]); tapping switches [activeWorkspaceProvider]. When signed
+/// [AppTheme.brandGreen]); tapping switches [activeWorkspaceProvider]. When signed
 /// in ([workspaceServiceProvider] != null) a "+" button at the bottom creates a
 /// team; when signed out only Personal is shown.
 class _WorkspaceRail extends ConsumerWidget {
@@ -88,24 +89,7 @@ class _WorkspaceRail extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 14),
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              gradient: AppTheme.brandGradient(Brightness.dark),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-            ),
-            child: const Text(
-              '</>',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ),
+          const SnippeterMark(size: 34),
           const SizedBox(height: 14),
           const _RailDivider(),
           // Scrollable library switcher: Personal + one avatar per team.
@@ -204,7 +188,7 @@ class _WorkspaceTile extends StatelessWidget {
         color: selected ? AppTheme.sidebarSelected : AppTheme.sidebarHover,
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? AppTheme.accent : Colors.transparent,
+          color: selected ? AppTheme.brandGreen : Colors.transparent,
           width: 2,
         ),
       ),
@@ -236,7 +220,7 @@ class _WorkspaceTile extends StatelessWidget {
               width: 3,
               height: size,
               decoration: BoxDecoration(
-                color: selected ? AppTheme.accent : Colors.transparent,
+                color: selected ? AppTheme.brandGreen : Colors.transparent,
                 borderRadius: const BorderRadiusDirectional.horizontal(
                   end: Radius.circular(2),
                 ),

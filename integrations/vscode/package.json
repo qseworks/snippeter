@@ -11,6 +11,11 @@
     "Other",
     "Snippets"
   ],
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#0D0E11",
+    "theme": "dark"
+  },
   "main": "./out/extension.js",
   "activationEvents": [
     "onCommand:snippetManager.signIn",

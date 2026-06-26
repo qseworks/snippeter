@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.snippetmanager" "\0"
-            VALUE "FileDescription", "snippet_manager" "\0"
+            VALUE "FileDescription", "Snippeter" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "snippet_manager" "\0"
+            VALUE "InternalName", "Snippeter" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.snippetmanager. All rights reserved." "\0"
-            VALUE "OriginalFilename", "snippet_manager.exe" "\0"
-            VALUE "ProductName", "snippet_manager" "\0"
+            VALUE "OriginalFilename", "Snippeter.exe" "\0"
+            VALUE "ProductName", "Snippeter" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,0 +1,11 @@
+<svg width="48" height="48" viewBox="-6 -6 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Snippeter">
+  <!-- Glyph only, for placement ON DARK surfaces (light chevron, green caret). -->
+  <defs>
+    <linearGradient id="caret" x1="0" y1="0" x2="0" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CF5A2"/>
+      <stop offset="1" stop-color="#5EE38B"/>
+    </linearGradient>
+  </defs>
+  <path d="M0 0 L17 17 L0 34" fill="none" stroke="#EDEEF2" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="27" y="0" width="11" height="34" rx="4" fill="url(#caret)"/>
+</svg>

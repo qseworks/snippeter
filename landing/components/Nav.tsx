@@ -1,4 +1,4 @@
-import LogoMark from "./LogoMark";
+import Logo from "./Logo";
 import CtaButton from "./CtaButton";
 
 const links = [
@@ -15,12 +15,8 @@ export default function Nav() {
         aria-label="Primary"
         className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6"
       >
-        <a
-          href="#top"
-          className="flex items-center gap-2.5 rounded-lg font-semibold tracking-tight"
-        >
-          <LogoMark size={30} />
-          <span className="text-lg">Snippeter</span>
+        <a href="#top" className="inline-flex rounded-lg">
+          <Logo size={30} idSuffix="nav" />
         </a>
 
         <ul className="hidden items-center gap-1 md:flex">

@@ -72,7 +72,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       languageId,
       description: tab?.url ? `Saved from ${tab.url}` : "Saved from Chrome",
     });
-    await flashBadge("OK", "#16B378");
+    await flashBadge("OK", "#65EA92");
     await notify("Saved to Snippeter", truncate(title, 80));
   } catch (err) {
     await flashBadge("ERR", "#E06C75");
