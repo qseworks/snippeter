@@ -25,6 +25,8 @@
   "editorAttachButton": "附加",
   "editorAddFileButton": "添加文件",
   "commonDiscard": "放弃",
+  "editorDiscardTitle": "放弃更改？",
+  "editorDiscardBody": "你未保存的更改将丢失。",
   "commonSave": "保存",
   "editorAppBarEditTitle": "编辑代码片段",
   "editorAppBarNewTitle": "新建代码片段",

@@ -25,6 +25,8 @@
   "editorAttachButton": "Adjuntar",
   "editorAddFileButton": "Añadir archivo",
   "commonDiscard": "Descartar",
+  "editorDiscardTitle": "¿Descartar los cambios?",
+  "editorDiscardBody": "Se perderán los cambios sin guardar.",
   "commonSave": "Guardar",
   "editorAppBarEditTitle": "Editar fragmento",
   "editorAppBarNewTitle": "Nuevo fragmento",

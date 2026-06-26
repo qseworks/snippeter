@@ -25,6 +25,8 @@
   "editorAttachButton": "منسلک کریں",
   "editorAddFileButton": "فائل شامل کریں",
   "commonDiscard": "مسترد کریں",
+  "editorDiscardTitle": "تبدیلیاں مسترد کریں؟",
+  "editorDiscardBody": "آپ کی غیر محفوظ شدہ تبدیلیاں ضائع ہو جائیں گی۔",
   "commonSave": "محفوظ کریں",
   "editorAppBarEditTitle": "سنیپٹ میں ترمیم کریں",
   "editorAppBarNewTitle": "نیا سنیپٹ",

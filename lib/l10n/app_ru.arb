@@ -25,6 +25,8 @@
   "editorAttachButton": "Прикрепить",
   "editorAddFileButton": "Добавить файл",
   "commonDiscard": "Отменить",
+  "editorDiscardTitle": "Отменить изменения?",
+  "editorDiscardBody": "Несохранённые изменения будут потеряны.",
   "commonSave": "Сохранить",
   "editorAppBarEditTitle": "Редактировать сниппет",
   "editorAppBarNewTitle": "Новый сниппет",

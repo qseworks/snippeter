@@ -25,6 +25,8 @@
   "editorAttachButton": "Joindre",
   "editorAddFileButton": "Ajouter un fichier",
   "commonDiscard": "Abandonner",
+  "editorDiscardTitle": "Abandonner les modifications ?",
+  "editorDiscardBody": "Vos modifications non enregistrées seront perdues.",
   "commonSave": "Enregistrer",
   "editorAppBarEditTitle": "Modifier le snippet",
   "editorAppBarNewTitle": "Nouveau snippet",

@@ -25,6 +25,8 @@
   "editorAttachButton": "সংযুক্ত করুন",
   "editorAddFileButton": "ফাইল যোগ করুন",
   "commonDiscard": "বাতিল করুন",
+  "editorDiscardTitle": "পরিবর্তন বাতিল করবেন?",
+  "editorDiscardBody": "আপনার অসংরক্ষিত পরিবর্তনগুলো হারিয়ে যাবে।",
   "commonSave": "সংরক্ষণ",
   "editorAppBarEditTitle": "স্নিপেট সম্পাদনা",
   "editorAppBarNewTitle": "নতুন স্নিপেট",

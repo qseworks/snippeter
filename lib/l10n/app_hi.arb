@@ -25,6 +25,8 @@
   "editorAttachButton": "संलग्न करें",
   "editorAddFileButton": "फ़ाइल जोड़ें",
   "commonDiscard": "रद्द करें",
+  "editorDiscardTitle": "बदलाव रद्द करें?",
+  "editorDiscardBody": "आपके असहेजे बदलाव खो जाएँगे।",
   "commonSave": "सहेजें",
   "editorAppBarEditTitle": "स्निपेट संपादित करें",
   "editorAppBarNewTitle": "नया स्निपेट",

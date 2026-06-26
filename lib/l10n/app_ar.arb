@@ -25,6 +25,8 @@
   "editorAttachButton": "إرفاق",
   "editorAddFileButton": "إضافة ملف",
   "commonDiscard": "تجاهل",
+  "editorDiscardTitle": "تجاهل التغييرات؟",
+  "editorDiscardBody": "ستفقد تغييراتك غير المحفوظة.",
   "commonSave": "حفظ",
   "editorAppBarEditTitle": "تحرير المقتطف",
   "editorAppBarNewTitle": "مقتطف جديد",

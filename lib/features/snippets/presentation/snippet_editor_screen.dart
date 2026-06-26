@@ -87,6 +87,16 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   /// at a time, so it is never attached to two positions simultaneously.
   final ScrollController _filesScrollController = ScrollController();
 
+  /// Focus node for the title. A fresh snippet requests focus here in a
+  /// post-frame callback (declarative `autofocus` loses to the code editor,
+  /// which claims focus on web inside a freshly-pushed dialog route).
+  final FocusNode _titleFocusNode = FocusNode();
+
+  /// Signature of the editable state when the editor opened — captured after
+  /// load (editing) or in initState (new). Used to detect unsaved changes
+  /// before discarding.
+  String _initialSnapshot = '';
+
   // Prompt-only controllers.
   final _modelController = TextEditingController();
   final _providerController = TextEditingController();
@@ -119,6 +129,12 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     } else {
       // New snippet: pre-select the user's default language, if set.
       _files.first.languageId = ref.read(settingsProvider).defaultLanguageId;
+      _initialSnapshot = _snapshot();
+      // Drop the caret in the title once laid out — a post-frame request wins
+      // over the code editor, which otherwise grabs focus on open.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _titleFocusNode.requestFocus();
+      });
     }
   }
 
@@ -174,6 +190,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       }
     }
     setState(() => _loading = false);
+    _initialSnapshot = _snapshot();
   }
 
   @override
@@ -189,6 +206,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     _temperatureController.dispose();
     _maxTokensController.dispose();
     _filesScrollController.dispose();
+    _titleFocusNode.dispose();
     super.dispose();
   }
 
@@ -326,7 +344,66 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     }
   }
 
-  void _discard() {
+  /// A signature of every editable field, compared against [_initialSnapshot]
+  /// to tell whether the user has unsaved changes.
+  String _snapshot() {
+    final b = StringBuffer()
+      ..writeln(_titleController.text)
+      ..writeln(_descriptionController.text)
+      ..writeln(_type.name)
+      ..writeln(_purpose ?? '')
+      ..writeln(_collectionId ?? '')
+      ..writeln(_visibility.name)
+      ..writeln(_workspaceId ?? '')
+      ..writeln(_labels.join(''))
+      ..writeln(_modelController.text)
+      ..writeln(_providerController.text)
+      ..writeln(_systemPromptController.text)
+      ..writeln(_temperatureController.text)
+      ..writeln(_maxTokensController.text);
+    for (final f in _files) {
+      b
+        ..writeln(f.filenameController.text)
+        ..writeln(f.languageId ?? '')
+        ..writeln(f.contentController.text);
+    }
+    return b.toString();
+  }
+
+  bool get _isDirty => _snapshot() != _initialSnapshot;
+
+  /// Confirm before throwing away unsaved edits — matching the intent of the
+  /// non-dismissible barrier set by [showSnippetEditor].
+  Future<bool> _confirmDiscard() async {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.editorDiscardTitle),
+        content: Text(l10n.editorDiscardBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDiscard),
+          ),
+        ],
+      ),
+    );
+    return discard ?? false;
+  }
+
+  Future<void> _discard() async {
+    if (_isDirty && !await _confirmDiscard()) return;
+    if (!mounted) return;
     if (widget.isModal) {
       _closeModal();
     } else {
@@ -492,9 +569,9 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       // Big Snippet-style title field.
       TextField(
         controller: _titleController,
-        // Fresh snippet: drop the caret in the title straight away; when editing
-        // an existing snippet, leave focus alone.
-        autofocus: !widget.isEditing,
+        // Fresh snippet: focus is requested in initState (post-frame) so the
+        // caret lands here reliably; when editing, focus is left alone.
+        focusNode: _titleFocusNode,
         textInputAction: TextInputAction.next,
         style: theme.textTheme.headlineSmall,
         decoration: InputDecoration(

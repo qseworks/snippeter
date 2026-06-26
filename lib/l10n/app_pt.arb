@@ -25,6 +25,8 @@
   "editorAttachButton": "Anexar",
   "editorAddFileButton": "Adicionar ficheiro",
   "commonDiscard": "Descartar",
+  "editorDiscardTitle": "Descartar alterações?",
+  "editorDiscardBody": "As suas alterações não guardadas serão perdidas.",
   "commonSave": "Guardar",
   "editorAppBarEditTitle": "Editar snippet",
   "editorAppBarNewTitle": "Novo snippet",
