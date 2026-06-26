@@ -70,7 +70,7 @@ multi-file/markdown/modal), `e711905` (P1 batch).
 
 ## P2 — Backend / collaboration
 
-Supabase backend (project `xxxxxxxxxxxxxxxxxxxx`, see [[supabase-project]] memory). App stays **local-first**; sign-in is optional and only turns on sync.
+Supabase backend (schema in `supabase/migrations/`; runs locally via `supabase start` — see [docs/local-dev.md](docs/local-dev.md)). App stays **local-first**; sign-in is optional and only turns on sync.
 
 - **P2.1 Accounts** ✅ — `supabase_flutter` + email/password auth (`lib/features/auth/`), optional sign-in/up/out in Settings; `owner_id` set server-side by RLS default. Config in `lib/core/config/supabase_config.dart` (`--dart-define`-overridable).
 - **P2.3 Real-time sync (core)** ✅ — `lib/features/sync/data/supabase_sync_service.dart`: push dirty rows (incl. tombstones) + pull-since with last-write-wins, Realtime, debounced `scheduleSync()`; `snippetRepositoryProvider` → `SyncedSnippetRepository`. Pure mappers unit-tested (`test/sync_mapping_test.dart`). Synced: snippets, snippet_files, collections, labels, snippet_labels, ai_prompt_meta (+ workspace_id). **Not synced yet:** attachments (BLOBs) + version history.
