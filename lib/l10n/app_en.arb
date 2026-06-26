@@ -64,6 +64,10 @@
   "@commonCreate": {
     "description": "FilledButton in the new-collection dialog"
   },
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Retry button on shared error states (AppErrorState)"
+  },
   "editorTitleHint": "Title",
   "@editorTitleHint": {
     "description": "hintText for the snippet title field"
@@ -617,6 +621,10 @@
   "teamErrorGeneric": "Something went wrong. Please try again.",
   "@teamErrorGeneric": {
     "description": "team_screen.dart: friendlyWorkspaceError generic fallback shown in UI (line 830)"
+  },
+  "teamErrorSignInRequired": "Please sign in to continue.",
+  "@teamErrorSignInRequired": {
+    "description": "team_screen.dart: friendlyWorkspaceError message when a StateError signals the user must be signed in"
   },
   "createWorkspaceSignInError": "Sign in to create a team.",
   "@createWorkspaceSignInError": {

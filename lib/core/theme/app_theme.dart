@@ -37,6 +37,7 @@ class AppTheme {
   ];
 
   /// Corner radius vocabulary used across components.
+  static const double radiusXxs = 6; // small icon hit-targets, tooltips
   static const double radiusXs = 8;
   static const double radiusSm = 10;
   static const double radiusMd = 14;
@@ -52,6 +53,20 @@ class AppTheme {
   static const Color sidebarSelected = Color(0xFF2B313C);
   static const Color sidebarHover = Color(0xFF272D37);
   static const Color accent = Color(0xFF16B378);
+
+  /// Fixed, Snippet-like palette giving labels and team roles stable, distinct
+  /// colors. Single source of truth — referenced by label chips, the new-label
+  /// color picker, and team role badges so they never drift apart.
+  static const List<Color> labelPalette = [
+    Color(0xFF16B378), // green
+    Color(0xFFE5484D), // red
+    Color(0xFF8E4EC6), // purple
+    Color(0xFFFFB224), // amber
+    Color(0xFF12A594), // teal
+    Color(0xFF3E63DD), // blue
+    Color(0xFFE93D82), // pink
+    Color(0xFF5753C6), // indigo
+  ];
 
   // --- Snippeter brand identity (the "prompt" mark) ------------------------
   // Used only by the logo mark (`SnippeterMark`) — not the Material scheme.
