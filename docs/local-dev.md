@@ -6,8 +6,10 @@ you don't need the paid hosted project at all: run the **entire Supabase stack
 locally in Docker** (Postgres + Auth + Storage + Realtime + Edge Functions +
 Studio). It's free and disposable.
 
-The hosted project (`xxxxxxxxxxxxxxxxxxxx`) stays untouched; switch back to it
-any time (see [Switching back to the cloud](#switching-back-to-the-cloud)).
+There is **no hosted project right now** — the old one was deleted, so development
+is fully local. When you want a cloud backend again, create a fresh project and
+push these same migrations to it (see
+[Going back to the cloud](#going-back-to-the-cloud)).
 
 ## Prerequisites
 
@@ -87,35 +89,31 @@ Edge functions live in `supabase/functions/`. `share` is served locally at
 `http://127.0.0.1:55321/functions/v1/share?id=<snippetId>` (no JWT, matching the
 deployed cloud function).
 
-## Switching back to the cloud
+## Going back to the cloud
 
-The compiled-in defaults already point at the hosted project, so:
-
-```bash
-scripts/dev-remote.sh -d macos   # or just: flutter run
-```
-
-When you've made schema changes locally and want to apply them to the hosted
-project (after reactivating it):
+There is no hosted project anymore, so reactivation means creating a **new** one
+and pushing these migrations to it:
 
 ```bash
-supabase link --project-ref xxxxxxxxxxxxxxxxxxxx   # one-time, asks for the DB password
-supabase db push                                   # pushes only NEW migrations
+supabase projects create snippeter            # or create it in the dashboard
+supabase link --project-ref <new-project-ref> # one-time, asks for the DB password
+supabase db push                              # applies all migrations to the new project
+supabase functions deploy share --no-verify-jwt --project-ref <new-project-ref>
 ```
 
-The 5 baseline migrations already exist on the remote with identical version
-numbers, so `db push` will skip them and apply only what you added.
+Because `supabase/migrations/` is the source of truth, the new project comes up
+with the exact same schema, RLS, and triggers as your local stack.
 
-## Stopping the ~$10/month bill while you develop
+Then point the app at it — no Dart edit required:
 
-Running locally costs nothing, but the hosted project keeps billing until you
-park it. Options:
+```bash
+SUPABASE_URL=https://<new-project-ref>.supabase.co \
+SUPABASE_ANON_KEY=<new-publishable-key> \
+scripts/dev-remote.sh -d macos
+```
 
-- **Pause the project** — Supabase Dashboard → project → *Pause*. Compute stops
-  billing; restore it when you're ready (restoring can take a few minutes and
-  the API is offline while paused). Your data and schema are preserved.
-- **Downgrade the org to the Free plan** — fully $0, but Free has usage limits
-  and auto-pauses after ~1 week of inactivity.
-
-Either way your local stack is unaffected. Tell me which you want and I can pause
-it for you via the Supabase tooling, or you can do it from the dashboard.
+(or bake those into the `--dart-define` defaults in
+`lib/core/config/supabase_config.dart`). The four first-party integrations
+(`integrations/cli`, `integrations/chrome`, `integrations/vscode`,
+`integrations/jetbrains`) still hardcode the old URL — swap in the new project's
+URL there too when you reactivate.

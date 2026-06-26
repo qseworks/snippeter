@@ -40,9 +40,10 @@ scripts/dev-local.sh -d macos  # run the app against the local stack (also -d ch
 supabase stop                  # stop when done
 ```
 
-`supabase/migrations/` is the schema source of truth and mirrors the hosted project 1:1. Studio runs at
-<http://127.0.0.1:55323>, captured emails at <http://127.0.0.1:55324>. To target the hosted project
-instead, use `scripts/dev-remote.sh` (or plain `flutter run`, which uses the compiled-in defaults).
+`supabase/migrations/` is the schema source of truth and brings up the same backend locally or hosted.
+Studio runs at <http://127.0.0.1:55323>, captured emails at <http://127.0.0.1:55324>. Plain `flutter run`
+(no `--dart-define`) runs **fully offline** — there is no hosted project baked in. To target a hosted
+backend later, pass `SUPABASE_URL` / `SUPABASE_ANON_KEY` to `scripts/dev-remote.sh`.
 
 Full guide — start/stop, accounts, per-platform networking, schema changes, switching back to the
 cloud — in [`docs/local-dev.md`](docs/local-dev.md); backend details in [`supabase/README.md`](supabase/README.md).

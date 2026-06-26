@@ -2,11 +2,11 @@
 // readers (deploy with --no-verify-jwt); uses the service role but only ever
 // exposes public, non-deleted snippets.
 //
-// Deploy (either):
-//   supabase functions deploy share --no-verify-jwt --project-ref xxxxxxxxxxxxxxxxxxxx
-// or approve the equivalent Supabase MCP deploy_edge_function call.
-//
-// Reader URL: https://xxxxxxxxxxxxxxxxxxxx.supabase.co/functions/v1/share?id=<snippetId>
+// Local: served automatically by `supabase start` at
+//   http://127.0.0.1:55321/functions/v1/share?id=<snippetId>
+// Hosted: once you create a project, deploy with
+//   supabase functions deploy share --no-verify-jwt --project-ref <your-project-ref>
+//   -> reader URL: https://<your-project-ref>.supabase.co/functions/v1/share?id=<snippetId>
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const esc = (s: string) =>

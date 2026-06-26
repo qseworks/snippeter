@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Run the Flutter app against the REMOTE (hosted) Supabase project.
+# Run the Flutter app against a REMOTE (hosted) Supabase project.
 #
-# The app's compiled-in defaults (lib/core/config/supabase_config.dart) already
-# point at the hosted project, so this is just `flutter run`. Provided for
-# symmetry with dev-local.sh and as the obvious place to override creds later.
+# There is no hosted project baked in anymore (the app defaults to offline), so
+# you must supply a project's URL + publishable key. Export them before running:
 #
+#   SUPABASE_URL=https://<ref>.supabase.co \
+#   SUPABASE_ANON_KEY=<publishable-key> \
 #   scripts/dev-remote.sh -d macos
 #
-# To point at a *different* hosted project without editing Dart, export these
-# before running:  SUPABASE_URL=... SUPABASE_ANON_KEY=...
+# With no creds set this just runs the app fully offline (local Drift only).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
