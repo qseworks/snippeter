@@ -15,6 +15,7 @@ import '../../../core/widgets/async_states.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../export/presentation/export_menu_button.dart';
 import '../application/snippet_providers.dart';
+import '../data/prompt_variables.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_type.dart';
 import '../domain/value_objects.dart';
@@ -22,6 +23,8 @@ import 'snippet_editor_modal.dart';
 import 'type_visuals.dart';
 import 'widgets/label_chip.dart';
 import 'widgets/notebook_view.dart';
+import 'widgets/prompt_fill_panel.dart';
+import 'widgets/snippet_copy.dart';
 import 'widgets/snippet_history_sheet.dart';
 
 /// Routed, full-screen detail view (with a back button on narrow layouts).
@@ -253,7 +256,11 @@ class SnippetDetailBody extends ConsumerWidget {
             ],
             const SizedBox(height: 20),
             // Files section header + one CodeBlock per file.
-            _FilesHeader(count: fileCount, snippetId: snippet.id),
+            _FilesHeader(
+              count: fileCount,
+              snippet: snippet,
+              languageMap: languageMap,
+            ),
             const SizedBox(height: 10),
             if (files.isEmpty)
               CodeBlock(
@@ -738,13 +745,18 @@ class _VisibilityPill extends StatelessWidget {
   }
 }
 
-/// The "Files (n)" section header with an "ADD FILE" affordance that opens the
-/// snippet editor (where files are added/edited).
+/// The "Files (n)" section header with a quick-copy menu (copy all files /
+/// copy as Markdown) and an "ADD FILE" affordance that opens the editor.
 class _FilesHeader extends StatelessWidget {
-  const _FilesHeader({required this.count, required this.snippetId});
+  const _FilesHeader({
+    required this.count,
+    required this.snippet,
+    required this.languageMap,
+  });
 
   final int count;
-  final String snippetId;
+  final Snippet snippet;
+  final Map<String, Language> languageMap;
 
   @override
   Widget build(BuildContext context) {
@@ -762,10 +774,11 @@ class _FilesHeader extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        _CopyMenuButton(snippet: snippet, languageMap: languageMap),
         Tooltip(
           message: l10n.detailAddFileTooltip,
           child: TextButton.icon(
-            onPressed: () => showSnippetEditor(context, snippetId: snippetId),
+            onPressed: () => showSnippetEditor(context, snippetId: snippet.id),
             icon: const Icon(Icons.add, size: 16),
             label: Text(l10n.detailAddFileButton),
             style: TextButton.styleFrom(
@@ -784,6 +797,56 @@ class _FilesHeader extends StatelessWidget {
   }
 }
 
+enum _CopyKind { allFiles, markdown }
+
+/// A "Copy ▾" menu in the files header offering "Copy all files" (raw content)
+/// and "Copy as Markdown" (fenced, with title/description) — the detail-side
+/// half of quick-copy.
+class _CopyMenuButton extends StatelessWidget {
+  const _CopyMenuButton({required this.snippet, required this.languageMap});
+
+  final Snippet snippet;
+  final Map<String, Language> languageMap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return PopupMenuButton<_CopyKind>(
+      tooltip: l10n.detailCopyMenuTooltip,
+      icon: const Icon(Icons.copy_rounded, size: 18),
+      onSelected: (kind) {
+        final text = switch (kind) {
+          _CopyKind.allFiles => snippetAllFilesText(snippet),
+          _CopyKind.markdown => snippetMarkdown(snippet, languageMap),
+        };
+        copyWithFeedback(context, text, l10n.exportMenuCopiedSnack);
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _CopyKind.allFiles,
+          child: Row(
+            children: [
+              const Icon(Icons.content_copy_outlined, size: 18),
+              const SizedBox(width: 12),
+              Text(l10n.detailCopyAllFiles),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: _CopyKind.markdown,
+          child: Row(
+            children: [
+              const Icon(Icons.notes_outlined, size: 18),
+              const SizedBox(width: 12),
+              Text(l10n.detailCopyAsMarkdown),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _PromptMetaView extends StatelessWidget {
   const _PromptMetaView({required this.snippet});
 
@@ -794,6 +857,10 @@ class _PromptMetaView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final meta = snippet.promptMeta!;
+    // The fillable variables come from the placeholders actually present in the
+    // prompt body (the editor reconciles meta to match), so the panel only
+    // appears when there's something to fill.
+    final variableNames = parsePromptVariableNames(snippet.body);
     final rows = <Widget>[
       if (meta.modelProvider != null)
         _kv(l10n.detailPromptProviderLabel, meta.modelProvider!),
@@ -820,23 +887,15 @@ class _PromptMetaView extends StatelessWidget {
           const SizedBox(height: 4),
           Text(meta.systemPrompt!, style: theme.textTheme.bodyMedium),
         ],
-        if (meta.variables.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Text(l10n.detailPromptVariablesLabel, style: theme.textTheme.labelLarge),
-          const SizedBox(height: 4),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final v in meta.variables)
-                Chip(
-                  avatar: const Icon(Icons.data_object, size: 16),
-                  label: Text(v.name),
-                  visualDensity: VisualDensity.compact,
-                ),
-            ],
+        if (variableNames.isNotEmpty)
+          // Interactive fill-in form (replaces the old read-only chips): a
+          // labeled field per variable, a live-resolved preview, and
+          // "Copy filled prompt". Keyed by the variable set so its controllers
+          // survive unrelated snippet-stream updates.
+          PromptFillPanel(
+            key: ValueKey('fill:${variableNames.join(',')}'),
+            snippet: snippet,
           ),
-        ],
       ],
     );
   }

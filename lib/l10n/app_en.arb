@@ -1525,5 +1525,50 @@
   "settingsLanguageSystemDefault": "System default",
   "@settingsLanguageSystemDefault": {
     "description": "Language picker option that follows the device/system locale"
+  },
+  "cardCopyTooltip": "Copy",
+  "@cardCopyTooltip": {
+    "description": "Tooltip on the quick-copy button in a snippet list row"
+  },
+  "detailCopyMenuTooltip": "Copy snippet",
+  "@detailCopyMenuTooltip": {
+    "description": "Tooltip on the copy menu button in the detail files header"
+  },
+  "detailCopyAllFiles": "Copy all files",
+  "@detailCopyAllFiles": {
+    "description": "Copy menu item: copies the raw content of every file"
+  },
+  "detailCopyAsMarkdown": "Copy as Markdown",
+  "@detailCopyAsMarkdown": {
+    "description": "Copy menu item: copies the snippet as Markdown with fenced code blocks"
+  },
+  "promptFillTitle": "Fill variables",
+  "@promptFillTitle": {
+    "description": "Header of the prompt variable fill-in form"
+  },
+  "promptFillSubtitle": "Enter values to resolve the prompt, then copy it.",
+  "@promptFillSubtitle": {
+    "description": "Subtitle under the prompt fill-in form header"
+  },
+  "promptFillPreviewLabel": "Preview",
+  "@promptFillPreviewLabel": {
+    "description": "Label above the live-resolved prompt preview"
+  },
+  "promptFillCopyButton": "Copy filled prompt",
+  "@promptFillCopyButton": {
+    "description": "Button that copies the resolved prompt with variables substituted"
+  },
+  "promptFillEmptyWarning": "Copied — some required variables are still empty",
+  "@promptFillEmptyWarning": {
+    "description": "Snackbar shown after copying when one or more required variables were left blank"
+  },
+  "promptFillFieldHint": "Value for {name}",
+  "@promptFillFieldHint": {
+    "description": "Hint text inside a variable input field",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

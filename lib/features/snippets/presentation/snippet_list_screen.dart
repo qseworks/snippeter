@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,9 +5,9 @@ import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/routing/route_paths.dart';
 import '../../../core/widgets/async_states.dart';
+import '../../search/presentation/library_filter_bar.dart';
 import '../application/snippet_providers.dart';
 import '../domain/snippet.dart';
-import '../domain/snippet_query.dart';
 import 'snippet_detail_screen.dart';
 import 'snippet_editor_modal.dart';
 import 'widgets/snippet_card.dart';
@@ -111,18 +109,13 @@ class _ListPane extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final query = ref.watch(libraryQueryProvider);
-    final controller = ref.read(libraryQueryProvider.notifier);
-
+    // Search, sort and composable Type/Language/Collection/Label facets all live
+    // in the shared LibraryFilterBar now (it drives libraryQueryProvider, which
+    // the results list watches reactively).
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: _SearchField(),
-        ),
-        _SortHeader(value: query.sort, onChanged: controller.setSort),
-        const Divider(height: 1),
+        const LibraryFilterBar(),
         Expanded(
           child: _ResultsArea(
             snippetsAsync: snippetsAsync,
@@ -132,119 +125,6 @@ class _ListPane extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Snippet's "Recently created ▾" sort header, wired to [setSort].
-class _SortHeader extends StatelessWidget {
-  const _SortHeader({required this.value, required this.onChanged});
-
-  final SnippetSort value;
-  final ValueChanged<SnippetSort> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final labels = {
-      SnippetSort.recent: l10n.listSortRecentlyUpdated,
-      SnippetSort.created: l10n.listSortRecentlyCreated,
-      SnippetSort.titleAsc: l10n.listSortTitleAsc,
-      SnippetSort.relevance: l10n.listSortRelevance,
-    };
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: PopupMenuButton<SnippetSort>(
-        initialValue: value,
-        onSelected: onChanged,
-        tooltip: l10n.listSortTooltip,
-        itemBuilder: (context) => [
-          for (final entry in labels.entries)
-            PopupMenuItem(value: entry.key, child: Text(entry.value)),
-        ],
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                labels[value] ?? l10n.listSortTooltip,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Icon(Icons.keyboard_arrow_down_rounded,
-                  size: 16, color: theme.colorScheme.onSurfaceVariant),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Search field driving [libraryQueryProvider] (kept as a [TextField] so the
-/// integration test that looks for the 'Search snippets…' hint keeps passing).
-class _SearchField extends ConsumerStatefulWidget {
-  const _SearchField();
-
-  @override
-  ConsumerState<_SearchField> createState() => _SearchFieldState();
-}
-
-class _SearchFieldState extends ConsumerState<_SearchField> {
-  late final TextEditingController _controller;
-  Timer? _debounce;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller =
-        TextEditingController(text: ref.read(libraryQueryProvider).text ?? '');
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onChanged(String value) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 150), () {
-      final trimmed = value.trim();
-      ref
-          .read(libraryQueryProvider.notifier)
-          .setText(trimmed.isEmpty ? null : trimmed);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return TextField(
-      controller: _controller,
-      focusNode: ref.watch(searchFocusProvider),
-      onChanged: _onChanged,
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        hintText: l10n.listSearchHint,
-        prefixIcon: const Icon(Icons.search),
-        isDense: true,
-        suffixIcon: _controller.text.isEmpty
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  _controller.clear();
-                  _onChanged('');
-                  setState(() {});
-                },
-              ),
-      ),
     );
   }
 }

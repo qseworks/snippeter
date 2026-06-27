@@ -181,6 +181,8 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
     final l10n = AppLocalizations.of(context);
     return TextField(
       controller: _controller,
+      // Shared focus node so the global Cmd/Ctrl+F shortcut can focus search.
+      focusNode: ref.watch(searchFocusProvider),
       onChanged: _onChanged,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(

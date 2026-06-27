@@ -8,6 +8,7 @@ import '../../application/snippet_providers.dart';
 import '../../domain/snippet.dart';
 import '../../domain/value_objects.dart';
 import 'label_chip.dart';
+import 'snippet_copy.dart';
 
 /// A Snippet-style snippet ROW in the master list: a lock glyph (private), the
 /// title, colored label chips + language pill, and a short date on the right.
@@ -89,6 +90,11 @@ class SnippetCard extends ConsumerWidget {
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     const SizedBox(width: 4),
+                    CopyIconButton(
+                      text: snippetPrimaryText(snippet),
+                      tooltip: l10n.cardCopyTooltip,
+                      copiedMessage: l10n.exportMenuCopiedSnack,
+                    ),
                     IconButton(
                       visualDensity: VisualDensity.compact,
                       iconSize: 18,

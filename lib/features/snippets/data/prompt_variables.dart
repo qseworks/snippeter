@@ -27,3 +27,13 @@ List<PromptVariable> reconcilePromptVariables(
       byName[name] ?? PromptVariable(name: name),
   ];
 }
+
+/// Substitutes `{{name}}` placeholders in [body] with the supplied [values].
+/// A name with no value (absent or empty) keeps its `{{placeholder}}` so the
+/// live preview still shows what remains unfilled.
+String resolvePromptVariables(String body, Map<String, String> values) {
+  return body.replaceAllMapped(_variablePattern, (match) {
+    final value = values[match.group(1)!];
+    return (value == null || value.isEmpty) ? match.group(0)! : value;
+  });
+}
