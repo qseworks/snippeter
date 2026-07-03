@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -144,26 +146,51 @@ List<Widget> snippetActions(
   Future<void> confirmDelete() async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.detailDeleteSnippetTitle),
-        content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.commonDelete),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return AlertDialog(
+          title: Text(l10n.detailDeleteSnippetTitle),
+          content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: scheme.error,
+                foregroundColor: scheme.onError,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.commonDelete),
+            ),
+          ],
+        );
+      },
     );
-    if (ok ?? false) {
-      await ref.read(snippetRepositoryProvider).softDelete(snippet.id);
-      if (!context.mounted) return;
-      onAfterDelete();
+    if (!(ok ?? false) || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final repo = ref.read(snippetRepositoryProvider);
+    try {
+      await repo.softDelete(snippet.id);
+    } catch (e, st) {
+      developer.log('softDelete failed', name: 'detail', error: e, stackTrace: st);
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+      );
+      return;
     }
+    if (context.mounted) onAfterDelete();
+    // Soft delete is reversible — offer Undo. `repo` is captured, so the
+    // action outlives this screen's navigation.
+    messenger.showSnackBar(SnackBar(
+      content: Text(l10n.detailDeletedSnack(snippet.title)),
+      duration: const Duration(seconds: 5),
+      action: SnackBarAction(
+        label: l10n.commonUndo,
+        onPressed: () => repo.undoDelete(snippet.id),
+      ),
+    ));
   }
 
   return [

@@ -4,37 +4,20 @@
   "@editorTitleRequiredSnack": {
     "description": "SnackBar shown when saving with an empty title"
   },
-  "editorCouldNotSaveSnack": "Could not save: {error}",
+  "editorCouldNotSaveSnack": "Couldn't save your changes. Please try again.",
   "@editorCouldNotSaveSnack": {
-    "description": "SnackBar shown when saving a snippet fails",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Network error"
-      }
-    }
+    "description": "Snackbar when saving a snippet fails (raw error is logged, not shown)"
   },
-  "editorCouldNotPickFilesSnack": "Could not pick files: {error}",
+  "editorCouldNotPickFilesSnack": "Couldn't open the file picker. Please try again.",
   "@editorCouldNotPickFilesSnack": {
-    "description": "SnackBar shown when the file picker throws",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Permission denied"
-      }
-    }
+    "description": "Snackbar when the OS file picker fails to open"
   },
-  "editorCouldNotAttachSnack": "Could not attach {filename}: {error}",
+  "editorCouldNotAttachSnack": "Couldn't attach {filename}. Please try again.",
   "@editorCouldNotAttachSnack": {
-    "description": "SnackBar shown when attaching a specific file fails",
+    "description": "Snackbar when attaching one picked file fails",
     "placeholders": {
       "filename": {
-        "type": "String",
-        "example": "image.png"
-      },
-      "error": {
-        "type": "String",
-        "example": "Read error"
+        "type": "String"
       }
     }
   },
@@ -67,6 +50,14 @@
   "commonRetry": "Retry",
   "@commonRetry": {
     "description": "Retry button on shared error states (AppErrorState)"
+  },
+  "commonUndo": "Undo",
+  "@commonUndo": {
+    "description": "Undo action on snackbars (e.g. after deleting a snippet)"
+  },
+  "commonSomethingWentWrong": "Something went wrong. Please try again.",
+  "@commonSomethingWentWrong": {
+    "description": "Generic failure snackbar for user actions (delete, restore, create label)"
   },
   "editorTitleHint": "Title",
   "@editorTitleHint": {
@@ -377,6 +368,15 @@
       "title": {
         "type": "String",
         "example": "My snippet"
+      }
+    }
+  },
+  "detailDeletedSnack": "Deleted “{title}”",
+  "@detailDeletedSnack": {
+    "description": "Snackbar after a snippet is deleted (paired with an Undo action)",
+    "placeholders": {
+      "title": {
+        "type": "String"
       }
     }
   },
@@ -793,6 +793,14 @@
   "settingsSyncNow": "Sync now",
   "@settingsSyncNow": {
     "description": "FilledButton label to trigger a manual sync"
+  },
+  "settingsSyncSuccessSnack": "Sync complete",
+  "@settingsSyncSuccessSnack": {
+    "description": "Snackbar after a manual Sync now succeeds"
+  },
+  "settingsSyncFailedSnack": "Sync failed. Check your connection and try again.",
+  "@settingsSyncFailedSnack": {
+    "description": "Snackbar after a manual Sync now fails (offline etc.)"
   },
   "settingsSignOut": "Sign out",
   "@settingsSignOut": {
@@ -1343,25 +1351,13 @@
       }
     }
   },
-  "exportImageSaveFailed": "Save failed: {error}",
+  "exportImageSaveFailed": "Couldn't save the image. Please try again.",
   "@exportImageSaveFailed": {
-    "description": "Snackbar toast when saving the PNG throws an error",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Permission denied"
-      }
-    }
+    "description": "Snackbar when saving the PNG image fails"
   },
-  "exportImageShareFailed": "Share failed: {error}",
+  "exportImageShareFailed": "Couldn't share the image. Please try again.",
   "@exportImageShareFailed": {
-    "description": "Snackbar toast when sharing the PNG throws an error",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Cancelled"
-      }
-    }
+    "description": "Snackbar when sharing the PNG image fails"
   },
   "exportImageTitle": "Export as image",
   "@exportImageTitle": {
@@ -1463,15 +1459,9 @@
       }
     }
   },
-  "exportMenuExportFailedSnack": "Export failed: {error}",
+  "exportMenuExportFailedSnack": "Export failed. Please try again.",
   "@exportMenuExportFailedSnack": {
-    "description": "SnackBar shown when an export action fails",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Disk full"
-      }
-    }
+    "description": "Snackbar when an export action fails (raw error is logged, not shown)"
   },
   "settingsAppLanguageLabel": "App language",
   "@settingsAppLanguageLabel": {

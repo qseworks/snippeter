@@ -52,9 +52,10 @@ class _CreateWorkspaceDialogState
     });
     try {
       final id = await service.createWorkspace(name);
+      if (!mounted) return;
       // Switch into the new team immediately.
       ref.read(activeWorkspaceProvider.notifier).setWorkspace(id);
-      if (mounted) Navigator.of(context).pop(id);
+      Navigator.of(context).pop(id);
     } catch (_) {
       if (mounted) {
         setState(() {

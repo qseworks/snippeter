@@ -79,6 +79,9 @@ class SyncedSnippetRepository implements SnippetRepository {
   Future<void> softDelete(String id) => _mutate(_local.softDelete(id));
 
   @override
+  Future<void> undoDelete(String id) => _mutate(_local.undoDelete(id));
+
+  @override
   Future<void> restoreVersion(String snippetId, int savedAt) =>
       _mutate(_local.restoreVersion(snippetId, savedAt));
 

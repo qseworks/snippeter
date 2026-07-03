@@ -31,6 +31,8 @@ class _FakeRepo implements SnippetRepository {
   @override
   Future<void> softDelete(String id) async {}
   @override
+  Future<void> undoDelete(String id) async {}
+  @override
   Future<List<SnippetVersion>> getVersions(String snippetId) async => const [];
   @override
   Future<void> restoreVersion(String snippetId, int savedAt) async {}

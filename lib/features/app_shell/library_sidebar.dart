@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -260,6 +262,7 @@ class LibrarySidebar extends ConsumerWidget {
                 controller: nameController,
                 autofocus: true,
                 decoration: InputDecoration(hintText: l10n.sidebarLabelNameHint),
+                onSubmitted: (_) => Navigator.pop(context, true),
               ),
               if (parentChoices.isNotEmpty) ...[
                 const SizedBox(height: 16),
@@ -361,18 +364,31 @@ class LibrarySidebar extends ConsumerWidget {
       ),
     );
 
-    if ((created ?? false) && nameController.text.trim().isNotEmpty) {
-      final hex = '#${(selectedColor.toARGB32() & 0xFFFFFF)
-          .toRadixString(16)
-          .padLeft(6, '0')
-          .toUpperCase()}';
-      await ref.read(snippetRepositoryProvider).createLabel(
-            nameController.text.trim(),
-            color: hex,
-            parentId: selectedParentId,
-          );
+    try {
+      if ((created ?? false) && nameController.text.trim().isNotEmpty) {
+        final hex = '#${(selectedColor.toARGB32() & 0xFFFFFF)
+            .toRadixString(16)
+            .padLeft(6, '0')
+            .toUpperCase()}';
+        try {
+          await ref.read(snippetRepositoryProvider).createLabel(
+                nameController.text.trim(),
+                color: hex,
+                parentId: selectedParentId,
+              );
+        } catch (e, st) {
+          developer.log('createLabel failed',
+              name: 'sidebar', error: e, stackTrace: st);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+            );
+          }
+        }
+      }
+    } finally {
+      nameController.dispose();
     }
-    nameController.dispose();
   }
 }
 

@@ -356,12 +356,19 @@ class _SignedInPanelState extends ConsumerState<_SignedInPanel> {
   Future<void> _syncNow() async {
     final service = ref.read(syncServiceProvider);
     if (service == null || _syncing) return;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     setState(() => _syncing = true);
+    var ok = false;
     try {
-      await service.syncOnce();
+      ok = await service.syncOnce();
     } finally {
       if (mounted) setState(() => _syncing = false);
     }
+    messenger.showSnackBar(SnackBar(
+      content: Text(
+          ok ? l10n.settingsSyncSuccessSnack : l10n.settingsSyncFailedSnack),
+    ));
   }
 
   Future<void> _signOut() async {

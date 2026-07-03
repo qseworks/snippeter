@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -112,6 +114,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
   bool _loading = false;
   bool _saving = false;
+  bool _attaching = false;
   SnippetVisibility _visibility = SnippetVisibility.private;
 
   /// The library this snippet belongs to. For an existing snippet this is
@@ -335,11 +338,13 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           context.pushReplacement(RoutePaths.snippetDetail(id));
         }
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
+      developer.log('save failed',
+          name: 'editor', error: error, stackTrace: stackTrace);
       if (mounted) {
         setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(l10n.editorCouldNotSaveSnack(error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.editorCouldNotSaveSnack)));
       }
     }
   }
@@ -417,18 +422,28 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   Future<void> _attachFiles() async {
     final l10n = AppLocalizations.of(context);
     final snippetId = widget.snippetId;
-    if (snippetId == null) return;
+    if (snippetId == null || _attaching) return;
+    _attaching = true;
+    try {
+      await _attachFilesInner(l10n, snippetId);
+    } finally {
+      _attaching = false;
+    }
+  }
 
+  Future<void> _attachFilesInner(AppLocalizations l10n, String snippetId) async {
     final FilePickerResult? result;
     try {
       // file_picker 12.x: pickFiles is multi-select by default; load each
       // file's bytes on demand via readAsBytes() (the withData parameter is
       // deprecated).
       result = await FilePicker.pickFiles();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      developer.log('file picker failed',
+          name: 'editor', error: error, stackTrace: stackTrace);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(l10n.editorCouldNotPickFilesSnack(error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.editorCouldNotPickFilesSnack)));
       }
       return;
     }
@@ -446,12 +461,12 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           bytes: bytes,
         );
         added++;
-      } catch (error) {
+      } catch (error, stackTrace) {
+        developer.log('attach failed',
+            name: 'editor', error: error, stackTrace: stackTrace);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(l10n.editorCouldNotAttachSnack(
-                    file.name, error.toString()))),
+            SnackBar(content: Text(l10n.editorCouldNotAttachSnack(file.name))),
           );
         }
       }
@@ -467,35 +482,40 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
   Future<void> _createCollection() async {
     final controller = TextEditingController();
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        final l10n = AppLocalizations.of(context);
-        return AlertDialog(
-          title: Text(l10n.editorNewCollectionDialogTitle),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: InputDecoration(labelText: l10n.commonName),
-            onSubmitted: (v) => Navigator.pop(context, v),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.commonCancel),
+    try {
+      final name = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          final l10n = AppLocalizations.of(context);
+          return AlertDialog(
+            title: Text(l10n.editorNewCollectionDialogTitle),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: InputDecoration(labelText: l10n.commonName),
+              onSubmitted: (v) => Navigator.pop(context, v),
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: Text(l10n.commonCreate),
-            ),
-          ],
-        );
-      },
-    );
-    if (name != null && name.trim().isNotEmpty) {
-      final id =
-          await ref.read(snippetRepositoryProvider).createCollection(name.trim());
-      if (mounted) setState(() => _collectionId = id);
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, controller.text),
+                child: Text(l10n.commonCreate),
+              ),
+            ],
+          );
+        },
+      );
+      if (name != null && name.trim().isNotEmpty) {
+        final id = await ref
+            .read(snippetRepositoryProvider)
+            .createCollection(name.trim());
+        if (mounted) setState(() => _collectionId = id);
+      }
+    } finally {
+      controller.dispose();
     }
   }
 

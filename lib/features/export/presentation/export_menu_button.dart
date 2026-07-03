@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -139,9 +141,11 @@ class ExportMenuButton extends ConsumerWidget {
         case _ExportAction.shareFile:
           await export.shareSourceFile(data, origin: origin);
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
+      developer.log('export failed',
+          name: 'export', error: error, stackTrace: stackTrace);
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.exportMenuExportFailedSnack('$error'))),
+        SnackBar(content: Text(l10n.exportMenuExportFailedSnack)),
       );
     }
   }

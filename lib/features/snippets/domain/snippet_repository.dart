@@ -17,6 +17,10 @@ abstract interface class SnippetRepository {
   Future<void> setFavorite(String id, {required bool value});
   Future<void> softDelete(String id);
 
+  /// Reverses a [softDelete] (e.g. from an Undo snackbar): clears the
+  /// tombstone and marks the row dirty so sync revives it remotely too.
+  Future<void> undoDelete(String id);
+
   // --- version history ---
   /// All saved versions of a snippet's files, most recent first.
   Future<List<SnippetVersion>> getVersions(String snippetId);

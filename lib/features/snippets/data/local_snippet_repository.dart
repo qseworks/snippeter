@@ -270,6 +270,18 @@ class LocalSnippetRepository implements SnippetRepository {
     );
   }
 
+  @override
+  Future<void> undoDelete(String id) async {
+    final ts = nowMs();
+    await (_db.update(_db.snippets)..where((t) => t.id.equals(id))).write(
+      SnippetsCompanion(
+        deletedAt: const Value(null),
+        updatedAt: Value(ts),
+        dirty: const Value(true),
+      ),
+    );
+  }
+
   // --- version history -----------------------------------------------------
 
   /// Copies the current snippet_files rows for [snippetId] into

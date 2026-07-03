@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
@@ -68,11 +70,27 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
   Future<List<SnippetVersion>> _load() =>
       ref.read(snippetRepositoryProvider).getVersions(widget.snippetId);
 
+  bool _restoring = false;
+
   Future<void> _restore(int savedAt) async {
-    await ref
-        .read(snippetRepositoryProvider)
-        .restoreVersion(widget.snippetId, savedAt);
-    if (mounted) Navigator.of(context).pop();
+    if (_restoring) return;
+    _restoring = true;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref
+          .read(snippetRepositoryProvider)
+          .restoreVersion(widget.snippetId, savedAt);
+      if (mounted) Navigator.of(context).pop();
+    } catch (e, st) {
+      developer.log('restoreVersion failed',
+          name: 'history', error: e, stackTrace: st);
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+      );
+    } finally {
+      _restoring = false;
+    }
   }
 
   @override
