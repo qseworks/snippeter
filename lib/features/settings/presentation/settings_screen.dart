@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -146,12 +147,39 @@ class SettingsScreen extends ConsumerWidget {
                   leading: const Icon(Icons.bookmarks_outlined),
                   title: Text(l10n.settingsAppName),
                   subtitle: Text(l10n.settingsAboutTagline),
+                  trailing: const _VersionLabel(),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// "1.0.0 (1)" from the platform package info; empty until loaded (fast) and
+/// on the rare platforms that don't report it.
+class _VersionLabel extends StatelessWidget {
+  const _VersionLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        final info = snapshot.data;
+        if (info == null || info.version.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        final build = info.buildNumber.isEmpty ? '' : ' (${info.buildNumber})';
+        return Text(
+          'v${info.version}$build',
+          style: theme.textTheme.labelMedium
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        );
+      },
     );
   }
 }

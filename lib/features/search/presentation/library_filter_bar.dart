@@ -6,6 +6,7 @@ import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/platform_keys.dart';
 import '../../snippets/application/snippet_providers.dart';
 import '../../snippets/domain/snippet_query.dart';
 import '../../snippets/domain/snippet_type.dart';
@@ -199,9 +200,23 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
           transitionBuilder: (child, animation) =>
               ScaleTransition(scale: animation, child: child),
           child: _controller.text.isEmpty
-              ? const SizedBox.shrink()
+              // Discoverability: surface the focus-search shortcut where the
+              // eye already is; swapped for the clear button while typing.
+              ? Padding(
+                  padding: const EdgeInsetsDirectional.only(end: 12),
+                  child: Text(
+                    shortcutLabel('F'),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withValues(alpha: 0.7),
+                        ),
+                  ),
+                )
               : IconButton(
                   key: const ValueKey('clear-search'),
+                  tooltip: l10n.commonClear,
                   icon: const Icon(Icons.close),
                   onPressed: () {
                     _controller.clear();

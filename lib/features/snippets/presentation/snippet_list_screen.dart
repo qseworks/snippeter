@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
@@ -11,6 +12,7 @@ import '../domain/snippet.dart';
 import 'snippet_detail_screen.dart';
 import 'snippet_editor_modal.dart';
 import 'widgets/snippet_card.dart';
+import 'widgets/snippet_copy.dart';
 
 /// The bare library body rendered inside the Snippet shell (no Scaffold / AppBar
 /// / FAB — the shell owns those). On wide content it's a list+detail two-pane;
@@ -60,35 +62,123 @@ class _TwoPaneLibrary extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedId = ref.watch(selectedSnippetProvider);
 
-    return Row(
-      children: [
-        SizedBox(
-          width: 380,
-          child: _ListPane(
-            snippetsAsync: snippetsAsync,
-            isFiltered: isFiltered,
-            selectedId: selectedId,
-            onTap: (snippet) =>
-                ref.read(selectedSnippetProvider.notifier).select(snippet.id),
+    return _ListKeyboardScope(
+      snippets: snippetsAsync.value ?? const <Snippet>[],
+      child: Row(
+        children: [
+          SizedBox(
+            width: 380,
+            child: _ListPane(
+              snippetsAsync: snippetsAsync,
+              isFiltered: isFiltered,
+              selectedId: selectedId,
+              onTap: (snippet) =>
+                  ref.read(selectedSnippetProvider.notifier).select(snippet.id),
+            ),
           ),
-        ),
-        const VerticalDivider(width: 1),
-        Expanded(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeOut,
-            transitionBuilder: (child, animation) =>
-                FadeTransition(opacity: animation, child: child),
-            child: selectedId == null
-                ? const DetailPanePlaceholder(key: ValueKey('placeholder'))
-                : InlineSnippetDetail(
-                    key: ValueKey(selectedId),
-                    snippetId: selectedId,
-                  ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeOut,
+              transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: selectedId == null
+                  ? const DetailPanePlaceholder(key: ValueKey('placeholder'))
+                  : InlineSnippetDetail(
+                      key: ValueKey(selectedId),
+                      snippetId: selectedId,
+                    ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Keyboard driving for the two-pane library — the baseline interaction of a
+/// pro desktop list: ↑/↓ move the selection, Enter opens the editor, Delete/
+/// Backspace ask to delete, Cmd/Ctrl+Shift+C copies the snippet's content.
+///
+/// Implemented as a raw [Focus] key handler (not [CallbackShortcuts]) so it
+/// can *decline* events — anything typed while an [EditableText] (search,
+/// label field…) has focus is left alone.
+class _ListKeyboardScope extends ConsumerWidget {
+  const _ListKeyboardScope({required this.snippets, required this.child});
+
+  final List<Snippet> snippets;
+  final Widget child;
+
+  KeyEventResult _onKeyEvent(
+      BuildContext context, WidgetRef ref, KeyEvent event) {
+    if (event is KeyUpEvent || snippets.isEmpty) {
+      return KeyEventResult.ignored;
+    }
+    final focusContext = FocusManager.instance.primaryFocus?.context;
+    if (focusContext?.findAncestorStateOfType<EditableTextState>() != null) {
+      return KeyEventResult.ignored;
+    }
+
+    final key = event.logicalKey;
+    final index =
+        snippets.indexWhere((s) => s.id == ref.read(selectedSnippetProvider));
+
+    if (key == LogicalKeyboardKey.arrowDown ||
+        key == LogicalKeyboardKey.arrowUp) {
+      final delta = key == LogicalKeyboardKey.arrowDown ? 1 : -1;
+      final next = index == -1
+          ? (delta > 0 ? 0 : snippets.length - 1)
+          : (index + delta).clamp(0, snippets.length - 1);
+      ref.read(selectedSnippetProvider.notifier).select(snippets[next].id);
+      return KeyEventResult.handled;
+    }
+
+    if (event is! KeyDownEvent || index == -1) return KeyEventResult.ignored;
+    final selected = snippets[index];
+
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      showSnippetEditor(context, snippetId: selected.id);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.delete ||
+        key == LogicalKeyboardKey.backspace) {
+      // Hand the selection to a neighbor so the detail pane doesn't blank.
+      final nextId = index + 1 < snippets.length
+          ? snippets[index + 1].id
+          : (index > 0 ? snippets[index - 1].id : null);
+      confirmAndDeleteSnippet(
+        context,
+        ref,
+        selected,
+        onAfterDelete: () =>
+            ref.read(selectedSnippetProvider.notifier).select(nextId),
+      );
+      return KeyEventResult.handled;
+    }
+    final hk = HardwareKeyboard.instance;
+    if (key == LogicalKeyboardKey.keyC &&
+        hk.isShiftPressed &&
+        (hk.isMetaPressed || hk.isControlPressed)) {
+      copyWithFeedback(
+        context,
+        snippetPrimaryText(selected),
+        AppLocalizations.of(context).exportMenuCopiedSnack,
+      );
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onKeyEvent: (node, event) => _onKeyEvent(context, ref, event),
+      child: child,
     );
   }
 }

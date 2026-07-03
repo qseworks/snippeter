@@ -7,6 +7,7 @@ import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../core/routing/route_paths.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/platform_keys.dart';
 import '../auth/application/auth_providers.dart';
 import '../import/gist_import_dialog.dart';
 import '../snippets/application/snippet_providers.dart';
@@ -98,18 +99,21 @@ class LibrarySidebar extends ConsumerWidget {
               padding: const EdgeInsetsDirectional.fromSTEB(12, 4, 12, 12),
               child: SizedBox(
                 width: double.infinity,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.accent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Tooltip(
+                  message: shortcutLabel('N'),
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.accent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      _closeDrawerIfNeeded(context);
+                      showSnippetEditor(context);
+                    },
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text(l10n.sidebarNewSnippetButton),
                   ),
-                  onPressed: () {
-                    _closeDrawerIfNeeded(context);
-                    showSnippetEditor(context);
-                  },
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(l10n.sidebarNewSnippetButton),
                 ),
               ),
             ),

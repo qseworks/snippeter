@@ -140,12 +140,14 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
                   _buildCheckText(
                     context: context,
                     text: 'Aa',
+                    tooltip: l10n.codeFindMatchCaseTooltip,
                     checked: value.option.caseSensitive,
                     onPressed: controller.toggleCaseSensitive,
                   ),
                   _buildCheckText(
                     context: context,
                     text: '.*',
+                    tooltip: l10n.codeFindRegexTooltip,
                     checked: value.option.regex,
                     onPressed: controller.toggleRegex,
                   ),
@@ -239,6 +241,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildCheckText({
     required BuildContext context,
     required String text,
+    required String tooltip,
     required bool checked,
     required VoidCallback onPressed,
   }) {
@@ -248,14 +251,17 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
       onTap: onPressed,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: SizedBox(
-          width: _kIconWidth * 0.75,
-          child: Text(
-            text,
-            style: TextStyle(
-              color: checked ? selectedColor : iconColor,
-              fontSize: inputFontSize,
-              fontWeight: checked ? FontWeight.w700 : FontWeight.w400,
+        child: Tooltip(
+          message: tooltip,
+          child: SizedBox(
+            width: _kIconWidth * 0.75,
+            child: Text(
+              text,
+              style: TextStyle(
+                color: checked ? selectedColor : iconColor,
+                fontSize: inputFontSize,
+                fontWeight: checked ? FontWeight.w700 : FontWeight.w400,
+              ),
             ),
           ),
         ),

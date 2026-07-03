@@ -8,6 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../application/snippet_providers.dart';
 import '../../domain/snippet.dart';
 import '../../domain/value_objects.dart';
+import '../snippet_editor_modal.dart';
 import 'label_chip.dart';
 import 'snippet_copy.dart';
 
@@ -26,6 +27,25 @@ class SnippetCard extends ConsumerWidget {
   final VoidCallback onTap;
   final bool selected;
 
+  // Manual double-click detection: an InkWell.onDoubleTap would delay every
+  // single tap by the disambiguation window, which reads as lag on the list's
+  // primary action. Instead the first click selects immediately and a second
+  // click on the same row within the window opens the editor.
+  static String? _lastTapId;
+  static int _lastTapMs = 0;
+
+  void _handleTap(BuildContext context) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final isDoubleClick =
+        _lastTapId == snippet.id && now - _lastTapMs < 350;
+    _lastTapId = snippet.id;
+    _lastTapMs = now;
+    onTap();
+    if (isDoubleClick) {
+      showSnippetEditor(context, snippetId: snippet.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -39,13 +59,15 @@ class SnippetCard extends ConsumerWidget {
     final language = ref.watch(languageMapProvider)[previewLanguageId];
     final isPrivate = snippet.visibility == SnippetVisibility.private;
 
-    return Padding(
+    return _KeepVisibleWhenSelected(
+      selected: selected,
+      child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: InkWell(
-          onTap: onTap,
+          onTap: () => _handleTap(context),
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
@@ -157,8 +179,45 @@ class SnippetCard extends ConsumerWidget {
           ),
         ),
       ),
+      ),
     );
   }
+}
+
+/// Scrolls itself into view when [selected] flips true, so the keyboard
+/// selection (↑/↓ in the library list) never walks off-screen. Only reacts to
+/// the flip — initial mounts and taps on already-visible rows don't yank the
+/// scroll position.
+class _KeepVisibleWhenSelected extends StatefulWidget {
+  const _KeepVisibleWhenSelected({required this.selected, required this.child});
+
+  final bool selected;
+  final Widget child;
+
+  @override
+  State<_KeepVisibleWhenSelected> createState() =>
+      _KeepVisibleWhenSelectedState();
+}
+
+class _KeepVisibleWhenSelectedState extends State<_KeepVisibleWhenSelected> {
+  @override
+  void didUpdateWidget(_KeepVisibleWhenSelected oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selected && !oldWidget.selected) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        // The keepVisibleAtEnd+keepVisibleAtStart pair scrolls the minimal
+        // amount to make the row fully visible, and not at all when it is.
+        Scrollable.ensureVisible(context,
+            alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
+        Scrollable.ensureVisible(context,
+            alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 /// A compact relative/short date from an epoch-ms timestamp.

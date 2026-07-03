@@ -63,6 +63,10 @@
   "@commonSomethingWentWrong": {
     "description": "Generic failure snackbar for user actions (delete, restore, create label)"
   },
+  "commonClear": "Clear",
+  "@commonClear": {
+    "description": "Tooltip on clear (×) buttons, e.g. the search field"
+  },
   "editorTitleHint": "Title",
   "@editorTitleHint": {
     "description": "hintText for the snippet title field"
@@ -1295,6 +1299,14 @@
   "codeFindNextTooltip": "Next",
   "@codeFindNextTooltip": {
     "description": "code_find_panel.dart: tooltip on the next-match (arrow down) IconButton"
+  },
+  "codeFindMatchCaseTooltip": "Match case",
+  "@codeFindMatchCaseTooltip": {
+    "description": "Tooltip on the find panel's Aa (case-sensitive) toggle"
+  },
+  "codeFindRegexTooltip": "Use regular expression",
+  "@codeFindRegexTooltip": {
+    "description": "Tooltip on the find panel's .* (regex) toggle"
   },
   "codeFindReplaceHint": "Replace",
   "@codeFindReplaceHint": {

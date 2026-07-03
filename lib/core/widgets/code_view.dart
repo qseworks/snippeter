@@ -204,8 +204,7 @@ class CodeBlock extends StatelessWidget {
               children: [
                 ?gutter,
                 Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
+                  child: _HorizontalCodeScroller(
                     child: SelectableText.rich(span),
                   ),
                 ),
@@ -214,6 +213,43 @@ class CodeBlock extends StatelessWidget {
           ),
         ],
         ),
+      ),
+    );
+  }
+}
+
+/// Horizontal scroller for long code lines with a scrollbar desktop users can
+/// actually see and grab (the default scroll behavior adds scrollbars only to
+/// vertical scrollables).
+class _HorizontalCodeScroller extends StatefulWidget {
+  const _HorizontalCodeScroller({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_HorizontalCodeScroller> createState() =>
+      _HorizontalCodeScrollerState();
+}
+
+class _HorizontalCodeScrollerState extends State<_HorizontalCodeScroller> {
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+      controller: _controller,
+      child: SingleChildScrollView(
+        controller: _controller,
+        scrollDirection: Axis.horizontal,
+        // Breathing room so the thumb doesn't sit on the last code line.
+        padding: const EdgeInsets.only(bottom: 6),
+        child: widget.child,
       ),
     );
   }

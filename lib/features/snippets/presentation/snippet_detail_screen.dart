@@ -137,6 +137,65 @@ class DetailPanePlaceholder extends StatelessWidget {
   }
 }
 
+/// Confirms, then soft-deletes [snippet], with a friendly failure snackbar
+/// and an Undo action on success. Shared by the detail AppBar delete button
+/// and the library list's Delete-key shortcut.
+Future<void> confirmAndDeleteSnippet(
+  BuildContext context,
+  WidgetRef ref,
+  Snippet snippet, {
+  VoidCallback? onAfterDelete,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      final scheme = Theme.of(context).colorScheme;
+      return AlertDialog(
+        title: Text(l10n.detailDeleteSnippetTitle),
+        content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      );
+    },
+  );
+  if (!(ok ?? false) || !context.mounted) return;
+  final messenger = ScaffoldMessenger.of(context);
+  final repo = ref.read(snippetRepositoryProvider);
+  try {
+    await repo.softDelete(snippet.id);
+  } catch (e, st) {
+    developer.log('softDelete failed', name: 'detail', error: e, stackTrace: st);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+    );
+    return;
+  }
+  if (context.mounted) onAfterDelete?.call();
+  // Soft delete is reversible — offer Undo. `repo` is captured, so the
+  // action outlives this screen's navigation.
+  messenger.showSnackBar(SnackBar(
+    content: Text(l10n.detailDeletedSnack(snippet.title)),
+    duration: const Duration(seconds: 5),
+    action: SnackBarAction(
+      label: l10n.commonUndo,
+      onPressed: () => repo.undoDelete(snippet.id),
+    ),
+  ));
+}
+
 /// Shared AppBar actions for both the routed and inline detail views.
 List<Widget> snippetActions(
   BuildContext context,
@@ -145,56 +204,6 @@ List<Widget> snippetActions(
   required VoidCallback onAfterDelete,
 }) {
   final l10n = AppLocalizations.of(context);
-  Future<void> confirmDelete() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        final scheme = Theme.of(context).colorScheme;
-        return AlertDialog(
-          title: Text(l10n.detailDeleteSnippetTitle),
-          content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.commonCancel),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: scheme.error,
-                foregroundColor: scheme.onError,
-              ),
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(l10n.commonDelete),
-            ),
-          ],
-        );
-      },
-    );
-    if (!(ok ?? false) || !context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
-    final repo = ref.read(snippetRepositoryProvider);
-    try {
-      await repo.softDelete(snippet.id);
-    } catch (e, st) {
-      developer.log('softDelete failed', name: 'detail', error: e, stackTrace: st);
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
-      );
-      return;
-    }
-    if (context.mounted) onAfterDelete();
-    // Soft delete is reversible — offer Undo. `repo` is captured, so the
-    // action outlives this screen's navigation.
-    messenger.showSnackBar(SnackBar(
-      content: Text(l10n.detailDeletedSnack(snippet.title)),
-      duration: const Duration(seconds: 5),
-      action: SnackBarAction(
-        label: l10n.commonUndo,
-        onPressed: () => repo.undoDelete(snippet.id),
-      ),
-    ));
-  }
-
   return [
     IconButton(
       tooltip: snippet.isFavorite
@@ -220,7 +229,8 @@ List<Widget> snippetActions(
     IconButton(
       tooltip: l10n.detailDeleteTooltip,
       icon: const Icon(Icons.delete_outline),
-      onPressed: confirmDelete,
+      onPressed: () => confirmAndDeleteSnippet(context, ref, snippet,
+          onAfterDelete: onAfterDelete),
     ),
   ];
 }
@@ -244,7 +254,11 @@ class SnippetDetailBody extends ConsumerWidget {
     final files = snippet.files;
     final fileCount = files.isEmpty ? 1 : files.length;
 
-    return Center(
+    // SelectionArea: a developer tool's detail text — the meta line (#id,
+    // dates), share URL, description, prompt fields — should all be mouse-
+    // selectable. Code blocks keep their own SelectableText islands.
+    return SelectionArea(
+      child: Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 900),
         child: ListView(
@@ -311,6 +325,7 @@ class SnippetDetailBody extends ConsumerWidget {
             _AttachmentsSection(snippetId: snippet.id),
           ],
         ),
+      ),
       ),
     );
   }

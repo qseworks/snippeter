@@ -14,6 +14,7 @@ import '../../../core/highlight/language_detect.dart';
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/platform_keys.dart';
 import '../../../core/widgets/async_states.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../settings/application/settings_providers.dart';
@@ -925,16 +926,19 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
             child: Text(l10n.commonDiscard),
           ),
           const SizedBox(width: 8),
-          FilledButton.icon(
-            onPressed: _saving ? null : _save,
-            icon: _saving
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.check),
-            label: Text(l10n.commonSave),
+          Tooltip(
+            message: shortcutLabel('S'),
+            child: FilledButton.icon(
+              onPressed: _saving ? null : _save,
+              icon: _saving
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check),
+              label: Text(l10n.commonSave),
+            ),
           ),
         ],
       ),
@@ -1017,10 +1021,23 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       if (!_saving) _save();
     }
 
+    // The modal route is barrierDismissible:false (protecting unsaved edits),
+    // which also disables the route's built-in Escape handling — so keyboard
+    // users would be trapped without these. Esc and Cmd/Ctrl+W both route
+    // through [_discard], preserving the unsaved-changes guard. (A first Esc
+    // inside the code editor still closes its find panel; the next one
+    // reaches us.)
+    void close() {
+      if (!_saving) _discard();
+    }
+
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.keyS, meta: true): save,
         const SingleActivator(LogicalKeyboardKey.keyS, control: true): save,
+        const SingleActivator(LogicalKeyboardKey.escape): close,
+        const SingleActivator(LogicalKeyboardKey.keyW, meta: true): close,
+        const SingleActivator(LogicalKeyboardKey.keyW, control: true): close,
       },
       child: child,
     );
@@ -1129,7 +1146,7 @@ class _ModalHeader extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           IconButton(
-            tooltip: l10n.commonClose,
+            tooltip: '${l10n.commonClose} (Esc)',
             onPressed: onClose,
             icon: const Icon(Icons.close),
           ),
