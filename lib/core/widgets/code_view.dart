@@ -296,7 +296,7 @@ class _CopyButtonState extends State<_CopyButton> {
         child: Icon(
           _copied ? Icons.check_rounded : Icons.copy_rounded,
           key: ValueKey<bool>(_copied),
-          color: _copied ? const Color(0xFF27C93F) : widget.color,
+          color: _copied ? AppTheme.accent : widget.color,
         ),
       ),
     );

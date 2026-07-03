@@ -3,10 +3,12 @@ import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../domain/snippet_type.dart';
 
-/// Icon used to represent a snippet type across the UI.
+/// Icon used to represent a snippet type across the UI. One family (filled)
+/// for all three — the glyphs render side by side in the editor's segmented
+/// button, the detail meta chip, and the type filter.
 IconData iconForType(SnippetType type) => switch (type) {
       SnippetType.code => Icons.code,
-      SnippetType.aiPrompt => Icons.smart_toy_outlined,
+      SnippetType.aiPrompt => Icons.smart_toy,
       SnippetType.text => Icons.notes,
     };
 

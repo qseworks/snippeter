@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/highlight/code_themes.dart';
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/i18n/app_locales.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/data/auth_service.dart';
 import '../../snippets/application/snippet_providers.dart';
@@ -191,16 +192,11 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // Shared recipe (settings previously used primary-colored headers — the
+    // odd one out of the app's four hand-rolled variants).
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 8),
-      child: Text(
-        title.toUpperCase(),
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.primary,
-          letterSpacing: 0.8,
-        ),
-      ),
+      child: SectionHeader(title),
     );
   }
 }

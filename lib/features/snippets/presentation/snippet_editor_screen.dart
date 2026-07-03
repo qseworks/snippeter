@@ -16,6 +16,7 @@ import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/platform_keys.dart';
 import '../../../core/widgets/async_states.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../workspaces/application/workspace_providers.dart';
@@ -616,7 +617,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         ),
       ),
       const Divider(height: 18),
-      _SectionHeader(title: l10n.editorSectionType),
+      SectionHeader(l10n.editorSectionType),
       const SizedBox(height: 8),
       Align(
         alignment: AlignmentDirectional.centerStart,
@@ -653,8 +654,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         ),
       ),
       const SizedBox(height: 16),
-      _SectionHeader(
-        title: l10n.editorSectionDescription,
+      SectionHeader(
+        l10n.editorSectionDescription,
         trailing: Text(
           l10n.editorMarkdownSupportedLabel,
           style: theme.textTheme.labelSmall
@@ -756,8 +757,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     ];
 
     // ---------- FILES ----------
-    final filesHeader = _SectionHeader(
-      title: l10n.editorSectionFiles,
+    final filesHeader = SectionHeader(
+      l10n.editorSectionFiles,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1158,37 +1159,6 @@ class _ModalHeader extends StatelessWidget {
 
 /// A small uppercase, letter-spaced Snippet-style section header with an
 /// optional trailing affordance (e.g. "Markdown supported" or an action).
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.trailing});
-
-  final String title;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Flexible(
-          child: Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.0,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        if (trailing != null) ...[
-          const Spacer(),
-          trailing!,
-        ],
-      ],
-    );
-  }
-}
-
 /// Snippet-style formatting toolbar that inserts Markdown around the description
 /// selection. Each button calls back into the editor's insertion helpers.
 class _MarkdownToolbar extends StatelessWidget {
@@ -1493,7 +1463,7 @@ class _BodyEditorState extends State<_BodyEditor> {
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppTheme.radiusXs),
             borderSide: BorderSide.none,
           ),
         ),

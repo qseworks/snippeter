@@ -41,7 +41,7 @@ class ExportMenuButton extends ConsumerWidget {
         PopupMenuItem(
           value: _ExportAction.copy,
           child: _MenuRow(
-              icon: Icons.copy_all_outlined, label: l10n.exportMenuCopyText),
+              icon: Icons.copy_rounded, label: l10n.exportMenuCopyText),
         ),
         PopupMenuItem(
           value: _ExportAction.image,

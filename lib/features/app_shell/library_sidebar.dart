@@ -88,7 +88,7 @@ class LibrarySidebar extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     iconSize: 18,
                     color: AppTheme.sidebarMuted,
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh_rounded),
                     onPressed: () => ref.invalidate(allSnippetsProvider),
                   ),
                 ],
@@ -181,7 +181,7 @@ class LibrarySidebar extends ConsumerWidget {
                             child: const Padding(
                               padding: EdgeInsets.all(6),
                               child: Icon(
-                                Icons.refresh,
+                                Icons.refresh_rounded,
                                 size: 16,
                                 color: AppTheme.sidebarMuted,
                               ),

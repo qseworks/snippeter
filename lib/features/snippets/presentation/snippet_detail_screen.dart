@@ -913,6 +913,8 @@ class _CopyMenuButton extends StatelessWidget {
     return PopupMenuButton<_CopyKind>(
       tooltip: l10n.detailCopyMenuTooltip,
       icon: const Icon(Icons.copy_rounded, size: 18),
+      // Match the compact ADD FILE button beside it so the header row aligns.
+      style: IconButton.styleFrom(visualDensity: VisualDensity.compact),
       onSelected: (kind) {
         final text = switch (kind) {
           _CopyKind.allFiles => snippetAllFilesText(snippet),
@@ -925,7 +927,7 @@ class _CopyMenuButton extends StatelessWidget {
           value: _CopyKind.allFiles,
           child: Row(
             children: [
-              const Icon(Icons.content_copy_outlined, size: 18),
+              const Icon(Icons.copy_rounded, size: 18),
               const SizedBox(width: 12),
               Text(l10n.detailCopyAllFiles),
             ],

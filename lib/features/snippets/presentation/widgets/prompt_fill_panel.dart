@@ -147,7 +147,6 @@ class _VariableField extends StatelessWidget {
         helperMaxLines: 2,
         hintText: l10n.promptFillFieldHint(variable.name),
         isDense: true,
-        border: const OutlineInputBorder(),
       ),
     );
   }

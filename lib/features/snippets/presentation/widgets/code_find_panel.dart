@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:re_editor/re_editor.dart';
+import 'package:snippet_manager/core/theme/app_theme.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 /// Find / replace panel for the code [CodeEditor]. Adapted from the re_editor
@@ -76,7 +77,7 @@ class CodeFindPanelView extends StatelessWidget implements PreferredSizeWidget {
             scrollDirection: Axis.horizontal,
             child: Material(
               elevation: 2,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               color: Theme.of(context).colorScheme.surfaceContainerHigh,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),

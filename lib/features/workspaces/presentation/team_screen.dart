@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/core/theme/app_theme.dart';
 import 'package:snippet_manager/core/widgets/async_states.dart';
+import 'package:snippet_manager/core/widgets/section_header.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
@@ -184,14 +185,7 @@ class _TeamBody extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 20),
       children: [
         // Members section.
-        Text(
-          l10n.teamMembersSectionHeader,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-            letterSpacing: 1.1,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        SectionHeader(l10n.teamMembersSectionHeader),
         const SizedBox(height: 8),
         if (members.isEmpty)
           Padding(
@@ -217,14 +211,7 @@ class _TeamBody extends StatelessWidget {
         // Invite section (managers/owners only).
         if (canManage) ...[
           const SizedBox(height: 24),
-          Text(
-            l10n.teamInviteSectionHeader,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              letterSpacing: 1.1,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          SectionHeader(l10n.teamInviteSectionHeader),
           const SizedBox(height: 10),
           _InviteRow(workspaceId: workspaceId, service: service),
         ],
