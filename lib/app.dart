@@ -19,7 +19,10 @@ class SnippetManagerApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
-    final themeMode = ref.watch(settingsProvider).themeMode;
+    // select() so unrelated settings (export theme, default language…) don't
+    // rebuild the entire MaterialApp.router.
+    final themeMode =
+        ref.watch(settingsProvider.select((s) => s.themeMode));
     // Selected UI language; null follows the system locale. Flutter resolves
     // text direction (RTL for Arabic/Urdu) from this locale via the global
     // localizations delegates below — no manual Directionality needed.

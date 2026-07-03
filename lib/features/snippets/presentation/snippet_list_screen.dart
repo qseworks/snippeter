@@ -236,9 +236,10 @@ class _ResultsArea extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
 
-    // Discriminator drives the cross-fade: it changes between
-    // loading/error/empty/data and, for data, with the result identity so a
-    // new result set fades in instead of swapping hard.
+    // Discriminator drives the cross-fade between the loading/error/empty/
+    // data PHASES only. Within the data phase the ListView updates in place —
+    // fading result-set changes meant two full lists alive per keystroke-
+    // committed search and a scroll reset on every refinement.
     final String discriminator;
     final Widget child;
 
@@ -263,8 +264,7 @@ class _ResultsArea extends ConsumerWidget {
         discriminator = 'empty';
         child = _EmptyState(filtered: isFiltered);
       } else {
-        discriminator =
-            'data:${snippets.length}:${snippets.first.id}:${snippets.last.id}';
+        discriminator = 'data';
         child = ListView.builder(
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
           itemCount: snippets.length,

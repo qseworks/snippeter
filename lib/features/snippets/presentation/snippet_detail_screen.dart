@@ -448,6 +448,10 @@ class _AttachmentTile extends StatelessWidget {
                       attachment.bytes,
                       width: 40,
                       height: 40,
+                      // Decode at thumbnail size (40px × up to 3x DPR): a
+                      // full-resolution photo would otherwise decode to tens
+                      // of MB of bitmap for a 40px preview.
+                      cacheWidth: 120,
                       fit: BoxFit.cover,
                       gaplessPlayback: true,
                       errorBuilder: (context, error, stack) =>
@@ -559,7 +563,7 @@ class _FileBlock extends StatelessWidget {
     // Jupyter notebooks (.ipynb) get a rich, cell-by-cell rendering when the
     // content parses as a notebook; otherwise we fall back to a raw CodeBlock.
     final Notebook? notebook = filename.toLowerCase().endsWith('.ipynb')
-        ? parseNotebook(file.content)
+        ? parseNotebookCached(file.content)
         : null;
 
     return Column(
