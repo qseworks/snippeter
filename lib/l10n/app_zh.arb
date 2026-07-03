@@ -9,6 +9,7 @@
   "commonName": "名称",
   "commonCancel": "取消",
   "commonCreate": "创建",
+  "commonRetry": "重试",
   "editorTitleHint": "标题",
   "editorSectionType": "类型",
   "editorTypeCode": "代码",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "只有管理员才能执行此操作。",
   "teamErrorNetworkUnavailable": "网络不可用。请重新连接后再试。",
   "teamErrorGeneric": "出错了。请重试。",
+  "teamErrorSignInRequired": "请登录后继续。",
   "createWorkspaceSignInError": "请登录以创建团队。",
   "createWorkspaceFailedError": "无法创建团队——你可能处于离线状态。",
   "createWorkspaceTitle": "新建团队",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "已保存 {filename}",
   "exportMenuExportFailedSnack": "导出失败：{error}",
   "settingsAppLanguageLabel": "应用语言",
-  "settingsLanguageSystemDefault": "系统默认"
+  "settingsLanguageSystemDefault": "系统默认",
+  "cardCopyTooltip": "复制",
+  "detailCopyMenuTooltip": "复制代码片段",
+  "detailCopyAllFiles": "复制所有文件",
+  "detailCopyAsMarkdown": "复制为 Markdown",
+  "promptFillTitle": "填写变量",
+  "promptFillSubtitle": "输入变量值以生成提示词，然后复制。",
+  "promptFillPreviewLabel": "预览",
+  "promptFillCopyButton": "复制填充后的提示词",
+  "promptFillEmptyWarning": "已复制——部分必填变量仍为空",
+  "promptFillFieldHint": "{name} 的值"
 }

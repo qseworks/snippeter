@@ -9,6 +9,7 @@
   "commonName": "नाम",
   "commonCancel": "रद्द करें",
   "commonCreate": "बनाएँ",
+  "commonRetry": "पुनः प्रयास करें",
   "editorTitleHint": "शीर्षक",
   "editorSectionType": "प्रकार",
   "editorTypeCode": "कोड",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "केवल प्रबंधक ही ऐसा कर सकते हैं।",
   "teamErrorNetworkUnavailable": "नेटवर्क उपलब्ध नहीं है। पुनः कनेक्ट करें और फिर से प्रयास करें।",
   "teamErrorGeneric": "कुछ गलत हो गया। कृपया फिर से प्रयास करें।",
+  "teamErrorSignInRequired": "जारी रखने के लिए कृपया साइन इन करें।",
   "createWorkspaceSignInError": "टीम बनाने के लिए साइन इन करें।",
   "createWorkspaceFailedError": "टीम नहीं बनाई जा सकी — हो सकता है आप ऑफ़लाइन हों।",
   "createWorkspaceTitle": "नई टीम",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "{filename} सहेजा गया",
   "exportMenuExportFailedSnack": "निर्यात विफल रहा: {error}",
   "settingsAppLanguageLabel": "ऐप भाषा",
-  "settingsLanguageSystemDefault": "सिस्टम डिफ़ॉल्ट"
+  "settingsLanguageSystemDefault": "सिस्टम डिफ़ॉल्ट",
+  "cardCopyTooltip": "कॉपी करें",
+  "detailCopyMenuTooltip": "स्निपेट कॉपी करें",
+  "detailCopyAllFiles": "सभी फ़ाइलें कॉपी करें",
+  "detailCopyAsMarkdown": "Markdown के रूप में कॉपी करें",
+  "promptFillTitle": "वेरिएबल भरें",
+  "promptFillSubtitle": "प्रॉम्प्ट तैयार करने के लिए मान दर्ज करें, फिर उसे कॉपी करें।",
+  "promptFillPreviewLabel": "पूर्वावलोकन",
+  "promptFillCopyButton": "भरा हुआ प्रॉम्प्ट कॉपी करें",
+  "promptFillEmptyWarning": "कॉपी हो गया — कुछ आवश्यक वेरिएबल अभी भी खाली हैं",
+  "promptFillFieldHint": "{name} का मान"
 }

@@ -9,6 +9,7 @@
   "commonName": "Nombre",
   "commonCancel": "Cancelar",
   "commonCreate": "Crear",
+  "commonRetry": "Reintentar",
   "editorTitleHint": "Título",
   "editorSectionType": "TIPO",
   "editorTypeCode": "Código",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "Solo los gestores pueden hacer eso.",
   "teamErrorNetworkUnavailable": "Sin conexión de red. Reconéctate e inténtalo de nuevo.",
   "teamErrorGeneric": "Algo salió mal. Inténtalo de nuevo.",
+  "teamErrorSignInRequired": "Inicia sesión para continuar.",
   "createWorkspaceSignInError": "Inicia sesión para crear un equipo.",
   "createWorkspaceFailedError": "No se pudo crear el equipo — puede que estés sin conexión.",
   "createWorkspaceTitle": "Nuevo equipo",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "Se guardó {filename}",
   "exportMenuExportFailedSnack": "Error al exportar: {error}",
   "settingsAppLanguageLabel": "Idioma de la app",
-  "settingsLanguageSystemDefault": "Predeterminado del sistema"
+  "settingsLanguageSystemDefault": "Predeterminado del sistema",
+  "cardCopyTooltip": "Copiar",
+  "detailCopyMenuTooltip": "Copiar fragmento",
+  "detailCopyAllFiles": "Copiar todos los archivos",
+  "detailCopyAsMarkdown": "Copiar como Markdown",
+  "promptFillTitle": "Completar variables",
+  "promptFillSubtitle": "Introduce los valores para completar el prompt y luego cópialo.",
+  "promptFillPreviewLabel": "Vista previa",
+  "promptFillCopyButton": "Copiar prompt completado",
+  "promptFillEmptyWarning": "Copiado — algunas variables obligatorias siguen vacías",
+  "promptFillFieldHint": "Valor de {name}"
 }

@@ -9,6 +9,7 @@
   "commonName": "نام",
   "commonCancel": "منسوخ کریں",
   "commonCreate": "بنائیں",
+  "commonRetry": "دوبارہ کوشش کریں",
   "editorTitleHint": "عنوان",
   "editorSectionType": "قسم",
   "editorTypeCode": "کوڈ",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "صرف منتظمین یہ کام کر سکتے ہیں۔",
   "teamErrorNetworkUnavailable": "نیٹ ورک دستیاب نہیں۔ دوبارہ منسلک ہوں اور پھر کوشش کریں۔",
   "teamErrorGeneric": "کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔",
+  "teamErrorSignInRequired": "جاری رکھنے کے لیے سائن ان کریں۔",
   "createWorkspaceSignInError": "ٹیم بنانے کے لیے سائن ان کریں۔",
   "createWorkspaceFailedError": "ٹیم نہیں بنائی جا سکی — ممکن ہے آپ آف لائن ہوں۔",
   "createWorkspaceTitle": "نئی ٹیم",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "{filename} محفوظ ہو گئی",
   "exportMenuExportFailedSnack": "ایکسپورٹ ناکام: {error}",
   "settingsAppLanguageLabel": "ایپ کی زبان",
-  "settingsLanguageSystemDefault": "سسٹم کی طے شدہ"
+  "settingsLanguageSystemDefault": "سسٹم کی طے شدہ",
+  "cardCopyTooltip": "کاپی کریں",
+  "detailCopyMenuTooltip": "سنیپٹ کاپی کریں",
+  "detailCopyAllFiles": "تمام فائلیں کاپی کریں",
+  "detailCopyAsMarkdown": "Markdown کے طور پر کاپی کریں",
+  "promptFillTitle": "ویری ایبلز بھریں",
+  "promptFillSubtitle": "پرامپٹ مکمل کرنے کے لیے قدریں درج کریں، پھر اسے کاپی کریں۔",
+  "promptFillPreviewLabel": "پیش منظر",
+  "promptFillCopyButton": "بھرا ہوا پرامپٹ کاپی کریں",
+  "promptFillEmptyWarning": "کاپی ہو گیا — کچھ درکار ویری ایبلز اب بھی خالی ہیں",
+  "promptFillFieldHint": "{name} کی قدر"
 }

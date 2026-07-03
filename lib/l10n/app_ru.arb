@@ -9,6 +9,7 @@
   "commonName": "Название",
   "commonCancel": "Отмена",
   "commonCreate": "Создать",
+  "commonRetry": "Повторить",
   "editorTitleHint": "Заголовок",
   "editorSectionType": "ТИП",
   "editorTypeCode": "Код",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "Это могут делать только менеджеры.",
   "teamErrorNetworkUnavailable": "Сеть недоступна. Восстановите подключение и повторите попытку.",
   "teamErrorGeneric": "Что-то пошло не так. Повторите попытку.",
+  "teamErrorSignInRequired": "Войдите, чтобы продолжить.",
   "createWorkspaceSignInError": "Войдите, чтобы создать команду.",
   "createWorkspaceFailedError": "Не удалось создать команду — возможно, вы офлайн.",
   "createWorkspaceTitle": "Новая команда",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "Сохранено {filename}",
   "exportMenuExportFailedSnack": "Не удалось экспортировать: {error}",
   "settingsAppLanguageLabel": "Язык приложения",
-  "settingsLanguageSystemDefault": "Системный по умолчанию"
+  "settingsLanguageSystemDefault": "Системный по умолчанию",
+  "cardCopyTooltip": "Копировать",
+  "detailCopyMenuTooltip": "Копировать сниппет",
+  "detailCopyAllFiles": "Копировать все файлы",
+  "detailCopyAsMarkdown": "Копировать как Markdown",
+  "promptFillTitle": "Заполнить переменные",
+  "promptFillSubtitle": "Введите значения, чтобы заполнить промпт, затем скопируйте его.",
+  "promptFillPreviewLabel": "Предпросмотр",
+  "promptFillCopyButton": "Копировать заполненный промпт",
+  "promptFillEmptyWarning": "Скопировано — некоторые обязательные переменные ещё пусты",
+  "promptFillFieldHint": "Значение {name}"
 }

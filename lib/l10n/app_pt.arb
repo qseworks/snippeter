@@ -9,6 +9,7 @@
   "commonName": "Nome",
   "commonCancel": "Cancelar",
   "commonCreate": "Criar",
+  "commonRetry": "Tentar novamente",
   "editorTitleHint": "Título",
   "editorSectionType": "TIPO",
   "editorTypeCode": "Código",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "Só os gestores podem fazer isso.",
   "teamErrorNetworkUnavailable": "Rede indisponível. Reconecte-se e tente novamente.",
   "teamErrorGeneric": "Algo correu mal. Tente novamente.",
+  "teamErrorSignInRequired": "Inicie sessão para continuar.",
   "createWorkspaceSignInError": "Inicie sessão para criar uma equipa.",
   "createWorkspaceFailedError": "Não foi possível criar a equipa — pode estar offline.",
   "createWorkspaceTitle": "Nova equipa",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "{filename} guardado",
   "exportMenuExportFailedSnack": "Falha na exportação: {error}",
   "settingsAppLanguageLabel": "Idioma da aplicação",
-  "settingsLanguageSystemDefault": "Predefinição do sistema"
+  "settingsLanguageSystemDefault": "Predefinição do sistema",
+  "cardCopyTooltip": "Copiar",
+  "detailCopyMenuTooltip": "Copiar snippet",
+  "detailCopyAllFiles": "Copiar todos os ficheiros",
+  "detailCopyAsMarkdown": "Copiar como Markdown",
+  "promptFillTitle": "Preencher variáveis",
+  "promptFillSubtitle": "Introduza os valores para preencher a prompt e depois copie-a.",
+  "promptFillPreviewLabel": "Pré-visualização",
+  "promptFillCopyButton": "Copiar prompt preenchida",
+  "promptFillEmptyWarning": "Copiado — algumas variáveis obrigatórias continuam vazias",
+  "promptFillFieldHint": "Valor de {name}"
 }

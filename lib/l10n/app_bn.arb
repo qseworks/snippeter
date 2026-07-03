@@ -9,6 +9,7 @@
   "commonName": "নাম",
   "commonCancel": "বাতিল",
   "commonCreate": "তৈরি করুন",
+  "commonRetry": "আবার চেষ্টা করুন",
   "editorTitleHint": "শিরোনাম",
   "editorSectionType": "ধরন",
   "editorTypeCode": "কোড",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "শুধুমাত্র ম্যানেজাররাই এটি করতে পারেন।",
   "teamErrorNetworkUnavailable": "নেটওয়ার্ক উপলব্ধ নয়। পুনরায় সংযুক্ত হয়ে আবার চেষ্টা করুন।",
   "teamErrorGeneric": "কিছু একটা ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "teamErrorSignInRequired": "চালিয়ে যেতে সাইন ইন করুন।",
   "createWorkspaceSignInError": "একটি টিম তৈরি করতে সাইন ইন করুন।",
   "createWorkspaceFailedError": "টিম তৈরি করা যায়নি — আপনি হয়তো অফলাইনে আছেন।",
   "createWorkspaceTitle": "নতুন টিম",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "{filename} সংরক্ষণ হয়েছে",
   "exportMenuExportFailedSnack": "এক্সপোর্ট ব্যর্থ হয়েছে: {error}",
   "settingsAppLanguageLabel": "অ্যাপের ভাষা",
-  "settingsLanguageSystemDefault": "সিস্টেম ডিফল্ট"
+  "settingsLanguageSystemDefault": "সিস্টেম ডিফল্ট",
+  "cardCopyTooltip": "কপি করুন",
+  "detailCopyMenuTooltip": "স্নিপেট কপি করুন",
+  "detailCopyAllFiles": "সব ফাইল কপি করুন",
+  "detailCopyAsMarkdown": "Markdown হিসেবে কপি করুন",
+  "promptFillTitle": "ভেরিয়েবল পূরণ করুন",
+  "promptFillSubtitle": "প্রম্পট প্রস্তুত করতে মানগুলো লিখুন, তারপর কপি করুন।",
+  "promptFillPreviewLabel": "প্রিভিউ",
+  "promptFillCopyButton": "পূরণ করা প্রম্পট কপি করুন",
+  "promptFillEmptyWarning": "কপি হয়েছে — কিছু আবশ্যক ভেরিয়েবল এখনও খালি",
+  "promptFillFieldHint": "{name}-এর মান"
 }

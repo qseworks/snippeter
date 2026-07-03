@@ -9,6 +9,7 @@
   "commonName": "الاسم",
   "commonCancel": "إلغاء",
   "commonCreate": "إنشاء",
+  "commonRetry": "إعادة المحاولة",
   "editorTitleHint": "العنوان",
   "editorSectionType": "النوع",
   "editorTypeCode": "كود",
@@ -135,6 +136,7 @@
   "teamErrorOnlyManagers": "يمكن للمديرين فقط القيام بذلك.",
   "teamErrorNetworkUnavailable": "الشبكة غير متاحة. أعد الاتصال وحاول مجددًا.",
   "teamErrorGeneric": "حدث خطأ ما. الرجاء المحاولة مجددًا.",
+  "teamErrorSignInRequired": "يرجى تسجيل الدخول للمتابعة.",
   "createWorkspaceSignInError": "سجّل الدخول لإنشاء فريق.",
   "createWorkspaceFailedError": "تعذّر إنشاء الفريق — قد تكون غير متصل بالإنترنت.",
   "createWorkspaceTitle": "فريق جديد",
@@ -304,5 +306,15 @@
   "exportMenuSavedSnack": "تم حفظ {filename}",
   "exportMenuExportFailedSnack": "فشل التصدير: {error}",
   "settingsAppLanguageLabel": "لغة التطبيق",
-  "settingsLanguageSystemDefault": "افتراضي النظام"
+  "settingsLanguageSystemDefault": "افتراضي النظام",
+  "cardCopyTooltip": "نسخ",
+  "detailCopyMenuTooltip": "نسخ المقتطف",
+  "detailCopyAllFiles": "نسخ كل الملفات",
+  "detailCopyAsMarkdown": "نسخ بصيغة Markdown",
+  "promptFillTitle": "تعبئة المتغيّرات",
+  "promptFillSubtitle": "أدخل القيم لتعبئة الموجّه، ثم انسخه.",
+  "promptFillPreviewLabel": "معاينة",
+  "promptFillCopyButton": "نسخ الموجّه المعبأ",
+  "promptFillEmptyWarning": "تم النسخ — بعض المتغيّرات المطلوبة لا تزال فارغة",
+  "promptFillFieldHint": "قيمة {name}"
 }
