@@ -185,4 +185,50 @@ void main() {
     labels = await repo.watchLabels().first;
     expect(labels.firstWhere((l) => l.id == child).parentId, isNull);
   });
+
+  test('undoDelete restores a soft-deleted snippet', () async {
+    final id = await repo.create(
+        const SnippetDraft(title: 'x', body: '', type: SnippetType.text));
+    await repo.softDelete(id);
+    expect(await repo.watchSnippets(const SnippetQuery()).first, isEmpty);
+
+    await repo.undoDelete(id);
+    final list = await repo.watchSnippets(const SnippetQuery()).first;
+    expect(list.map((s) => s.id), [id]);
+  });
+
+  test('watchLibraryStats aggregates counts database-side', () async {
+    final a = await repo.create(const SnippetDraft(
+        title: 'a',
+        body: '',
+        type: SnippetType.code,
+        languageId: 'python',
+        labelNames: ['util']));
+    await repo.create(const SnippetDraft(
+        title: 'b', body: '', type: SnippetType.code, languageId: 'python'));
+    final c = await repo.create(
+        const SnippetDraft(title: 'c', body: '', type: SnippetType.text));
+    await repo.setFavorite(a, value: true);
+    // A team snippet must not count toward the personal library.
+    await repo.create(const SnippetDraft(
+        title: 'team', body: '', type: SnippetType.text, workspaceId: 'ws1'));
+
+    final stats = await repo.watchLibraryStats().first;
+    expect(stats.total, 3);
+    expect(stats.starred, 1);
+    expect(stats.unlabeled, 2);
+    expect(stats.byLanguageId, {'python': 2});
+    expect(stats.byLabelId.values.toList(), [1]);
+
+    // Deleted snippets drop out of every bucket.
+    await repo.softDelete(c);
+    final after = await repo.watchLibraryStats().first;
+    expect(after.total, 2);
+    expect(after.unlabeled, 1);
+
+    // The team library counts only its own rows.
+    final team = await repo.watchLibraryStats(workspaceId: 'ws1').first;
+    expect(team.total, 1);
+    expect(team.unlabeled, 1);
+  });
 }

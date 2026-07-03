@@ -39,6 +39,9 @@ class _FakeRepo implements SnippetRepository {
   @override
   Stream<List<Label>> watchLabels() => Stream.value(const []);
   @override
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId}) =>
+      Stream.value(const LibraryStats());
+  @override
   Future<String> createLabel(String name, {String? color, String? parentId}) async => 'l';
   @override
   Future<void> setLabelColor(String id, String color) async {}

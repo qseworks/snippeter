@@ -255,7 +255,7 @@ class _ResultsArea extends ConsumerWidget {
         onRetry: () {
           final query = ref.read(libraryQueryProvider);
           ref.invalidate(snippetListProvider(query));
-          ref.invalidate(allSnippetsProvider);
+          ref.invalidate(libraryStatsStreamProvider);
         },
       );
     } else {

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'library_stats.dart';
 import 'snippet.dart';
 import 'snippet_query.dart';
 import 'value_objects.dart';
@@ -31,6 +32,10 @@ abstract interface class SnippetRepository {
 
   // --- labels ---
   Stream<List<Label>> watchLabels();
+
+  /// Aggregate sidebar counts for one library (null = personal), computed
+  /// database-side so watching them never hydrates snippet content.
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId});
   Future<String> createLabel(String name, {String? color, String? parentId});
   Future<void> setLabelColor(String id, String color);
   Future<void> setLabelParent(String id, String? parentId);

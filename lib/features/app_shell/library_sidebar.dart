@@ -89,7 +89,7 @@ class LibrarySidebar extends ConsumerWidget {
                     iconSize: 18,
                     color: AppTheme.sidebarMuted,
                     icon: const Icon(Icons.refresh_rounded),
-                    onPressed: () => ref.invalidate(allSnippetsProvider),
+                    onPressed: () => ref.invalidate(libraryStatsStreamProvider),
                   ),
                 ],
               ),
