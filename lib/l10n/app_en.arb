@@ -8,6 +8,10 @@
   "@editorCouldNotSaveSnack": {
     "description": "Snackbar when saving a snippet fails (raw error is logged, not shown)"
   },
+  "editorSavedSnack": "Saved",
+  "@editorSavedSnack": {
+    "description": "Snackbar after a snippet is saved (create or update)"
+  },
   "editorCouldNotPickFilesSnack": "Couldn't open the file picker. Please try again.",
   "@editorCouldNotPickFilesSnack": {
     "description": "Snackbar when the OS file picker fails to open"
@@ -417,6 +421,19 @@
   "detailDeleteAttachmentTooltip": "Delete attachment",
   "@detailDeleteAttachmentTooltip": {
     "description": "IconButton tooltip on each attachment row"
+  },
+  "detailDeleteAttachmentTitle": "Delete attachment?",
+  "@detailDeleteAttachmentTitle": {
+    "description": "Confirm dialog title before deleting an attachment"
+  },
+  "detailDeleteAttachmentConfirm": "“{filename}” will be removed.",
+  "@detailDeleteAttachmentConfirm": {
+    "description": "Confirm dialog body before deleting an attachment (irreversible)",
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
   },
   "detailUpdatedLabel": "Updated {date}",
   "@detailUpdatedLabel": {
@@ -1163,15 +1180,9 @@
   "@historySheetTitle": {
     "description": "snippet_history_sheet.dart: barrierLabel for the history dialog (line 21) and the header title Text (line 102). Both render 'History'."
   },
-  "historyLoadError": "Could not load history.\n{error}",
+  "historyLoadError": "Could not load history.",
   "@historyLoadError": {
-    "description": "snippet_history_sheet.dart: empty-state text shown when history fails to load (line 127). Interpolates snapshot.error.",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Database is locked"
-      }
-    }
+    "description": "History sheet load-failure message (raw error is logged, not shown)"
   },
   "historyEmptyState": "No history yet",
   "@historyEmptyState": {
@@ -1210,32 +1221,6 @@
       "filename": {
         "type": "String",
         "example": "main.dart"
-      }
-    }
-  },
-  "historyTimestampFormat": "{month} {day}, {year} · {hh}:{mm}",
-  "@historyTimestampFormat": {
-    "description": "snippet_history_sheet.dart: _formatTimestamp output for a version's saved time, shown as the tile title (lines 196, 352). Hand-rolled date format with a hardcoded English month abbreviation list (lines 345-348). Recommend replacing with DateFormat from intl for proper localization rather than localizing this template literally.",
-    "placeholders": {
-      "month": {
-        "type": "String",
-        "example": "Jun"
-      },
-      "day": {
-        "type": "int",
-        "example": "20"
-      },
-      "year": {
-        "type": "int",
-        "example": "2026"
-      },
-      "hh": {
-        "type": "String",
-        "example": "14"
-      },
-      "mm": {
-        "type": "String",
-        "example": "32"
       }
     }
   },

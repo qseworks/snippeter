@@ -40,8 +40,7 @@ class SnippetDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const Scaffold(body: AppLoader()),
       error: (error, _) => Scaffold(
         appBar: AppBar(),
         body: AppErrorState(
@@ -53,7 +52,10 @@ class SnippetDetailScreen extends ConsumerWidget {
         if (snippet == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: Center(child: Text(l10n.detailSnippetNotFound)),
+            body: AppEmptyState(
+              icon: Icons.search_off,
+              title: l10n.detailSnippetNotFound,
+            ),
           );
         }
         return Scaffold(
@@ -90,16 +92,16 @@ class InlineSnippetDetail extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppLoader(),
       error: (error, _) => AppErrorState(
         message: l10n.settingsGenericError,
         onRetry: () => ref.invalidate(snippetProvider(snippetId)),
       ),
       data: (snippet) {
         if (snippet == null) {
-          return _PaneMessage(
+          return AppEmptyState(
             icon: Icons.search_off,
-            text: l10n.detailSnippetUnavailable,
+            title: l10n.detailSnippetUnavailable,
           );
         }
         return Scaffold(
@@ -128,9 +130,9 @@ class DetailPanePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return _PaneMessage(
-      icon: Icons.touch_app_outlined,
-      text: l10n.detailSelectSnippetPlaceholder,
+    return AppEmptyState(
+      icon: Icons.article_outlined,
+      title: l10n.detailSelectSnippetPlaceholder,
     );
   }
 }
@@ -345,10 +347,54 @@ class _AttachmentsSection extends ConsumerWidget {
         for (final a in attachments)
           _AttachmentTile(
             attachment: a,
-            onDelete: () =>
-                ref.read(snippetRepositoryProvider).deleteAttachment(a.id),
+            onDelete: () => _confirmDeleteAttachment(context, ref, a),
           ),
       ],
+    );
+  }
+}
+
+/// Confirms, then deletes one attachment — deletion is irreversible (unlike
+/// the snippet soft-delete), so it warrants the extra tap.
+Future<void> _confirmDeleteAttachment(
+  BuildContext context,
+  WidgetRef ref,
+  Attachment attachment,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      final scheme = Theme.of(context).colorScheme;
+      return AlertDialog(
+        title: Text(l10n.detailDeleteAttachmentTitle),
+        content: Text(l10n.detailDeleteAttachmentConfirm(attachment.filename)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      );
+    },
+  );
+  if (!(ok ?? false) || !context.mounted) return;
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    await ref.read(snippetRepositoryProvider).deleteAttachment(attachment.id);
+  } catch (e, st) {
+    developer.log('deleteAttachment failed',
+        name: 'detail', error: e, stackTrace: st);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.commonSomethingWentWrong)),
     );
   }
 }
@@ -972,26 +1018,3 @@ class _Meta extends StatelessWidget {
   }
 }
 
-class _PaneMessage extends StatelessWidget {
-  const _PaneMessage({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 48, color: theme.colorScheme.outline),
-          const SizedBox(height: 12),
-          Text(text,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-        ],
-      ),
-    );
-  }
-}

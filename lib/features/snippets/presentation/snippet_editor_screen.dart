@@ -14,6 +14,7 @@ import '../../../core/highlight/language_detect.dart';
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/async_states.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../workspaces/application/workspace_providers.dart';
@@ -318,6 +319,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       visibility: _visibility,
     );
     final repo = ref.read(snippetRepositoryProvider);
+    // Captured before the write: the modal/route is gone when the toast fires.
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (widget.isEditing) {
         await repo.update(widget.snippetId!, draft);
@@ -338,6 +341,10 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           context.pushReplacement(RoutePaths.snippetDetail(id));
         }
       }
+      messenger.showSnackBar(SnackBar(
+        content: Text(l10n.editorSavedSnack),
+        duration: const Duration(seconds: 2),
+      ));
     } catch (error, stackTrace) {
       developer.log('save failed',
           name: 'editor', error: error, stackTrace: stackTrace);
@@ -573,7 +580,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     final l10n = AppLocalizations.of(context);
 
     if (_loading) {
-      const indicator = Center(child: CircularProgressIndicator());
+      const indicator = AppLoader();
       return widget.isModal ? indicator : const Scaffold(body: indicator);
     }
 

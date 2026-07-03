@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/core/theme/app_theme.dart';
+import 'package:snippet_manager/core/widgets/async_states.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
@@ -114,11 +115,15 @@ class TeamScreen extends ConsumerWidget {
               : membersAsync.when(
                   loading: () => const Padding(
                     padding: EdgeInsets.all(40),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: AppLoader(),
                   ),
                   error: (e, _) => Padding(
                     padding: const EdgeInsets.all(24),
-                    child: _TeamError(message: friendlyWorkspaceError(context, e)),
+                    child: AppErrorState(
+                      message: friendlyWorkspaceError(context, e),
+                      onRetry: () => ref
+                          .invalidate(workspaceMembersProvider(workspaceId)),
+                    ),
                   ),
                   data: (members) => _TeamBody(
                     workspaceId: workspaceId,
@@ -143,30 +148,10 @@ class _OfflineNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.cloud_off_outlined,
-              size: 36, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(height: 16),
-          Text(
-            l10n.teamOfflineTitle,
-            style: theme.textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.teamOfflineBody,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.cloud_off_outlined,
+      title: l10n.teamOfflineTitle,
+      subtitle: l10n.teamOfflineBody,
     );
   }
 }
@@ -333,6 +318,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(l10n.commonRemove),
@@ -596,6 +582,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(action),
@@ -674,13 +661,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
     if (_busy) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
-        child: Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
+        child: AppLoader(size: 20),
       );
     }
     // Wrap (not Row) so the Delete action drops to a second line on narrow
