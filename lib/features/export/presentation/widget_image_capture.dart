@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -46,7 +47,16 @@ Future<Uint8List?> captureWidgetToPng(
     final boundary = key.currentContext?.findRenderObject();
     if (boundary is! RenderRepaintBoundary) return null;
 
-    final image = await boundary.toImage(pixelRatio: pixelRatio);
+    // Clamp the effective ratio so the bitmap never exceeds the GPU/Skia
+    // texture ceiling (~32k px/side): a very long snippet at 3.0 would
+    // otherwise fail toImage or OOM. Degrades resolution, not the export.
+    final longestSide =
+        math.max(boundary.size.width, boundary.size.height);
+    final effectiveRatio = longestSide <= 0
+        ? pixelRatio
+        : math.min(pixelRatio, 16000 / longestSide);
+
+    final image = await boundary.toImage(pixelRatio: effectiveRatio);
     try {
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
       return data?.buffer.asUint8List();

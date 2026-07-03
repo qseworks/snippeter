@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
@@ -18,6 +19,9 @@ Future<void> showGistImportDialog(BuildContext context) {
   return showDialog<void>(
     context: context,
     useRootNavigator: true,
+    // Holds typed input + a fetched selection — don't let an outside-tap
+    // discard it (Esc and Close still work).
+    barrierDismissible: false,
     builder: (context) => const _GistImportDialog(),
   );
 }
@@ -176,21 +180,30 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
     final size = MediaQuery.sizeOf(context);
     final width = size.width < 560 ? size.width - 32 : 520.0;
 
-    return AlertDialog(
-      title: Row(
-        children: [
-          const Icon(Icons.cloud_download_outlined, size: 22),
-          const SizedBox(width: 10),
-          Expanded(child: Text(l10n.gistImportTitle)),
-        ],
+    // barrierDismissible is off (protects typed input + a fetched selection
+    // from stray outside taps), which also disables the route's built-in
+    // Escape handling — so bind Esc explicitly.
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () =>
+            Navigator.of(context).maybePop(),
+      },
+      child: AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.cloud_download_outlined, size: 22),
+            const SizedBox(width: 10),
+            Expanded(child: Text(l10n.gistImportTitle)),
+          ],
+        ),
+        content: SizedBox(
+          width: width,
+          child: _phase == _Phase.preview
+              ? _buildPreview(context)
+              : _buildInput(context),
+        ),
+        actions: _buildActions(context),
       ),
-      content: SizedBox(
-        width: width,
-        child: _phase == _Phase.preview
-            ? _buildPreview(context)
-            : _buildInput(context),
-      ),
-      actions: _buildActions(context),
     );
   }
 
@@ -399,7 +412,9 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
       case 403:
         return l10n.gistImportErrorAccessDenied;
       default:
-        return e.message;
+        // Never surface the raw exception text — map every other HTTP status
+        // to a localized generic message.
+        return l10n.gistImportErrorGeneric(e.statusCode ?? 0);
     }
   }
 }

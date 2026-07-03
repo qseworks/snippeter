@@ -1,5 +1,8 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -68,11 +71,27 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
   Future<List<SnippetVersion>> _load() =>
       ref.read(snippetRepositoryProvider).getVersions(widget.snippetId);
 
+  bool _restoring = false;
+
   Future<void> _restore(int savedAt) async {
-    await ref
-        .read(snippetRepositoryProvider)
-        .restoreVersion(widget.snippetId, savedAt);
-    if (mounted) Navigator.of(context).pop();
+    if (_restoring) return;
+    _restoring = true;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref
+          .read(snippetRepositoryProvider)
+          .restoreVersion(widget.snippetId, savedAt);
+      if (mounted) Navigator.of(context).pop();
+    } catch (e, st) {
+      developer.log('restoreVersion failed',
+          name: 'history', error: e, stackTrace: st);
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+      );
+    } finally {
+      _restoring = false;
+    }
   }
 
   @override
@@ -124,20 +143,20 @@ class _SnippetHistorySheetState extends ConsumerState<_SnippetHistorySheet> {
                     future: _future,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const AppLoader();
                       }
                       if (snapshot.hasError) {
                         return AppErrorState(
-                          message: l10n.historyLoadError('').trim(),
+                          message: l10n.historyLoadError,
                           onRetry: () =>
                               setState(() => _future = _load()),
                         );
                       }
                       final versions = snapshot.data ?? const [];
                       if (versions.isEmpty) {
-                        return _EmptyState(
+                        return AppEmptyState(
                           icon: Icons.history_toggle_off,
-                          text: l10n.historyEmptyState,
+                          title: l10n.historyEmptyState,
                         );
                       }
                       return ListView.separated(
@@ -315,46 +334,11 @@ class _VersionFilePreview extends StatelessWidget {
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 44, color: theme.colorScheme.outline),
-            const SizedBox(height: 12),
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 /// Formats an epoch-ms (UTC) timestamp into a readable local date + time, e.g.
-/// "Jun 20, 2026 · 14:32".
+/// "Jun 20, 2026 · 2:32 PM" — both parts locale-aware.
 String _formatTimestamp(AppLocalizations l10n, int epochMs) {
   final dt = DateTime.fromMillisecondsSinceEpoch(epochMs).toLocal();
-  const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-  final month = months[dt.month - 1];
-  final hh = dt.hour.toString().padLeft(2, '0');
-  final mm = dt.minute.toString().padLeft(2, '0');
-  return l10n.historyTimestampFormat(month, dt.day, dt.year, hh, mm);
+  final date = DateFormat.yMMMd(l10n.localeName).format(dt);
+  final time = DateFormat.jm(l10n.localeName).format(dt);
+  return '$date · $time';
 }

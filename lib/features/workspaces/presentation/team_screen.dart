@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snippet_manager/core/theme/app_theme.dart';
+import 'package:snippet_manager/core/widgets/async_states.dart';
+import 'package:snippet_manager/core/widgets/section_header.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
@@ -114,11 +116,15 @@ class TeamScreen extends ConsumerWidget {
               : membersAsync.when(
                   loading: () => const Padding(
                     padding: EdgeInsets.all(40),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: AppLoader(),
                   ),
                   error: (e, _) => Padding(
                     padding: const EdgeInsets.all(24),
-                    child: _TeamError(message: friendlyWorkspaceError(context, e)),
+                    child: AppErrorState(
+                      message: friendlyWorkspaceError(context, e),
+                      onRetry: () => ref
+                          .invalidate(workspaceMembersProvider(workspaceId)),
+                    ),
                   ),
                   data: (members) => _TeamBody(
                     workspaceId: workspaceId,
@@ -143,30 +149,10 @@ class _OfflineNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.cloud_off_outlined,
-              size: 36, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(height: 16),
-          Text(
-            l10n.teamOfflineTitle,
-            style: theme.textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.teamOfflineBody,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.cloud_off_outlined,
+      title: l10n.teamOfflineTitle,
+      subtitle: l10n.teamOfflineBody,
     );
   }
 }
@@ -199,14 +185,7 @@ class _TeamBody extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 20),
       children: [
         // Members section.
-        Text(
-          l10n.teamMembersSectionHeader,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-            letterSpacing: 1.1,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        SectionHeader(l10n.teamMembersSectionHeader),
         const SizedBox(height: 8),
         if (members.isEmpty)
           Padding(
@@ -232,14 +211,7 @@ class _TeamBody extends StatelessWidget {
         // Invite section (managers/owners only).
         if (canManage) ...[
           const SizedBox(height: 24),
-          Text(
-            l10n.teamInviteSectionHeader,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              letterSpacing: 1.1,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          SectionHeader(l10n.teamInviteSectionHeader),
           const SizedBox(height: 10),
           _InviteRow(workspaceId: workspaceId, service: service),
         ],
@@ -333,6 +305,7 @@ class _MemberRowState extends ConsumerState<_MemberRow> {
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(l10n.commonRemove),
@@ -490,7 +463,9 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
       if (!mounted) return;
       _emailController.clear();
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.teamInvitedSnack(email, _role.wire))),
+        SnackBar(
+            content:
+                Text(l10n.teamInvitedSnack(email, _roleLabel(context, _role)))),
       );
     } catch (e) {
       if (!mounted) return;
@@ -594,6 +569,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(action),
@@ -672,13 +648,7 @@ class _MembershipActionsState extends ConsumerState<_MembershipActions> {
     if (_busy) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
-        child: Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
+        child: AppLoader(size: 20),
       );
     }
     // Wrap (not Row) so the Delete action drops to a second line on narrow

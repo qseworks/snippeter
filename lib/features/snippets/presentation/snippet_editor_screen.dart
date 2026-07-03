@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +14,9 @@ import '../../../core/highlight/language_detect.dart';
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/routing/route_paths.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/platform_keys.dart';
+import '../../../core/widgets/async_states.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../workspaces/application/workspace_providers.dart';
@@ -112,6 +117,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
   bool _loading = false;
   bool _saving = false;
+  bool _attaching = false;
   SnippetVisibility _visibility = SnippetVisibility.private;
 
   /// The library this snippet belongs to. For an existing snippet this is
@@ -315,6 +321,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       visibility: _visibility,
     );
     final repo = ref.read(snippetRepositoryProvider);
+    // Captured before the write: the modal/route is gone when the toast fires.
+    final messenger = ScaffoldMessenger.of(context);
     try {
       if (widget.isEditing) {
         await repo.update(widget.snippetId!, draft);
@@ -335,11 +343,17 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           context.pushReplacement(RoutePaths.snippetDetail(id));
         }
       }
-    } catch (error) {
+      messenger.showSnackBar(SnackBar(
+        content: Text(l10n.editorSavedSnack),
+        duration: const Duration(seconds: 2),
+      ));
+    } catch (error, stackTrace) {
+      developer.log('save failed',
+          name: 'editor', error: error, stackTrace: stackTrace);
       if (mounted) {
         setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(l10n.editorCouldNotSaveSnack(error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.editorCouldNotSaveSnack)));
       }
     }
   }
@@ -417,18 +431,28 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
   Future<void> _attachFiles() async {
     final l10n = AppLocalizations.of(context);
     final snippetId = widget.snippetId;
-    if (snippetId == null) return;
+    if (snippetId == null || _attaching) return;
+    _attaching = true;
+    try {
+      await _attachFilesInner(l10n, snippetId);
+    } finally {
+      _attaching = false;
+    }
+  }
 
+  Future<void> _attachFilesInner(AppLocalizations l10n, String snippetId) async {
     final FilePickerResult? result;
     try {
       // file_picker 12.x: pickFiles is multi-select by default; load each
       // file's bytes on demand via readAsBytes() (the withData parameter is
       // deprecated).
       result = await FilePicker.pickFiles();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      developer.log('file picker failed',
+          name: 'editor', error: error, stackTrace: stackTrace);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(l10n.editorCouldNotPickFilesSnack(error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.editorCouldNotPickFilesSnack)));
       }
       return;
     }
@@ -446,12 +470,12 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
           bytes: bytes,
         );
         added++;
-      } catch (error) {
+      } catch (error, stackTrace) {
+        developer.log('attach failed',
+            name: 'editor', error: error, stackTrace: stackTrace);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(l10n.editorCouldNotAttachSnack(
-                    file.name, error.toString()))),
+            SnackBar(content: Text(l10n.editorCouldNotAttachSnack(file.name))),
           );
         }
       }
@@ -467,35 +491,40 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
   Future<void> _createCollection() async {
     final controller = TextEditingController();
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        final l10n = AppLocalizations.of(context);
-        return AlertDialog(
-          title: Text(l10n.editorNewCollectionDialogTitle),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: InputDecoration(labelText: l10n.commonName),
-            onSubmitted: (v) => Navigator.pop(context, v),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.commonCancel),
+    try {
+      final name = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          final l10n = AppLocalizations.of(context);
+          return AlertDialog(
+            title: Text(l10n.editorNewCollectionDialogTitle),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: InputDecoration(labelText: l10n.commonName),
+              onSubmitted: (v) => Navigator.pop(context, v),
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: Text(l10n.commonCreate),
-            ),
-          ],
-        );
-      },
-    );
-    if (name != null && name.trim().isNotEmpty) {
-      final id =
-          await ref.read(snippetRepositoryProvider).createCollection(name.trim());
-      if (mounted) setState(() => _collectionId = id);
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, controller.text),
+                child: Text(l10n.commonCreate),
+              ),
+            ],
+          );
+        },
+      );
+      if (name != null && name.trim().isNotEmpty) {
+        final id = await ref
+            .read(snippetRepositoryProvider)
+            .createCollection(name.trim());
+        if (mounted) setState(() => _collectionId = id);
+      }
+    } finally {
+      controller.dispose();
     }
   }
 
@@ -553,7 +582,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     final l10n = AppLocalizations.of(context);
 
     if (_loading) {
-      const indicator = Center(child: CircularProgressIndicator());
+      const indicator = AppLoader();
       return widget.isModal ? indicator : const Scaffold(body: indicator);
     }
 
@@ -588,7 +617,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         ),
       ),
       const Divider(height: 18),
-      _SectionHeader(title: l10n.editorSectionType),
+      SectionHeader(l10n.editorSectionType),
       const SizedBox(height: 8),
       Align(
         alignment: AlignmentDirectional.centerStart,
@@ -625,8 +654,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
         ),
       ),
       const SizedBox(height: 16),
-      _SectionHeader(
-        title: l10n.editorSectionDescription,
+      SectionHeader(
+        l10n.editorSectionDescription,
         trailing: Text(
           l10n.editorMarkdownSupportedLabel,
           style: theme.textTheme.labelSmall
@@ -728,8 +757,8 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
     ];
 
     // ---------- FILES ----------
-    final filesHeader = _SectionHeader(
-      title: l10n.editorSectionFiles,
+    final filesHeader = SectionHeader(
+      l10n.editorSectionFiles,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -898,16 +927,19 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
             child: Text(l10n.commonDiscard),
           ),
           const SizedBox(width: 8),
-          FilledButton.icon(
-            onPressed: _saving ? null : _save,
-            icon: _saving
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.check),
-            label: Text(l10n.commonSave),
+          Tooltip(
+            message: shortcutLabel('S'),
+            child: FilledButton.icon(
+              onPressed: _saving ? null : _save,
+              icon: _saving
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check),
+              label: Text(l10n.commonSave),
+            ),
           ),
         ],
       ),
@@ -990,10 +1022,23 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
       if (!_saving) _save();
     }
 
+    // The modal route is barrierDismissible:false (protecting unsaved edits),
+    // which also disables the route's built-in Escape handling — so keyboard
+    // users would be trapped without these. Esc and Cmd/Ctrl+W both route
+    // through [_discard], preserving the unsaved-changes guard. (A first Esc
+    // inside the code editor still closes its find panel; the next one
+    // reaches us.)
+    void close() {
+      if (!_saving) _discard();
+    }
+
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.keyS, meta: true): save,
         const SingleActivator(LogicalKeyboardKey.keyS, control: true): save,
+        const SingleActivator(LogicalKeyboardKey.escape): close,
+        const SingleActivator(LogicalKeyboardKey.keyW, meta: true): close,
+        const SingleActivator(LogicalKeyboardKey.keyW, control: true): close,
       },
       child: child,
     );
@@ -1102,7 +1147,7 @@ class _ModalHeader extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           IconButton(
-            tooltip: l10n.commonClose,
+            tooltip: '${l10n.commonClose} (Esc)',
             onPressed: onClose,
             icon: const Icon(Icons.close),
           ),
@@ -1114,37 +1159,6 @@ class _ModalHeader extends StatelessWidget {
 
 /// A small uppercase, letter-spaced Snippet-style section header with an
 /// optional trailing affordance (e.g. "Markdown supported" or an action).
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.trailing});
-
-  final String title;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Flexible(
-          child: Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.0,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        if (trailing != null) ...[
-          const Spacer(),
-          trailing!,
-        ],
-      ],
-    );
-  }
-}
-
 /// Snippet-style formatting toolbar that inserts Markdown around the description
 /// selection. Each button calls back into the editor's insertion helpers.
 class _MarkdownToolbar extends StatelessWidget {
@@ -1449,7 +1463,7 @@ class _BodyEditorState extends State<_BodyEditor> {
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppTheme.radiusXs),
             borderSide: BorderSide.none,
           ),
         ),
@@ -1615,7 +1629,9 @@ class _PurposeDropdown extends StatelessWidget {
       items: [
         DropdownMenuItem(value: null, child: Text(l10n.editorNoPurposeOption)),
         for (final p in applicable)
-          DropdownMenuItem(value: p.id, child: Text(p.label)),
+          DropdownMenuItem(
+              value: p.id,
+              child: Text(labelForPurpose(l10n, p.id, fallback: p.label))),
       ],
       onChanged: onChanged,
     );

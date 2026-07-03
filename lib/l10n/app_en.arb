@@ -4,37 +4,24 @@
   "@editorTitleRequiredSnack": {
     "description": "SnackBar shown when saving with an empty title"
   },
-  "editorCouldNotSaveSnack": "Could not save: {error}",
+  "editorCouldNotSaveSnack": "Couldn't save your changes. Please try again.",
   "@editorCouldNotSaveSnack": {
-    "description": "SnackBar shown when saving a snippet fails",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Network error"
-      }
-    }
+    "description": "Snackbar when saving a snippet fails (raw error is logged, not shown)"
   },
-  "editorCouldNotPickFilesSnack": "Could not pick files: {error}",
+  "editorSavedSnack": "Saved",
+  "@editorSavedSnack": {
+    "description": "Snackbar after a snippet is saved (create or update)"
+  },
+  "editorCouldNotPickFilesSnack": "Couldn't open the file picker. Please try again.",
   "@editorCouldNotPickFilesSnack": {
-    "description": "SnackBar shown when the file picker throws",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Permission denied"
-      }
-    }
+    "description": "Snackbar when the OS file picker fails to open"
   },
-  "editorCouldNotAttachSnack": "Could not attach {filename}: {error}",
+  "editorCouldNotAttachSnack": "Couldn't attach {filename}. Please try again.",
   "@editorCouldNotAttachSnack": {
-    "description": "SnackBar shown when attaching a specific file fails",
+    "description": "Snackbar when attaching one picked file fails",
     "placeholders": {
       "filename": {
-        "type": "String",
-        "example": "image.png"
-      },
-      "error": {
-        "type": "String",
-        "example": "Read error"
+        "type": "String"
       }
     }
   },
@@ -67,6 +54,18 @@
   "commonRetry": "Retry",
   "@commonRetry": {
     "description": "Retry button on shared error states (AppErrorState)"
+  },
+  "commonUndo": "Undo",
+  "@commonUndo": {
+    "description": "Undo action on snackbars (e.g. after deleting a snippet)"
+  },
+  "commonSomethingWentWrong": "Something went wrong. Please try again.",
+  "@commonSomethingWentWrong": {
+    "description": "Generic failure snackbar for user actions (delete, restore, create label)"
+  },
+  "commonClear": "Clear",
+  "@commonClear": {
+    "description": "Tooltip on clear (×) buttons, e.g. the search field"
   },
   "editorTitleHint": "Title",
   "@editorTitleHint": {
@@ -270,6 +269,46 @@
   "@editorNoPurposeOption": {
     "description": "DropdownMenuItem label for clearing the purpose selection"
   },
+  "purposeUtility": "Utility",
+  "@purposeUtility": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeUtility'"
+  },
+  "purposeBoilerplate": "Boilerplate",
+  "@purposeBoilerplate": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeBoilerplate'"
+  },
+  "purposeAlgorithm": "Algorithm",
+  "@purposeAlgorithm": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeAlgorithm'"
+  },
+  "purposeRegex": "Regex",
+  "@purposeRegex": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeRegex'"
+  },
+  "purposeSqlQuery": "SQL Query",
+  "@purposeSqlQuery": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeSqlQuery'"
+  },
+  "purposeConfig": "Configuration",
+  "@purposeConfig": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeConfig'"
+  },
+  "purposeReference": "Reference",
+  "@purposeReference": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeReference'"
+  },
+  "purposePromptCoding": "Coding Prompt",
+  "@purposePromptCoding": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposePromptCoding'"
+  },
+  "purposePromptSummarization": "Summarization Prompt",
+  "@purposePromptSummarization": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposePromptSummarization'"
+  },
+  "purposePromptSystem": "System Prompt",
+  "@purposePromptSystem": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposePromptSystem'"
+  },
   "editorCollectionLabel": "Collection",
   "@editorCollectionLabel": {
     "description": "labelText for the collection DropdownButtonFormField"
@@ -310,16 +349,6 @@
   "@editorPromptSystemPromptLabel": {
     "description": "labelText for the system prompt TextField"
   },
-  "commonError": "Error: {error}",
-  "@commonError": {
-    "description": "Error fallback shown in body Center when snippet load fails (both routed screen and inline pane)",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Network timeout"
-      }
-    }
-  },
   "detailUntitledTitle": "Untitled",
   "@detailUntitledTitle": {
     "description": "AppBar title fallback when a snippet has no title (routed screen and inline pane)"
@@ -347,6 +376,15 @@
       "title": {
         "type": "String",
         "example": "My snippet"
+      }
+    }
+  },
+  "detailDeletedSnack": "Deleted “{title}”",
+  "@detailDeletedSnack": {
+    "description": "Snackbar after a snippet is deleted (paired with an Undo action)",
+    "placeholders": {
+      "title": {
+        "type": "String"
       }
     }
   },
@@ -387,6 +425,19 @@
   "detailDeleteAttachmentTooltip": "Delete attachment",
   "@detailDeleteAttachmentTooltip": {
     "description": "IconButton tooltip on each attachment row"
+  },
+  "detailDeleteAttachmentTitle": "Delete attachment?",
+  "@detailDeleteAttachmentTitle": {
+    "description": "Confirm dialog title before deleting an attachment"
+  },
+  "detailDeleteAttachmentConfirm": "“{filename}” will be removed.",
+  "@detailDeleteAttachmentConfirm": {
+    "description": "Confirm dialog body before deleting an attachment (irreversible)",
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
   },
   "detailUpdatedLabel": "Updated {date}",
   "@detailUpdatedLabel": {
@@ -431,10 +482,6 @@
         "example": "2"
       }
     }
-  },
-  "detailHistoryButton": "HISTORY",
-  "@detailHistoryButton": {
-    "description": "TextButton.icon label in the files header (uppercase styling)"
   },
   "detailAddFileTooltip": "Add file",
   "@detailAddFileTooltip": {
@@ -768,6 +815,14 @@
   "@settingsSyncNow": {
     "description": "FilledButton label to trigger a manual sync"
   },
+  "settingsSyncSuccessSnack": "Sync complete",
+  "@settingsSyncSuccessSnack": {
+    "description": "Snackbar after a manual Sync now succeeds"
+  },
+  "settingsSyncFailedSnack": "Sync failed. Check your connection and try again.",
+  "@settingsSyncFailedSnack": {
+    "description": "Snackbar after a manual Sync now fails (offline etc.)"
+  },
   "settingsSignOut": "Sign out",
   "@settingsSignOut": {
     "description": "OutlinedButton label to sign out"
@@ -870,7 +925,7 @@
   "@gistImportTokenHint": {
     "description": "hintText for the token TextField"
   },
-  "gistImportFetching": "Fetching gists...",
+  "gistImportFetching": "Fetching gists…",
   "@gistImportFetching": {
     "description": "Progress text shown while fetching gists"
   },
@@ -914,7 +969,7 @@
   "@gistImportPrivateSuffix": {
     "description": "Suffix appended to the file-count subtitle for non-public gists"
   },
-  "gistImportImporting": "Importing...",
+  "gistImportImporting": "Importing…",
   "@gistImportImporting": {
     "description": "Progress text shown while importing selected gists"
   },
@@ -947,6 +1002,15 @@
   "gistImportErrorAccessDenied": "Access denied or rate-limited. Add a personal access token and try again.",
   "@gistImportErrorAccessDenied": {
     "description": "Friendly error message for HTTP 401/403 from GitHub"
+  },
+  "gistImportErrorGeneric": "GitHub request failed (HTTP {status}). Please try again.",
+  "@gistImportErrorGeneric": {
+    "description": "Import error banner for unexpected GitHub HTTP statuses",
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
   },
   "sidebarPersonalLibraryTitle": "Personal Library",
   "@sidebarPersonalLibraryTitle": {
@@ -1120,15 +1184,9 @@
   "@historySheetTitle": {
     "description": "snippet_history_sheet.dart: barrierLabel for the history dialog (line 21) and the header title Text (line 102). Both render 'History'."
   },
-  "historyLoadError": "Could not load history.\n{error}",
+  "historyLoadError": "Could not load history.",
   "@historyLoadError": {
-    "description": "snippet_history_sheet.dart: empty-state text shown when history fails to load (line 127). Interpolates snapshot.error.",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Database is locked"
-      }
-    }
+    "description": "History sheet load-failure message (raw error is logged, not shown)"
   },
   "historyEmptyState": "No history yet",
   "@historyEmptyState": {
@@ -1170,32 +1228,6 @@
       }
     }
   },
-  "historyTimestampFormat": "{month} {day}, {year} · {hh}:{mm}",
-  "@historyTimestampFormat": {
-    "description": "snippet_history_sheet.dart: _formatTimestamp output for a version's saved time, shown as the tile title (lines 196, 352). Hand-rolled date format with a hardcoded English month abbreviation list (lines 345-348). Recommend replacing with DateFormat from intl for proper localization rather than localizing this template literally.",
-    "placeholders": {
-      "month": {
-        "type": "String",
-        "example": "Jun"
-      },
-      "day": {
-        "type": "int",
-        "example": "20"
-      },
-      "year": {
-        "type": "int",
-        "example": "2026"
-      },
-      "hh": {
-        "type": "String",
-        "example": "14"
-      },
-      "mm": {
-        "type": "String",
-        "example": "32"
-      }
-    }
-  },
   "cardUntitled": "Untitled",
   "@cardUntitled": {
     "description": "snippet_card.dart: fallback title shown when snippet.title is empty (line 70)."
@@ -1218,20 +1250,6 @@
       }
     }
   },
-  "cardTimeFormat": "{hh}:{mm}",
-  "@cardTimeFormat": {
-    "description": "snippet_card.dart: _shortDate same-day time format shown on the right of the row (lines 82, 143-145). Hand-rolled; recommend intl DateFormat for localization.",
-    "placeholders": {
-      "hh": {
-        "type": "String",
-        "example": "09"
-      },
-      "mm": {
-        "type": "String",
-        "example": "05"
-      }
-    }
-  },
   "cardDaysAgo": "{days, plural, other{{days}d ago}}",
   "@cardDaysAgo": {
     "description": "snippet_card.dart: _shortDate relative format for the last week, e.g. '3d ago' (line 147). Abbreviated 'd ago' is English-specific; isPlural noted though current code uses a single 'd' form.",
@@ -1242,38 +1260,6 @@
       }
     }
   },
-  "cardDateFormatSameYear": "{month} {day}",
-  "@cardDateFormatSameYear": {
-    "description": "snippet_card.dart: _shortDate format for dates in the current year, e.g. 'Jun 20' (line 154). Uses hardcoded English month abbreviations (lines 148-151). Recommend intl DateFormat.",
-    "placeholders": {
-      "month": {
-        "type": "String",
-        "example": "Jun"
-      },
-      "day": {
-        "type": "int",
-        "example": "20"
-      }
-    }
-  },
-  "cardDateFormatOtherYear": "{month} {day}, {year}",
-  "@cardDateFormatOtherYear": {
-    "description": "snippet_card.dart: _shortDate format for dates in other years, e.g. 'Jun 20, 2025' (line 155). Uses hardcoded English month abbreviations. Recommend intl DateFormat.",
-    "placeholders": {
-      "month": {
-        "type": "String",
-        "example": "Jun"
-      },
-      "day": {
-        "type": "int",
-        "example": "20"
-      },
-      "year": {
-        "type": "int",
-        "example": "2025"
-      }
-    }
-  },
   "labelFieldLabel": "Labels",
   "@labelFieldLabel": {
     "description": "label_field.dart: labelText of the InputDecorator wrapping the chip editor (line 61)."
@@ -1281,40 +1267,6 @@
   "labelFieldHint": "Add label…",
   "@labelFieldHint": {
     "description": "label_field.dart: hintText of the trailing TextField for adding a new label (line 82)."
-  },
-  "listSortRecentlyUpdated": "Recently updated",
-  "@listSortRecentlyUpdated": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.recent)"
-  },
-  "listSortRecentlyCreated": "Recently created",
-  "@listSortRecentlyCreated": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.created)"
-  },
-  "listSortTitleAsc": "Title A–Z",
-  "@listSortTitleAsc": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.titleAsc). Contains an en-dash."
-  },
-  "listSortRelevance": "Relevance",
-  "@listSortRelevance": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.relevance)"
-  },
-  "listSortTooltip": "Sort",
-  "@listSortTooltip": {
-    "description": "snippet_list_screen.dart: tooltip on the sort PopupMenuButton, and the fallback shown in the header Text when value has no label (lines 148, 159)"
-  },
-  "listSearchHint": "Search snippets…",
-  "@listSearchHint": {
-    "description": "snippet_list_screen.dart: hintText of the library search TextField. Note: an integration test searches for this exact string per the comment at line 176."
-  },
-  "listErrorGeneric": "Something went wrong:\n{error}",
-  "@listErrorGeneric": {
-    "description": "snippet_list_screen.dart: error state Text shown in the results area when the snippet list fails to load",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "DatabaseException"
-      }
-    }
   },
   "listEmptyFilteredTitle": "No matching snippets",
   "@listEmptyFilteredTitle": {
@@ -1347,6 +1299,14 @@
   "codeFindNextTooltip": "Next",
   "@codeFindNextTooltip": {
     "description": "code_find_panel.dart: tooltip on the next-match (arrow down) IconButton"
+  },
+  "codeFindMatchCaseTooltip": "Match case",
+  "@codeFindMatchCaseTooltip": {
+    "description": "Tooltip on the find panel's Aa (case-sensitive) toggle"
+  },
+  "codeFindRegexTooltip": "Use regular expression",
+  "@codeFindRegexTooltip": {
+    "description": "Tooltip on the find panel's .* (regex) toggle"
   },
   "codeFindReplaceHint": "Replace",
   "@codeFindReplaceHint": {
@@ -1388,25 +1348,13 @@
       }
     }
   },
-  "exportImageSaveFailed": "Save failed: {error}",
+  "exportImageSaveFailed": "Couldn't save the image. Please try again.",
   "@exportImageSaveFailed": {
-    "description": "Snackbar toast when saving the PNG throws an error",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Permission denied"
-      }
-    }
+    "description": "Snackbar when saving the PNG image fails"
   },
-  "exportImageShareFailed": "Share failed: {error}",
+  "exportImageShareFailed": "Couldn't share the image. Please try again.",
   "@exportImageShareFailed": {
-    "description": "Snackbar toast when sharing the PNG throws an error",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Cancelled"
-      }
-    }
+    "description": "Snackbar when sharing the PNG image fails"
   },
   "exportImageTitle": "Export as image",
   "@exportImageTitle": {
@@ -1508,15 +1456,9 @@
       }
     }
   },
-  "exportMenuExportFailedSnack": "Export failed: {error}",
+  "exportMenuExportFailedSnack": "Export failed. Please try again.",
   "@exportMenuExportFailedSnack": {
-    "description": "SnackBar shown when an export action fails",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Disk full"
-      }
-    }
+    "description": "Snackbar when an export action fails (raw error is logged, not shown)"
   },
   "settingsAppLanguageLabel": "App language",
   "@settingsAppLanguageLabel": {
@@ -1525,5 +1467,50 @@
   "settingsLanguageSystemDefault": "System default",
   "@settingsLanguageSystemDefault": {
     "description": "Language picker option that follows the device/system locale"
+  },
+  "cardCopyTooltip": "Copy",
+  "@cardCopyTooltip": {
+    "description": "Tooltip on the quick-copy button in a snippet list row"
+  },
+  "detailCopyMenuTooltip": "Copy snippet",
+  "@detailCopyMenuTooltip": {
+    "description": "Tooltip on the copy menu button in the detail files header"
+  },
+  "detailCopyAllFiles": "Copy all files",
+  "@detailCopyAllFiles": {
+    "description": "Copy menu item: copies the raw content of every file"
+  },
+  "detailCopyAsMarkdown": "Copy as Markdown",
+  "@detailCopyAsMarkdown": {
+    "description": "Copy menu item: copies the snippet as Markdown with fenced code blocks"
+  },
+  "promptFillTitle": "Fill variables",
+  "@promptFillTitle": {
+    "description": "Header of the prompt variable fill-in form"
+  },
+  "promptFillSubtitle": "Enter values to resolve the prompt, then copy it.",
+  "@promptFillSubtitle": {
+    "description": "Subtitle under the prompt fill-in form header"
+  },
+  "promptFillPreviewLabel": "Preview",
+  "@promptFillPreviewLabel": {
+    "description": "Label above the live-resolved prompt preview"
+  },
+  "promptFillCopyButton": "Copy filled prompt",
+  "@promptFillCopyButton": {
+    "description": "Button that copies the resolved prompt with variables substituted"
+  },
+  "promptFillEmptyWarning": "Copied — some required variables are still empty",
+  "@promptFillEmptyWarning": {
+    "description": "Snackbar shown after copying when one or more required variables were left blank"
+  },
+  "promptFillFieldHint": "Value for {name}",
+  "@promptFillFieldHint": {
+    "description": "Hint text inside a variable input field",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

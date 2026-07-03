@@ -286,7 +286,7 @@ class AppTheme {
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
           color: scheme.inverseSurface,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(radiusXxs),
         ),
         textStyle: textTheme.labelSmall?.copyWith(color: scheme.onInverseSurface),
       ),

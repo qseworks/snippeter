@@ -6,11 +6,14 @@ import '../../sync/application/sync_providers.dart';
 import '../../sync/data/synced_snippet_repository.dart';
 import '../../workspaces/application/workspace_providers.dart';
 import '../data/local_snippet_repository.dart';
+import '../domain/library_stats.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_query.dart';
 import '../domain/snippet_repository.dart';
 import '../domain/snippet_type.dart';
 import '../domain/value_objects.dart';
+
+export '../domain/library_stats.dart';
 
 /// The single seam. Always backed by [LocalSnippetRepository] (offline-first
 /// source of truth), wrapped by [SyncedSnippetRepository] which mirrors mutating
@@ -51,62 +54,23 @@ final labelsProvider = StreamProvider<List<Label>>(
   (ref) => ref.watch(snippetRepositoryProvider).watchLabels(),
 );
 
-/// All non-deleted snippets in the ACTIVE library (Personal or the active team
-/// workspace). Backs derived library stats and the sidebar counts. autoDispose
-/// so it's released when nothing observes it.
-final allSnippetsProvider = StreamProvider.autoDispose<List<Snippet>>(
+/// Aggregate sidebar counts for the ACTIVE library (Personal or team),
+/// computed database-side (see [SnippetRepository.watchLibraryStats]) so
+/// no snippet content is hydrated just to show numbers. autoDispose so the
+/// watched query is released when nothing observes it.
+final libraryStatsStreamProvider = StreamProvider.autoDispose<LibraryStats>(
   (ref) {
     final workspaceId = ref.watch(activeWorkspaceProvider);
-    return ref.watch(snippetRepositoryProvider).watchSnippets(
-          SnippetQuery(workspaceId: workspaceId),
-        );
+    return ref
+        .watch(snippetRepositoryProvider)
+        .watchLibraryStats(workspaceId: workspaceId);
   },
 );
 
-/// Aggregate counts derived from [allSnippetsProvider] for the sidebar/stats.
-class LibraryStats {
-  const LibraryStats({
-    this.total = 0,
-    this.starred = 0,
-    this.unlabeled = 0,
-    this.byLanguageId = const {},
-    this.byLabelId = const {},
-  });
-
-  final int total;
-  final int starred;
-  final int unlabeled;
-  final Map<String, int> byLanguageId;
-  final Map<String, int> byLabelId;
-}
-
-/// Derives [LibraryStats] from the current snapshot of all snippets.
-final libraryStatsProvider = Provider<LibraryStats>((ref) {
-  final snippets = ref.watch(allSnippetsProvider).value;
-  if (snippets == null) return const LibraryStats();
-
-  var starred = 0;
-  var unlabeled = 0;
-  final byLanguageId = <String, int>{};
-  final byLabelId = <String, int>{};
-
-  for (final s in snippets) {
-    if (s.isFavorite) starred++;
-    if (s.labels.isEmpty) unlabeled++;
-    final lang = s.languageId;
-    if (lang != null) byLanguageId[lang] = (byLanguageId[lang] ?? 0) + 1;
-    for (final label in s.labels) {
-      byLabelId[label.id] = (byLabelId[label.id] ?? 0) + 1;
-    }
-  }
-
-  return LibraryStats(
-    total: snippets.length,
-    starred: starred,
-    unlabeled: unlabeled,
-    byLanguageId: byLanguageId,
-    byLabelId: byLabelId,
-  );
+/// Latest [LibraryStats] snapshot (zeros until the first emission), for
+/// consumers that just want values, not an AsyncValue.
+final libraryStatsProvider = Provider.autoDispose<LibraryStats>((ref) {
+  return ref.watch(libraryStatsStreamProvider).value ?? const LibraryStats();
 });
 
 /// Snippet list keyed by a (value-equal) [SnippetQuery]. autoDispose so that

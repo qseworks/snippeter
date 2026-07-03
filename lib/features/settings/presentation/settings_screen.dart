@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/highlight/code_themes.dart';
 import '../../../core/highlight/language_visuals.dart';
 import '../../../core/i18n/app_locales.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/data/auth_service.dart';
 import '../../snippets/application/snippet_providers.dart';
@@ -146,12 +148,39 @@ class SettingsScreen extends ConsumerWidget {
                   leading: const Icon(Icons.bookmarks_outlined),
                   title: Text(l10n.settingsAppName),
                   subtitle: Text(l10n.settingsAboutTagline),
+                  trailing: const _VersionLabel(),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// "1.0.0 (1)" from the platform package info; empty until loaded (fast) and
+/// on the rare platforms that don't report it.
+class _VersionLabel extends StatelessWidget {
+  const _VersionLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        final info = snapshot.data;
+        if (info == null || info.version.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        final build = info.buildNumber.isEmpty ? '' : ' (${info.buildNumber})';
+        return Text(
+          'v${info.version}$build',
+          style: theme.textTheme.labelMedium
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        );
+      },
     );
   }
 }
@@ -163,16 +192,11 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // Shared recipe (settings previously used primary-colored headers — the
+    // odd one out of the app's four hand-rolled variants).
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 8),
-      child: Text(
-        title.toUpperCase(),
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.primary,
-          letterSpacing: 0.8,
-        ),
-      ),
+      child: SectionHeader(title),
     );
   }
 }
@@ -356,12 +380,19 @@ class _SignedInPanelState extends ConsumerState<_SignedInPanel> {
   Future<void> _syncNow() async {
     final service = ref.read(syncServiceProvider);
     if (service == null || _syncing) return;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     setState(() => _syncing = true);
+    var ok = false;
     try {
-      await service.syncOnce();
+      ok = await service.syncOnce();
     } finally {
       if (mounted) setState(() => _syncing = false);
     }
+    messenger.showSnackBar(SnackBar(
+      content: Text(
+          ok ? l10n.settingsSyncSuccessSnack : l10n.settingsSyncFailedSnack),
+    ));
   }
 
   Future<void> _signOut() async {

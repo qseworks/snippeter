@@ -59,10 +59,9 @@ class _LabelFieldState extends State<LabelField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InputDecorator(
-          decoration: InputDecoration(
-            labelText: l10n.labelFieldLabel,
-            border: const OutlineInputBorder(),
-          ),
+          // No border override: the themed input decoration (8px radius,
+          // outlineVariant) applies, matching every other field.
+          decoration: InputDecoration(labelText: l10n.labelFieldLabel),
           child: Wrap(
             spacing: 6,
             runSpacing: 6,

@@ -31,11 +31,16 @@ class _FakeRepo implements SnippetRepository {
   @override
   Future<void> softDelete(String id) async {}
   @override
+  Future<void> undoDelete(String id) async {}
+  @override
   Future<List<SnippetVersion>> getVersions(String snippetId) async => const [];
   @override
   Future<void> restoreVersion(String snippetId, int savedAt) async {}
   @override
   Stream<List<Label>> watchLabels() => Stream.value(const []);
+  @override
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId}) =>
+      Stream.value(const LibraryStats());
   @override
   Future<String> createLabel(String name, {String? color, String? parentId}) async => 'l';
   @override

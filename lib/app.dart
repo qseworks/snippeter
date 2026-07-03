@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/routing/app_router.dart';
+import 'core/routing/route_paths.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'features/settings/application/settings_providers.dart';
@@ -18,7 +19,10 @@ class SnippetManagerApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
-    final themeMode = ref.watch(settingsProvider).themeMode;
+    // select() so unrelated settings (export theme, default language…) don't
+    // rebuild the entire MaterialApp.router.
+    final themeMode =
+        ref.watch(settingsProvider.select((s) => s.themeMode));
     // Selected UI language; null follows the system locale. Flutter resolves
     // text direction (RTL for Arabic/Urdu) from this locale via the global
     // localizations delegates below — no manual Directionality needed.
@@ -46,6 +50,7 @@ class SnippetManagerApp extends ConsumerWidget {
 /// App-wide keyboard shortcuts:
 ///   * Cmd/Ctrl+N — open the new-snippet editor modal.
 ///   * Cmd/Ctrl+F — focus the Library search field.
+///   * Cmd/Ctrl+, — open Settings (macOS Preferences convention).
 ///   * Esc — handled by the open dialog itself (no-op here otherwise).
 ///
 /// Uses [CallbackShortcuts] with both `meta` (macOS) and `control` (everywhere
@@ -91,6 +96,7 @@ class _GlobalShortcutsState extends ConsumerState<_GlobalShortcuts> {
   Widget build(BuildContext context) {
     void newSnippet() => showSnippetEditor(context);
     void focusSearch() => ref.read(searchFocusProvider).requestFocus();
+    void openSettings() => ref.read(goRouterProvider).go(RoutePaths.settings);
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
@@ -100,6 +106,10 @@ class _GlobalShortcutsState extends ConsumerState<_GlobalShortcuts> {
         const SingleActivator(LogicalKeyboardKey.keyF, meta: true): focusSearch,
         const SingleActivator(LogicalKeyboardKey.keyF, control: true):
             focusSearch,
+        const SingleActivator(LogicalKeyboardKey.comma, meta: true):
+            openSettings,
+        const SingleActivator(LogicalKeyboardKey.comma, control: true):
+            openSettings,
       },
       child: Focus(focusNode: _rootFocusNode, child: widget.child),
     );

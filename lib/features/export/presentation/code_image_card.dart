@@ -45,8 +45,17 @@ class CodeImageCard extends StatelessWidget {
       height: 1.5,
       color: baseColor,
     );
+    // Cap the rendered lines: the card is captured as one bitmap, and a
+    // multi-thousand-line body would blow the texture ceiling long before it
+    // made a useful image. 500 lines is far beyond any readable card.
+    var body = data.body.isEmpty ? ' ' : data.body;
+    const maxLines = 500;
+    final lines = body.split('\n');
+    if (lines.length > maxLines) {
+      body = '${lines.take(maxLines).join('\n')}\n…';
+    }
     final span = CodeHighlighter.instance.highlight(
-      code: data.body.isEmpty ? ' ' : data.body,
+      code: body,
       grammarId: data.grammarId,
       baseStyle: base,
       theme: theme,

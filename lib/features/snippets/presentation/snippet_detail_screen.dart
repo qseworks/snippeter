@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -15,6 +17,7 @@ import '../../../core/widgets/async_states.dart';
 import '../../../core/widgets/code_view.dart';
 import '../../export/presentation/export_menu_button.dart';
 import '../application/snippet_providers.dart';
+import '../data/prompt_variables.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_type.dart';
 import '../domain/value_objects.dart';
@@ -22,6 +25,8 @@ import 'snippet_editor_modal.dart';
 import 'type_visuals.dart';
 import 'widgets/label_chip.dart';
 import 'widgets/notebook_view.dart';
+import 'widgets/prompt_fill_panel.dart';
+import 'widgets/snippet_copy.dart';
 import 'widgets/snippet_history_sheet.dart';
 
 /// Routed, full-screen detail view (with a back button on narrow layouts).
@@ -35,8 +40,7 @@ class SnippetDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const Scaffold(body: AppLoader()),
       error: (error, _) => Scaffold(
         appBar: AppBar(),
         body: AppErrorState(
@@ -48,7 +52,10 @@ class SnippetDetailScreen extends ConsumerWidget {
         if (snippet == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: Center(child: Text(l10n.detailSnippetNotFound)),
+            body: AppEmptyState(
+              icon: Icons.search_off,
+              title: l10n.detailSnippetNotFound,
+            ),
           );
         }
         return Scaffold(
@@ -85,16 +92,16 @@ class InlineSnippetDetail extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(snippetProvider(snippetId));
     return async.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppLoader(),
       error: (error, _) => AppErrorState(
         message: l10n.settingsGenericError,
         onRetry: () => ref.invalidate(snippetProvider(snippetId)),
       ),
       data: (snippet) {
         if (snippet == null) {
-          return _PaneMessage(
+          return AppEmptyState(
             icon: Icons.search_off,
-            text: l10n.detailSnippetUnavailable,
+            title: l10n.detailSnippetUnavailable,
           );
         }
         return Scaffold(
@@ -123,11 +130,70 @@ class DetailPanePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return _PaneMessage(
-      icon: Icons.touch_app_outlined,
-      text: l10n.detailSelectSnippetPlaceholder,
+    return AppEmptyState(
+      icon: Icons.article_outlined,
+      title: l10n.detailSelectSnippetPlaceholder,
     );
   }
+}
+
+/// Confirms, then soft-deletes [snippet], with a friendly failure snackbar
+/// and an Undo action on success. Shared by the detail AppBar delete button
+/// and the library list's Delete-key shortcut.
+Future<void> confirmAndDeleteSnippet(
+  BuildContext context,
+  WidgetRef ref,
+  Snippet snippet, {
+  VoidCallback? onAfterDelete,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      final scheme = Theme.of(context).colorScheme;
+      return AlertDialog(
+        title: Text(l10n.detailDeleteSnippetTitle),
+        content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      );
+    },
+  );
+  if (!(ok ?? false) || !context.mounted) return;
+  final messenger = ScaffoldMessenger.of(context);
+  final repo = ref.read(snippetRepositoryProvider);
+  try {
+    await repo.softDelete(snippet.id);
+  } catch (e, st) {
+    developer.log('softDelete failed', name: 'detail', error: e, stackTrace: st);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+    );
+    return;
+  }
+  if (context.mounted) onAfterDelete?.call();
+  // Soft delete is reversible — offer Undo. `repo` is captured, so the
+  // action outlives this screen's navigation.
+  messenger.showSnackBar(SnackBar(
+    content: Text(l10n.detailDeletedSnack(snippet.title)),
+    duration: const Duration(seconds: 5),
+    action: SnackBarAction(
+      label: l10n.commonUndo,
+      onPressed: () => repo.undoDelete(snippet.id),
+    ),
+  ));
 }
 
 /// Shared AppBar actions for both the routed and inline detail views.
@@ -138,31 +204,6 @@ List<Widget> snippetActions(
   required VoidCallback onAfterDelete,
 }) {
   final l10n = AppLocalizations.of(context);
-  Future<void> confirmDelete() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.detailDeleteSnippetTitle),
-        content: Text(l10n.detailDeleteSnippetConfirm(snippet.title)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (ok ?? false) {
-      await ref.read(snippetRepositoryProvider).softDelete(snippet.id);
-      if (!context.mounted) return;
-      onAfterDelete();
-    }
-  }
-
   return [
     IconButton(
       tooltip: snippet.isFavorite
@@ -188,7 +229,8 @@ List<Widget> snippetActions(
     IconButton(
       tooltip: l10n.detailDeleteTooltip,
       icon: const Icon(Icons.delete_outline),
-      onPressed: confirmDelete,
+      onPressed: () => confirmAndDeleteSnippet(context, ref, snippet,
+          onAfterDelete: onAfterDelete),
     ),
   ];
 }
@@ -212,7 +254,11 @@ class SnippetDetailBody extends ConsumerWidget {
     final files = snippet.files;
     final fileCount = files.isEmpty ? 1 : files.length;
 
-    return Center(
+    // SelectionArea: a developer tool's detail text — the meta line (#id,
+    // dates), share URL, description, prompt fields — should all be mouse-
+    // selectable. Code blocks keep their own SelectableText islands.
+    return SelectionArea(
+      child: Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 900),
         child: ListView(
@@ -236,7 +282,9 @@ class SnippetDetailBody extends ConsumerWidget {
                     name: language.name,
                   ),
                 if (snippet.purpose != null)
-                  _Meta(icon: Icons.label_outline, label: snippet.purpose!),
+                  _Meta(
+                      icon: Icons.label_outline,
+                      label: labelForPurpose(l10n, snippet.purpose!)),
                 if (collection != null)
                   _Meta(icon: Icons.folder_outlined, label: collection.name),
                 for (final label in snippet.labels) LabelChip(label: label),
@@ -253,7 +301,11 @@ class SnippetDetailBody extends ConsumerWidget {
             ],
             const SizedBox(height: 20),
             // Files section header + one CodeBlock per file.
-            _FilesHeader(count: fileCount, snippetId: snippet.id),
+            _FilesHeader(
+              count: fileCount,
+              snippet: snippet,
+              languageMap: languageMap,
+            ),
             const SizedBox(height: 10),
             if (files.isEmpty)
               CodeBlock(
@@ -273,6 +325,7 @@ class SnippetDetailBody extends ConsumerWidget {
             _AttachmentsSection(snippetId: snippet.id),
           ],
         ),
+      ),
       ),
     );
   }
@@ -309,10 +362,54 @@ class _AttachmentsSection extends ConsumerWidget {
         for (final a in attachments)
           _AttachmentTile(
             attachment: a,
-            onDelete: () =>
-                ref.read(snippetRepositoryProvider).deleteAttachment(a.id),
+            onDelete: () => _confirmDeleteAttachment(context, ref, a),
           ),
       ],
+    );
+  }
+}
+
+/// Confirms, then deletes one attachment — deletion is irreversible (unlike
+/// the snippet soft-delete), so it warrants the extra tap.
+Future<void> _confirmDeleteAttachment(
+  BuildContext context,
+  WidgetRef ref,
+  Attachment attachment,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      final scheme = Theme.of(context).colorScheme;
+      return AlertDialog(
+        title: Text(l10n.detailDeleteAttachmentTitle),
+        content: Text(l10n.detailDeleteAttachmentConfirm(attachment.filename)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      );
+    },
+  );
+  if (!(ok ?? false) || !context.mounted) return;
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    await ref.read(snippetRepositoryProvider).deleteAttachment(attachment.id);
+  } catch (e, st) {
+    developer.log('deleteAttachment failed',
+        name: 'detail', error: e, stackTrace: st);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.commonSomethingWentWrong)),
     );
   }
 }
@@ -351,6 +448,10 @@ class _AttachmentTile extends StatelessWidget {
                       attachment.bytes,
                       width: 40,
                       height: 40,
+                      // Decode at thumbnail size (40px × up to 3x DPR): a
+                      // full-resolution photo would otherwise decode to tens
+                      // of MB of bitmap for a 40px preview.
+                      cacheWidth: 120,
                       fit: BoxFit.cover,
                       gaplessPlayback: true,
                       errorBuilder: (context, error, stack) =>
@@ -373,7 +474,7 @@ class _AttachmentTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _humanSize(attachment.sizeBytes),
+                  _humanSize(l10n, attachment.sizeBytes),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -409,9 +510,11 @@ class _FileIcon extends StatelessWidget {
 }
 
 /// Formats a byte count as a short human-readable string (e.g. "12 B",
-/// "3.4 KB", "1.2 MB").
-String _humanSize(int bytes) {
-  if (bytes < 1024) return '$bytes B';
+/// "3.4 KB", "1.2 MB"), with the mantissa in the locale's number format.
+String _humanSize(AppLocalizations l10n, int bytes) {
+  if (bytes < 1024) {
+    return '${NumberFormat.decimalPattern(l10n.localeName).format(bytes)} B';
+  }
   const units = ['KB', 'MB', 'GB', 'TB'];
   var size = bytes / 1024;
   var unit = 0;
@@ -419,7 +522,10 @@ String _humanSize(int bytes) {
     size /= 1024;
     unit++;
   }
-  final value = size >= 100 ? size.toStringAsFixed(0) : size.toStringAsFixed(1);
+  final value = NumberFormat.decimalPatternDigits(
+    locale: l10n.localeName,
+    decimalDigits: size >= 100 ? 0 : 1,
+  ).format(size);
   return '$value ${units[unit]}';
 }
 
@@ -457,7 +563,7 @@ class _FileBlock extends StatelessWidget {
     // Jupyter notebooks (.ipynb) get a rich, cell-by-cell rendering when the
     // content parses as a notebook; otherwise we fall back to a raw CodeBlock.
     final Notebook? notebook = filename.toLowerCase().endsWith('.ipynb')
-        ? parseNotebook(file.content)
+        ? parseNotebookCached(file.content)
         : null;
 
     return Column(
@@ -738,13 +844,18 @@ class _VisibilityPill extends StatelessWidget {
   }
 }
 
-/// The "Files (n)" section header with an "ADD FILE" affordance that opens the
-/// snippet editor (where files are added/edited).
+/// The "Files (n)" section header with a quick-copy menu (copy all files /
+/// copy as Markdown) and an "ADD FILE" affordance that opens the editor.
 class _FilesHeader extends StatelessWidget {
-  const _FilesHeader({required this.count, required this.snippetId});
+  const _FilesHeader({
+    required this.count,
+    required this.snippet,
+    required this.languageMap,
+  });
 
   final int count;
-  final String snippetId;
+  final Snippet snippet;
+  final Map<String, Language> languageMap;
 
   @override
   Widget build(BuildContext context) {
@@ -762,10 +873,11 @@ class _FilesHeader extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        _CopyMenuButton(snippet: snippet, languageMap: languageMap),
         Tooltip(
           message: l10n.detailAddFileTooltip,
           child: TextButton.icon(
-            onPressed: () => showSnippetEditor(context, snippetId: snippetId),
+            onPressed: () => showSnippetEditor(context, snippetId: snippet.id),
             icon: const Icon(Icons.add, size: 16),
             label: Text(l10n.detailAddFileButton),
             style: TextButton.styleFrom(
@@ -784,6 +896,58 @@ class _FilesHeader extends StatelessWidget {
   }
 }
 
+enum _CopyKind { allFiles, markdown }
+
+/// A "Copy ▾" menu in the files header offering "Copy all files" (raw content)
+/// and "Copy as Markdown" (fenced, with title/description) — the detail-side
+/// half of quick-copy.
+class _CopyMenuButton extends StatelessWidget {
+  const _CopyMenuButton({required this.snippet, required this.languageMap});
+
+  final Snippet snippet;
+  final Map<String, Language> languageMap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return PopupMenuButton<_CopyKind>(
+      tooltip: l10n.detailCopyMenuTooltip,
+      icon: const Icon(Icons.copy_rounded, size: 18),
+      // Match the compact ADD FILE button beside it so the header row aligns.
+      style: IconButton.styleFrom(visualDensity: VisualDensity.compact),
+      onSelected: (kind) {
+        final text = switch (kind) {
+          _CopyKind.allFiles => snippetAllFilesText(snippet),
+          _CopyKind.markdown => snippetMarkdown(snippet, languageMap),
+        };
+        copyWithFeedback(context, text, l10n.exportMenuCopiedSnack);
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _CopyKind.allFiles,
+          child: Row(
+            children: [
+              const Icon(Icons.copy_rounded, size: 18),
+              const SizedBox(width: 12),
+              Text(l10n.detailCopyAllFiles),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: _CopyKind.markdown,
+          child: Row(
+            children: [
+              const Icon(Icons.notes_outlined, size: 18),
+              const SizedBox(width: 12),
+              Text(l10n.detailCopyAsMarkdown),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _PromptMetaView extends StatelessWidget {
   const _PromptMetaView({required this.snippet});
 
@@ -794,15 +958,23 @@ class _PromptMetaView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final meta = snippet.promptMeta!;
+    // The fillable variables come from the placeholders actually present in the
+    // prompt body (the editor reconciles meta to match), so the panel only
+    // appears when there's something to fill.
+    final variableNames = parsePromptVariableNames(snippet.body);
     final rows = <Widget>[
       if (meta.modelProvider != null)
         _kv(l10n.detailPromptProviderLabel, meta.modelProvider!),
       if (meta.targetModel != null)
         _kv(l10n.detailPromptModelLabel, meta.targetModel!),
       if (meta.temperature != null)
-        _kv(l10n.detailPromptTemperatureLabel, meta.temperature!.toString()),
+        _kv(l10n.detailPromptTemperatureLabel,
+            NumberFormat.decimalPattern(l10n.localeName)
+                .format(meta.temperature!)),
       if (meta.maxTokens != null)
-        _kv(l10n.detailPromptMaxTokensLabel, meta.maxTokens!.toString()),
+        _kv(l10n.detailPromptMaxTokensLabel,
+            NumberFormat.decimalPattern(l10n.localeName)
+                .format(meta.maxTokens!)),
     ];
 
     return Column(
@@ -820,23 +992,15 @@ class _PromptMetaView extends StatelessWidget {
           const SizedBox(height: 4),
           Text(meta.systemPrompt!, style: theme.textTheme.bodyMedium),
         ],
-        if (meta.variables.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Text(l10n.detailPromptVariablesLabel, style: theme.textTheme.labelLarge),
-          const SizedBox(height: 4),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final v in meta.variables)
-                Chip(
-                  avatar: const Icon(Icons.data_object, size: 16),
-                  label: Text(v.name),
-                  visualDensity: VisualDensity.compact,
-                ),
-            ],
+        if (variableNames.isNotEmpty)
+          // Interactive fill-in form (replaces the old read-only chips): a
+          // labeled field per variable, a live-resolved preview, and
+          // "Copy filled prompt". Keyed by the variable set so its controllers
+          // survive unrelated snippet-stream updates.
+          PromptFillPanel(
+            key: ValueKey('fill:${variableNames.join(',')}'),
+            snippet: snippet,
           ),
-        ],
       ],
     );
   }
@@ -875,26 +1039,3 @@ class _Meta extends StatelessWidget {
   }
 }
 
-class _PaneMessage extends StatelessWidget {
-  const _PaneMessage({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 48, color: theme.colorScheme.outline),
-          const SizedBox(height: 12),
-          Text(text,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-        ],
-      ),
-    );
-  }
-}

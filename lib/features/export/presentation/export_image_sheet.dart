@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -95,8 +96,9 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
     setState(() => _busy = true);
     try {
       if (_dirty || _bytes == null) await _render();
+      if (!mounted) return;
       final bytes = _bytes;
-      if (bytes == null || !mounted) {
+      if (bytes == null) {
         _toast(l10n.exportImageRenderError);
         return;
       }
@@ -106,9 +108,10 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
       if (mounted) {
         _toast(l10n.exportImageSavedNamed(widget.data.baseName));
       }
-    } catch (e) {
+    } catch (e, st) {
+      developer.log('image save failed', name: 'export', error: e, stackTrace: st);
       if (mounted) {
-        _toast(l10n.exportImageSaveFailed(e.toString()));
+        _toast(l10n.exportImageSaveFailed);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -135,9 +138,11 @@ class _ExportImageSheetState extends ConsumerState<_ExportImageSheet> {
             subject: widget.data.title,
             origin: origin,
           );
-    } catch (e) {
+    } catch (e, st) {
+      developer.log('image share failed',
+          name: 'export', error: e, stackTrace: st);
       if (mounted) {
-        _toast(l10n.exportImageShareFailed(e.toString()));
+        _toast(l10n.exportImageShareFailed);
       }
     }
   }

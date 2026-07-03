@@ -55,8 +55,14 @@ class SupabaseSyncService {
   }
 
   /// Runs one push-then-pull cycle. Guarded against concurrency and offline.
-  Future<void> syncOnce() async {
-    if (_running || _userId == null) return;
+  ///
+  /// Returns true when the cycle completed (or another was already in
+  /// flight), false when it failed or the user is signed out — so a manual
+  /// "Sync now" can tell the user what happened. Background callers ignore
+  /// the result; failures never throw.
+  Future<bool> syncOnce() async {
+    if (_userId == null) return false;
+    if (_running) return true;
     _running = true;
     try {
       await pushDirty();
@@ -67,8 +73,10 @@ class SupabaseSyncService {
         DateTime.now().toUtc().millisecondsSinceEpoch,
       ].reduce((a, b) => a > b ? a : b);
       await _setLastSyncedAt(next);
+      return true;
     } catch (e, st) {
       developer.log('syncOnce failed', name: 'sync', error: e, stackTrace: st);
+      return false;
     } finally {
       _running = false;
     }
@@ -78,6 +86,11 @@ class SupabaseSyncService {
 
   /// Pushes every locally-dirty row (including tombstones) to the matching
   /// remote table, then clears the local `dirty` flag for what was pushed.
+  ///
+  /// The clear is conditional on `updated_at` still matching the snapshot we
+  /// pushed: a row edited *while* the push was on the wire keeps its dirty
+  /// flag (and its new timestamp), so the next cycle pushes the newer edit
+  /// instead of silently stranding it locally.
   Future<void> pushDirty() async {
     if (_userId == null) return;
 
@@ -92,9 +105,14 @@ class SupabaseSyncService {
       for (final s in dirtySnippets) {
         await _pushSnippetChildren(s.id);
       }
-      await (_db.update(_db.snippets)
-            ..where((s) => s.id.isIn([for (final s in dirtySnippets) s.id])))
-          .write(const SnippetsCompanion(dirty: Value(false)));
+      await _db.transaction(() async {
+        for (final s in dirtySnippets) {
+          await (_db.update(_db.snippets)
+                ..where((r) =>
+                    r.id.equals(s.id) & r.updatedAt.equals(s.updatedAt)))
+              .write(const SnippetsCompanion(dirty: Value(false)));
+        }
+      });
     }
 
     // snippet_files
@@ -105,9 +123,14 @@ class SupabaseSyncService {
       await _client.from('snippet_files').upsert(
             [for (final f in dirtyFiles) snippetFileRowToRemote(f)],
           );
-      await (_db.update(_db.snippetFiles)
-            ..where((f) => f.id.isIn([for (final f in dirtyFiles) f.id])))
-          .write(const SnippetFilesCompanion(dirty: Value(false)));
+      await _db.transaction(() async {
+        for (final f in dirtyFiles) {
+          await (_db.update(_db.snippetFiles)
+                ..where((r) =>
+                    r.id.equals(f.id) & r.updatedAt.equals(f.updatedAt)))
+              .write(const SnippetFilesCompanion(dirty: Value(false)));
+        }
+      });
     }
 
     // collections
@@ -118,9 +141,14 @@ class SupabaseSyncService {
       await _client.from('collections').upsert(
             [for (final c in dirtyCollections) collectionRowToRemote(c)],
           );
-      await (_db.update(_db.collections)
-            ..where((c) => c.id.isIn([for (final c in dirtyCollections) c.id])))
-          .write(const CollectionsCompanion(dirty: Value(false)));
+      await _db.transaction(() async {
+        for (final c in dirtyCollections) {
+          await (_db.update(_db.collections)
+                ..where((r) =>
+                    r.id.equals(c.id) & r.updatedAt.equals(c.updatedAt)))
+              .write(const CollectionsCompanion(dirty: Value(false)));
+        }
+      });
     }
 
     // tags -> remote labels
@@ -130,9 +158,14 @@ class SupabaseSyncService {
       await _client.from('labels').upsert(
             [for (final t in dirtyTags) tagRowToLabelRemote(t)],
           );
-      await (_db.update(_db.tags)
-            ..where((t) => t.id.isIn([for (final t in dirtyTags) t.id])))
-          .write(const TagsCompanion(dirty: Value(false)));
+      await _db.transaction(() async {
+        for (final t in dirtyTags) {
+          await (_db.update(_db.tags)
+                ..where((r) =>
+                    r.id.equals(t.id) & r.updatedAt.equals(t.updatedAt)))
+              .write(const TagsCompanion(dirty: Value(false)));
+        }
+      });
     }
   }
 

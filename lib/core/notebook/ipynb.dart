@@ -33,6 +33,28 @@ class NotebookCell {
   final int? executionCount;
 }
 
+// Memo for [parseNotebookCached]: notebooks can be multi-MB JSON decodes and
+// the detail view re-runs build() far more often than content changes. Tiny
+// LRU — only a handful of notebooks are ever on screen.
+final Map<String, Notebook?> _parseCache = {};
+const int _parseCacheLimit = 8;
+
+/// [parseNotebook] with a small LRU over the source text. Use from widget
+/// build() paths; [parseNotebook] itself stays pure for tests/tools.
+Notebook? parseNotebookCached(String jsonText) {
+  if (_parseCache.containsKey(jsonText)) {
+    final hit = _parseCache.remove(jsonText);
+    _parseCache[jsonText] = hit; // Re-insert: most recently used.
+    return hit;
+  }
+  final parsed = parseNotebook(jsonText);
+  _parseCache[jsonText] = parsed;
+  if (_parseCache.length > _parseCacheLimit) {
+    _parseCache.remove(_parseCache.keys.first);
+  }
+  return parsed;
+}
+
 /// Parses [jsonText] as a Jupyter notebook. Returns null if the text is not
 /// valid JSON or does not look like a notebook (no `cells` array).
 Notebook? parseNotebook(String jsonText) {

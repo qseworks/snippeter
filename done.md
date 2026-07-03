@@ -86,11 +86,42 @@ Supabase backend (schema in `supabase/migrations/`; runs locally via `supabase s
 - PNG "carbon" image export; AI-prompt snippet type with `{{variable}}` parsing;
   code editor with find/replace, line numbers, and code folding.
 
+## Professional-grade polish pass (Jul 2026)
+
+Driven by a five-dimension audit (i18n/RTL, async-safety, UX consistency,
+desktop input, performance). Highlights, one themed commit each:
+
+- **i18n end-to-end** — full key parity across all 10 locales (12 + 11 + 5 + 3
+  new/changed key sets translated); card dates/times via `DateFormat`;
+  purposes localized (`labelForPurpose`) — the detail chip previously showed
+  the raw id slug; locale-aware number formatting; dead keys purged.
+- **Async-safety** — sync `pushDirty` no longer clears `dirty` over a
+  mid-flight edit (per-row `updated_at`-guarded clear across all 4 tables);
+  `syncOnce` reports success/failure and Settings → Sync now toasts it;
+  delete/restore get try/catch + friendly failure copy; no more raw
+  `error.toString()` in any snackbar; controller leaks + double-tap gates.
+- **UX states & feedback** — `AppLoader`/`AppEmptyState`/`AppErrorState`
+  adopted on every remaining surface; snippet delete is error-styled with an
+  **Undo** snackbar (new `undoDelete` repo API, synced); attachment delete
+  confirms; "Saved" toast; input-holding dialogs no longer dismiss on a stray
+  outside tap (Esc still explicitly bound).
+- **Desktop** — the editor modal is no longer a keyboard trap (Esc/⌘W honor
+  the discard guard); ↑/↓/Enter/Delete/⌘⇧C drive the two-pane list;
+  double-click edits; ⌘, opens Settings; shortcut hints in tooltips + a ⌘F
+  hint in the search field; detail body is a `SelectionArea`; horizontal
+  code scrollbar; macOS min window size + `PRODUCT_NAME = Snippeter`; app
+  version in Settings (package_info_plus).
+- **Performance** — syntax highlighting memoized (LRU; was re-tokenizing the
+  full file on every rebuild); sidebar stats computed database-side (was
+  hydrating every snippet's content twice per mutation); notebook parses
+  memoized; thumbnails decode at `cacheWidth`; PNG export size-guarded;
+  list updates in place instead of cross-fading/scroll-resetting.
+
 ---
 
 ## Verification baseline
 
-`flutter analyze` → no issues · `flutter test` → 48 passing · macOS
+`flutter analyze` → no issues · `flutter test` → 58 passing · macOS
 `integration_test` (list→search→view→copy→delete) → pass · `flutter build web`
 → built · v1→v2 … v4→v5 migrations verified on a real on-disk database ·
 macOS app launches with `Supabase init completed` (offline, no session) ·

@@ -2,6 +2,7 @@
 // ignore_for_file: prefer_initializing_formals
 import 'dart:typed_data';
 
+import '../../snippets/domain/library_stats.dart';
 import '../../snippets/domain/snippet.dart';
 import '../../snippets/domain/snippet_query.dart';
 import '../../snippets/domain/snippet_repository.dart';
@@ -46,6 +47,10 @@ class SyncedSnippetRepository implements SnippetRepository {
   Stream<List<Label>> watchLabels() => _local.watchLabels();
 
   @override
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId}) =>
+      _local.watchLibraryStats(workspaceId: workspaceId);
+
+  @override
   Stream<List<Collection>> watchCollections() => _local.watchCollections();
 
   @override
@@ -77,6 +82,9 @@ class SyncedSnippetRepository implements SnippetRepository {
 
   @override
   Future<void> softDelete(String id) => _mutate(_local.softDelete(id));
+
+  @override
+  Future<void> undoDelete(String id) => _mutate(_local.undoDelete(id));
 
   @override
   Future<void> restoreVersion(String snippetId, int savedAt) =>

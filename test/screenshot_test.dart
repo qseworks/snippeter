@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snippet_manager/app.dart';
 import 'package:snippet_manager/core/theme/app_theme.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:snippet_manager/features/settings/application/settings_providers.dart';
 import 'package:snippet_manager/features/snippets/application/snippet_providers.dart';
 import 'package:snippet_manager/features/snippets/domain/snippet.dart';
@@ -156,6 +157,27 @@ class _SeedRepo implements SnippetRepository {
   @override
   Stream<List<Label>> watchLabels() => Stream.value(_labels);
   @override
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId}) {
+    final all = _snippets();
+    final byLanguageId = <String, int>{};
+    final byLabelId = <String, int>{};
+    for (final s in all) {
+      if (s.languageId != null) {
+        byLanguageId[s.languageId!] = (byLanguageId[s.languageId!] ?? 0) + 1;
+      }
+      for (final l in s.labels) {
+        byLabelId[l.id] = (byLabelId[l.id] ?? 0) + 1;
+      }
+    }
+    return Stream.value(LibraryStats(
+      total: all.length,
+      starred: all.where((s) => s.isFavorite).length,
+      unlabeled: all.where((s) => s.labels.isEmpty).length,
+      byLanguageId: byLanguageId,
+      byLabelId: byLabelId,
+    ));
+  }
+  @override
   Stream<List<Collection>> watchCollections() => Stream.value(const [
         Collection(id: 'c1', name: 'Work'),
         Collection(id: 'c2', name: 'Personal'),
@@ -173,6 +195,8 @@ class _SeedRepo implements SnippetRepository {
   Future<void> setFavorite(String id, {required bool value}) async {}
   @override
   Future<void> softDelete(String id) async {}
+  @override
+  Future<void> undoDelete(String id) async {}
   @override
   Future<List<SnippetVersion>> getVersions(String snippetId) async => const [];
   @override
@@ -294,6 +318,8 @@ void main() {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark(),
         themeMode: ThemeMode.dark,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           backgroundColor: const Color(0xFF050509),
           body: Center(

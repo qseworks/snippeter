@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'library_stats.dart';
 import 'snippet.dart';
 import 'snippet_query.dart';
 import 'value_objects.dart';
@@ -17,6 +18,10 @@ abstract interface class SnippetRepository {
   Future<void> setFavorite(String id, {required bool value});
   Future<void> softDelete(String id);
 
+  /// Reverses a [softDelete] (e.g. from an Undo snackbar): clears the
+  /// tombstone and marks the row dirty so sync revives it remotely too.
+  Future<void> undoDelete(String id);
+
   // --- version history ---
   /// All saved versions of a snippet's files, most recent first.
   Future<List<SnippetVersion>> getVersions(String snippetId);
@@ -27,6 +32,10 @@ abstract interface class SnippetRepository {
 
   // --- labels ---
   Stream<List<Label>> watchLabels();
+
+  /// Aggregate sidebar counts for one library (null = personal), computed
+  /// database-side so watching them never hydrates snippet content.
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId});
   Future<String> createLabel(String name, {String? color, String? parentId});
   Future<void> setLabelColor(String id, String color);
   Future<void> setLabelParent(String id, String? parentId);

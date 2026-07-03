@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../core/routing/route_paths.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/platform_keys.dart';
 import '../auth/application/auth_providers.dart';
 import '../import/gist_import_dialog.dart';
 import '../snippets/application/snippet_providers.dart';
@@ -85,8 +88,8 @@ class LibrarySidebar extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     iconSize: 18,
                     color: AppTheme.sidebarMuted,
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => ref.invalidate(allSnippetsProvider),
+                    icon: const Icon(Icons.refresh_rounded),
+                    onPressed: () => ref.invalidate(libraryStatsStreamProvider),
                   ),
                 ],
               ),
@@ -96,18 +99,21 @@ class LibrarySidebar extends ConsumerWidget {
               padding: const EdgeInsetsDirectional.fromSTEB(12, 4, 12, 12),
               child: SizedBox(
                 width: double.infinity,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.accent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Tooltip(
+                  message: shortcutLabel('N'),
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.accent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      _closeDrawerIfNeeded(context);
+                      showSnippetEditor(context);
+                    },
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text(l10n.sidebarNewSnippetButton),
                   ),
-                  onPressed: () {
-                    _closeDrawerIfNeeded(context);
-                    showSnippetEditor(context);
-                  },
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(l10n.sidebarNewSnippetButton),
                 ),
               ),
             ),
@@ -175,7 +181,7 @@ class LibrarySidebar extends ConsumerWidget {
                             child: const Padding(
                               padding: EdgeInsets.all(6),
                               child: Icon(
-                                Icons.refresh,
+                                Icons.refresh_rounded,
                                 size: 16,
                                 color: AppTheme.sidebarMuted,
                               ),
@@ -260,6 +266,7 @@ class LibrarySidebar extends ConsumerWidget {
                 controller: nameController,
                 autofocus: true,
                 decoration: InputDecoration(hintText: l10n.sidebarLabelNameHint),
+                onSubmitted: (_) => Navigator.pop(context, true),
               ),
               if (parentChoices.isNotEmpty) ...[
                 const SizedBox(height: 16),
@@ -361,18 +368,31 @@ class LibrarySidebar extends ConsumerWidget {
       ),
     );
 
-    if ((created ?? false) && nameController.text.trim().isNotEmpty) {
-      final hex = '#${(selectedColor.toARGB32() & 0xFFFFFF)
-          .toRadixString(16)
-          .padLeft(6, '0')
-          .toUpperCase()}';
-      await ref.read(snippetRepositoryProvider).createLabel(
-            nameController.text.trim(),
-            color: hex,
-            parentId: selectedParentId,
-          );
+    try {
+      if ((created ?? false) && nameController.text.trim().isNotEmpty) {
+        final hex = '#${(selectedColor.toARGB32() & 0xFFFFFF)
+            .toRadixString(16)
+            .padLeft(6, '0')
+            .toUpperCase()}';
+        try {
+          await ref.read(snippetRepositoryProvider).createLabel(
+                nameController.text.trim(),
+                color: hex,
+                parentId: selectedParentId,
+              );
+        } catch (e, st) {
+          developer.log('createLabel failed',
+              name: 'sidebar', error: e, stackTrace: st);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.commonSomethingWentWrong)),
+            );
+          }
+        }
+      }
+    } finally {
+      nameController.dispose();
     }
-    nameController.dispose();
   }
 }
 

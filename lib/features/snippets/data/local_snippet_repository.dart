@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/app_database.dart';
 import '../../../core/utils/clock.dart';
 import '../../../core/utils/ids.dart';
+import '../domain/library_stats.dart';
 import '../domain/snippet.dart';
 import '../domain/snippet_query.dart';
 import '../domain/snippet_repository.dart';
@@ -270,6 +271,18 @@ class LocalSnippetRepository implements SnippetRepository {
     );
   }
 
+  @override
+  Future<void> undoDelete(String id) async {
+    final ts = nowMs();
+    await (_db.update(_db.snippets)..where((t) => t.id.equals(id))).write(
+      SnippetsCompanion(
+        deletedAt: const Value(null),
+        updatedAt: Value(ts),
+        dirty: const Value(true),
+      ),
+    );
+  }
+
   // --- version history -----------------------------------------------------
 
   /// Copies the current snippet_files rows for [snippetId] into
@@ -370,6 +383,77 @@ class LocalSnippetRepository implements SnippetRepository {
   }
 
   // --- labels --------------------------------------------------------------
+
+  @override
+  Stream<LibraryStats> watchLibraryStats({String? workspaceId}) {
+    // One watched aggregate over snippets + the label join. Counting SQL-side
+    // means a favorite tap or label edit re-runs COUNTs — not a full-library
+    // hydration of every snippet's file content (which is what deriving stats
+    // from watchSnippets used to cost, twice, on every mutation).
+    //
+    // `?1` is referenced by every branch, so a single variable serves all.
+    // Join rows are counted as-is (no tag-tombstone filter), matching how
+    // _attachRelations builds `Snippet.labels`.
+    final wsFilter = workspaceId == null
+        ? 's.workspace_id IS NULL'
+        : 's.workspace_id = ?1';
+    final vars = [if (workspaceId != null) Variable<String>(workspaceId)];
+    final query = '''
+SELECT 'total' AS kind, NULL AS k, COUNT(*) AS c
+  FROM snippets s WHERE s.deleted_at IS NULL AND $wsFilter
+UNION ALL
+SELECT 'starred', NULL, COUNT(*)
+  FROM snippets s
+  WHERE s.deleted_at IS NULL AND s.is_favorite = 1 AND $wsFilter
+UNION ALL
+SELECT 'unlabeled', NULL, COUNT(*)
+  FROM snippets s
+  WHERE s.deleted_at IS NULL AND $wsFilter
+    AND NOT EXISTS (SELECT 1 FROM snippet_tags j WHERE j.snippet_id = s.id)
+UNION ALL
+SELECT 'lang', s.language_id, COUNT(*)
+  FROM snippets s
+  WHERE s.deleted_at IS NULL AND s.language_id IS NOT NULL AND $wsFilter
+  GROUP BY s.language_id
+UNION ALL
+SELECT 'label', j.tag_id, COUNT(*)
+  FROM snippet_tags j
+  INNER JOIN snippets s ON s.id = j.snippet_id
+  WHERE s.deleted_at IS NULL AND $wsFilter
+  GROUP BY j.tag_id
+''';
+    return _db
+        .customSelect(query,
+            variables: vars, readsFrom: {_db.snippets, _db.snippetTags})
+        .watch()
+        .map((rows) {
+      var total = 0, starred = 0, unlabeled = 0;
+      final byLanguageId = <String, int>{};
+      final byLabelId = <String, int>{};
+      for (final row in rows) {
+        final c = row.read<int>('c');
+        switch (row.read<String>('kind')) {
+          case 'total':
+            total = c;
+          case 'starred':
+            starred = c;
+          case 'unlabeled':
+            unlabeled = c;
+          case 'lang':
+            byLanguageId[row.read<String>('k')] = c;
+          case 'label':
+            byLabelId[row.read<String>('k')] = c;
+        }
+      }
+      return LibraryStats(
+        total: total,
+        starred: starred,
+        unlabeled: unlabeled,
+        byLanguageId: byLanguageId,
+        byLabelId: byLabelId,
+      );
+    });
+  }
 
   @override
   Stream<List<Label>> watchLabels() {
