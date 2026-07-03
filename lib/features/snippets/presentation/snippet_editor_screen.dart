@@ -1615,7 +1615,9 @@ class _PurposeDropdown extends StatelessWidget {
       items: [
         DropdownMenuItem(value: null, child: Text(l10n.editorNoPurposeOption)),
         for (final p in applicable)
-          DropdownMenuItem(value: p.id, child: Text(p.label)),
+          DropdownMenuItem(
+              value: p.id,
+              child: Text(labelForPurpose(l10n, p.id, fallback: p.label))),
       ],
       onChanged: onChanged,
     );

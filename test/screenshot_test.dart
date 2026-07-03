@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snippet_manager/app.dart';
 import 'package:snippet_manager/core/theme/app_theme.dart';
+import 'package:snippet_manager/l10n/app_localizations.dart';
 import 'package:snippet_manager/features/settings/application/settings_providers.dart';
 import 'package:snippet_manager/features/snippets/application/snippet_providers.dart';
 import 'package:snippet_manager/features/snippets/domain/snippet.dart';
@@ -294,6 +295,8 @@ void main() {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark(),
         themeMode: ThemeMode.dark,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           backgroundColor: const Color(0xFF050509),
           body: Center(

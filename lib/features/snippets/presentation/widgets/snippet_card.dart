@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:snippet_manager/l10n/app_localizations.dart';
 
 import '../../../../core/highlight/language_visuals.dart';
@@ -166,19 +167,14 @@ String _shortDate(AppLocalizations l10n, int epochMs) {
   final now = DateTime.now();
   final diff = now.difference(date);
   if (diff.inDays == 0 && now.day == date.day) {
-    final h = date.hour.toString().padLeft(2, '0');
-    final m = date.minute.toString().padLeft(2, '0');
-    return l10n.cardTimeFormat(h, m);
+    return DateFormat.jm(l10n.localeName).format(date);
   }
   if (diff.inDays < 7 && diff.inDays >= 0) {
     return l10n.cardDaysAgo(diff.inDays + 1);
   }
-  const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-  final month = months[date.month - 1];
+  // Locale-aware month/day (the hand-rolled predecessor leaked English month
+  // abbreviations into all nine non-English locales).
   return date.year == now.year
-      ? l10n.cardDateFormatSameYear(month, date.day)
-      : l10n.cardDateFormatOtherYear(month, date.day, date.year);
+      ? DateFormat.MMMd(l10n.localeName).format(date)
+      : DateFormat.yMMMd(l10n.localeName).format(date);
 }

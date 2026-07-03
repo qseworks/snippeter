@@ -399,7 +399,9 @@ class _GistImportDialogState extends ConsumerState<_GistImportDialog> {
       case 403:
         return l10n.gistImportErrorAccessDenied;
       default:
-        return e.message;
+        // Never surface the raw exception text — map every other HTTP status
+        // to a localized generic message.
+        return l10n.gistImportErrorGeneric(e.statusCode ?? 0);
     }
   }
 }

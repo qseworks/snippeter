@@ -270,6 +270,46 @@
   "@editorNoPurposeOption": {
     "description": "DropdownMenuItem label for clearing the purpose selection"
   },
+  "purposeUtility": "Utility",
+  "@purposeUtility": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeUtility'"
+  },
+  "purposeBoilerplate": "Boilerplate",
+  "@purposeBoilerplate": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeBoilerplate'"
+  },
+  "purposeAlgorithm": "Algorithm",
+  "@purposeAlgorithm": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeAlgorithm'"
+  },
+  "purposeRegex": "Regex",
+  "@purposeRegex": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeRegex'"
+  },
+  "purposeSqlQuery": "SQL Query",
+  "@purposeSqlQuery": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeSqlQuery'"
+  },
+  "purposeConfig": "Configuration",
+  "@purposeConfig": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeConfig'"
+  },
+  "purposeReference": "Reference",
+  "@purposeReference": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposeReference'"
+  },
+  "purposePromptCoding": "Coding Prompt",
+  "@purposePromptCoding": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposePromptCoding'"
+  },
+  "purposePromptSummarization": "Summarization Prompt",
+  "@purposePromptSummarization": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposePromptSummarization'"
+  },
+  "purposePromptSystem": "System Prompt",
+  "@purposePromptSystem": {
+    "description": "Purpose category name (editor dropdown + detail meta chip); id 'purposePromptSystem'"
+  },
   "editorCollectionLabel": "Collection",
   "@editorCollectionLabel": {
     "description": "labelText for the collection DropdownButtonFormField"
@@ -309,16 +349,6 @@
   "editorPromptSystemPromptLabel": "System prompt",
   "@editorPromptSystemPromptLabel": {
     "description": "labelText for the system prompt TextField"
-  },
-  "commonError": "Error: {error}",
-  "@commonError": {
-    "description": "Error fallback shown in body Center when snippet load fails (both routed screen and inline pane)",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Network timeout"
-      }
-    }
   },
   "detailUntitledTitle": "Untitled",
   "@detailUntitledTitle": {
@@ -431,10 +461,6 @@
         "example": "2"
       }
     }
-  },
-  "detailHistoryButton": "HISTORY",
-  "@detailHistoryButton": {
-    "description": "TextButton.icon label in the files header (uppercase styling)"
   },
   "detailAddFileTooltip": "Add file",
   "@detailAddFileTooltip": {
@@ -870,7 +896,7 @@
   "@gistImportTokenHint": {
     "description": "hintText for the token TextField"
   },
-  "gistImportFetching": "Fetching gists...",
+  "gistImportFetching": "Fetching gists…",
   "@gistImportFetching": {
     "description": "Progress text shown while fetching gists"
   },
@@ -914,7 +940,7 @@
   "@gistImportPrivateSuffix": {
     "description": "Suffix appended to the file-count subtitle for non-public gists"
   },
-  "gistImportImporting": "Importing...",
+  "gistImportImporting": "Importing…",
   "@gistImportImporting": {
     "description": "Progress text shown while importing selected gists"
   },
@@ -947,6 +973,15 @@
   "gistImportErrorAccessDenied": "Access denied or rate-limited. Add a personal access token and try again.",
   "@gistImportErrorAccessDenied": {
     "description": "Friendly error message for HTTP 401/403 from GitHub"
+  },
+  "gistImportErrorGeneric": "GitHub request failed (HTTP {status}). Please try again.",
+  "@gistImportErrorGeneric": {
+    "description": "Import error banner for unexpected GitHub HTTP statuses",
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
   },
   "sidebarPersonalLibraryTitle": "Personal Library",
   "@sidebarPersonalLibraryTitle": {
@@ -1218,20 +1253,6 @@
       }
     }
   },
-  "cardTimeFormat": "{hh}:{mm}",
-  "@cardTimeFormat": {
-    "description": "snippet_card.dart: _shortDate same-day time format shown on the right of the row (lines 82, 143-145). Hand-rolled; recommend intl DateFormat for localization.",
-    "placeholders": {
-      "hh": {
-        "type": "String",
-        "example": "09"
-      },
-      "mm": {
-        "type": "String",
-        "example": "05"
-      }
-    }
-  },
   "cardDaysAgo": "{days, plural, other{{days}d ago}}",
   "@cardDaysAgo": {
     "description": "snippet_card.dart: _shortDate relative format for the last week, e.g. '3d ago' (line 147). Abbreviated 'd ago' is English-specific; isPlural noted though current code uses a single 'd' form.",
@@ -1242,38 +1263,6 @@
       }
     }
   },
-  "cardDateFormatSameYear": "{month} {day}",
-  "@cardDateFormatSameYear": {
-    "description": "snippet_card.dart: _shortDate format for dates in the current year, e.g. 'Jun 20' (line 154). Uses hardcoded English month abbreviations (lines 148-151). Recommend intl DateFormat.",
-    "placeholders": {
-      "month": {
-        "type": "String",
-        "example": "Jun"
-      },
-      "day": {
-        "type": "int",
-        "example": "20"
-      }
-    }
-  },
-  "cardDateFormatOtherYear": "{month} {day}, {year}",
-  "@cardDateFormatOtherYear": {
-    "description": "snippet_card.dart: _shortDate format for dates in other years, e.g. 'Jun 20, 2025' (line 155). Uses hardcoded English month abbreviations. Recommend intl DateFormat.",
-    "placeholders": {
-      "month": {
-        "type": "String",
-        "example": "Jun"
-      },
-      "day": {
-        "type": "int",
-        "example": "20"
-      },
-      "year": {
-        "type": "int",
-        "example": "2025"
-      }
-    }
-  },
   "labelFieldLabel": "Labels",
   "@labelFieldLabel": {
     "description": "label_field.dart: labelText of the InputDecorator wrapping the chip editor (line 61)."
@@ -1281,40 +1270,6 @@
   "labelFieldHint": "Add label…",
   "@labelFieldHint": {
     "description": "label_field.dart: hintText of the trailing TextField for adding a new label (line 82)."
-  },
-  "listSortRecentlyUpdated": "Recently updated",
-  "@listSortRecentlyUpdated": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.recent)"
-  },
-  "listSortRecentlyCreated": "Recently created",
-  "@listSortRecentlyCreated": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.created)"
-  },
-  "listSortTitleAsc": "Title A–Z",
-  "@listSortTitleAsc": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.titleAsc). Contains an en-dash."
-  },
-  "listSortRelevance": "Relevance",
-  "@listSortRelevance": {
-    "description": "snippet_list_screen.dart: sort option label in the sort PopupMenuButton (SnippetSort.relevance)"
-  },
-  "listSortTooltip": "Sort",
-  "@listSortTooltip": {
-    "description": "snippet_list_screen.dart: tooltip on the sort PopupMenuButton, and the fallback shown in the header Text when value has no label (lines 148, 159)"
-  },
-  "listSearchHint": "Search snippets…",
-  "@listSearchHint": {
-    "description": "snippet_list_screen.dart: hintText of the library search TextField. Note: an integration test searches for this exact string per the comment at line 176."
-  },
-  "listErrorGeneric": "Something went wrong:\n{error}",
-  "@listErrorGeneric": {
-    "description": "snippet_list_screen.dart: error state Text shown in the results area when the snippet list fails to load",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "DatabaseException"
-      }
-    }
   },
   "listEmptyFilteredTitle": "No matching snippets",
   "@listEmptyFilteredTitle": {

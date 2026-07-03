@@ -239,7 +239,9 @@ class SnippetDetailBody extends ConsumerWidget {
                     name: language.name,
                   ),
                 if (snippet.purpose != null)
-                  _Meta(icon: Icons.label_outline, label: snippet.purpose!),
+                  _Meta(
+                      icon: Icons.label_outline,
+                      label: labelForPurpose(l10n, snippet.purpose!)),
                 if (collection != null)
                   _Meta(icon: Icons.folder_outlined, label: collection.name),
                 for (final label in snippet.labels) LabelChip(label: label),
@@ -380,7 +382,7 @@ class _AttachmentTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _humanSize(attachment.sizeBytes),
+                  _humanSize(l10n, attachment.sizeBytes),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -416,9 +418,11 @@ class _FileIcon extends StatelessWidget {
 }
 
 /// Formats a byte count as a short human-readable string (e.g. "12 B",
-/// "3.4 KB", "1.2 MB").
-String _humanSize(int bytes) {
-  if (bytes < 1024) return '$bytes B';
+/// "3.4 KB", "1.2 MB"), with the mantissa in the locale's number format.
+String _humanSize(AppLocalizations l10n, int bytes) {
+  if (bytes < 1024) {
+    return '${NumberFormat.decimalPattern(l10n.localeName).format(bytes)} B';
+  }
   const units = ['KB', 'MB', 'GB', 'TB'];
   var size = bytes / 1024;
   var unit = 0;
@@ -426,7 +430,10 @@ String _humanSize(int bytes) {
     size /= 1024;
     unit++;
   }
-  final value = size >= 100 ? size.toStringAsFixed(0) : size.toStringAsFixed(1);
+  final value = NumberFormat.decimalPatternDigits(
+    locale: l10n.localeName,
+    decimalDigits: size >= 100 ? 0 : 1,
+  ).format(size);
   return '$value ${units[unit]}';
 }
 
@@ -867,9 +874,13 @@ class _PromptMetaView extends StatelessWidget {
       if (meta.targetModel != null)
         _kv(l10n.detailPromptModelLabel, meta.targetModel!),
       if (meta.temperature != null)
-        _kv(l10n.detailPromptTemperatureLabel, meta.temperature!.toString()),
+        _kv(l10n.detailPromptTemperatureLabel,
+            NumberFormat.decimalPattern(l10n.localeName)
+                .format(meta.temperature!)),
       if (meta.maxTokens != null)
-        _kv(l10n.detailPromptMaxTokensLabel, meta.maxTokens!.toString()),
+        _kv(l10n.detailPromptMaxTokensLabel,
+            NumberFormat.decimalPattern(l10n.localeName)
+                .format(meta.maxTokens!)),
     ];
 
     return Column(

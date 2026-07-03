@@ -490,7 +490,9 @@ class _InviteRowState extends ConsumerState<_InviteRow> {
       if (!mounted) return;
       _emailController.clear();
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.teamInvitedSnack(email, _role.wire))),
+        SnackBar(
+            content:
+                Text(l10n.teamInvitedSnack(email, _roleLabel(context, _role)))),
       );
     } catch (e) {
       if (!mounted) return;
