@@ -74,7 +74,6 @@ Feature-first folders with clean layering (UI → state → domain ← data). Th
 interface is the seam that keeps storage swappable. See:
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full design (tech stack, data model, export pipeline, sync plan).
-- [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) — the phased build plan.
 - [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) — where the implementation deliberately deviates from the plan.
 
 ```

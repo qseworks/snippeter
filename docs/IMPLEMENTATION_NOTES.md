@@ -1,6 +1,6 @@
 # Implementation Notes
 
-Where the build deliberately deviates from `ARCHITECTURE.md` / `BUILD_PLAN.md`, and why. Everything below is intentional, not an oversight.
+Where the build deliberately deviates from `ARCHITECTURE.md`, and why. Everything below is intentional, not an oversight.
 
 ## FTS5 created via `customStatement`, not a `.drift` file
 The plan declared the `snippets_fts` virtual table + triggers in a `.drift` file. We instead create them with raw `customStatement`s in the Drift `onCreate` migration (`lib/core/db/app_database.dart`). Cross-referencing Dart-defined tables from a `.drift` file's triggers is brittle; raw statements are robust and fully covered by `test/search_test.dart`. The FTS table is **standalone** (stores its own copy) with triggers mirroring `snippets` and re-denormalizing `tag_text` from `snippet_tags`. The `build.yaml` `fts5`/`json1` modules remain (harmless; needed if we move FTS into `.drift` later).
