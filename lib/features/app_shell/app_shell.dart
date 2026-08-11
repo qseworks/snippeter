@@ -11,7 +11,7 @@ import '../workspaces/presentation/create_workspace_dialog.dart';
 import '../workspaces/presentation/team_screen.dart';
 import 'library_sidebar.dart';
 
-/// The Snippet-style master shell. Owns the [Scaffold] and lays out the dark
+/// The app's master shell. Owns the [Scaffold] and lays out the dark
 /// 3-pane chrome on wide screens: a thin workspace rail, the dark
 /// [LibrarySidebar], and the routed content (`child`). On narrow screens the
 /// sidebar collapses into a [Drawer] behind a hamburger app bar.

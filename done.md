@@ -1,24 +1,23 @@
 # Done — shipped features
 
-The completed counterpart to [spec.md](spec.md). Items here are built, tested
+The running log of shipped features. Items here are built, tested
 (`flutter analyze` clean, full `flutter test` green, macOS integration flow +
-web build passing), and committed. Remaining/planned work stays in `spec.md`.
+web build passing), and committed.
 
-Effort key matches spec.md (S/M/L). Commits: `7348382` (initial — Snippet look +
-multi-file/markdown/modal), `e711905` (P1 batch).
+Effort key: S/M/L.
 
 ---
 
 ## Foundations
 
-- **Snippet green theme + dark sidebar tokens** — `lib/core/theme/app_theme.dart`
+- **Brand green theme + dark sidebar tokens** — `lib/core/theme/app_theme.dart`
   (seed `#16B378`, `sidebar*` palette, green `brandGradient`).
 - **Bundled type** — Inter (UI) + JetBrains Mono (code) in `assets/fonts/`,
   pixel-stable incl. PNG/PDF export.
 - **Tags → Labels rename** — renamed domain-up (domain, repository API,
   providers, UI, tests); physical SQL stays `tags`/`snippet_tags` (no migration).
 
-## P0 — Local-first Snippet parity ✅ (commit `7348382`)
+## P0 — Local-first foundations ✅
 
 - **P0.1 Multi-file snippets** — `snippet_files` table (schema **v2**, migration
   backfills one file per existing snippet); `SnippetFile`/`SnippetDraft.files`;
@@ -36,7 +35,7 @@ multi-file/markdown/modal), `e711905` (P1 batch).
   repository; `unlabeled` query filter; `libraryStats` counts.
 - **P0.5 Private/Public flag** — `snippets.visibility` (default private);
   `SnippetVisibility`; toggle in the editor, lock/globe pill in detail + cards.
-- **P0.6 Dark 3-pane Snippet shell** — `AppShell` (workspace rail + sidebar +
+- **P0.6 Dark 3-pane shell** — `AppShell` (workspace rail + sidebar +
   content), responsive (sidebar → drawer + FAB on narrow), `ShellRoute` routing.
 - **P0.7 Copy file contents** — inline copy button in the `CodeBlock` header.
 - **Modal editor** — `showSnippetEditor` (`snippet_editor_modal.dart`); NEW
@@ -81,7 +80,7 @@ Supabase backend (schema in `supabase/migrations/`; runs locally via `supabase s
 - **P2.5 Public share pages** ✅ **deployed** — `supabase/functions/share` is live (`verify_jwt=false`) at `…/functions/v1/share?id=<id>`; the app shows this URL on public snippets. ⚠️ Supabase's shared functions domain forces `text/plain`+`nosniff`+sandbox CSP, so a browser shows the HTML as source — **rendering needs a custom domain** on Edge Functions (see `supabase/README.md`). Export → Save as HTML gives a rendered page today.
 - Build note: macOS min deployment target **13.5** (passkeys plugin via `supabase_flutter`); iOS would need 16+ before an iOS build. Live cross-device sync needs a confirmed account (Supabase email-confirmation is on by default). RLS helper functions (`is_member`/`can_write`/`can_manage`) raise a benign advisor WARN (RPC-callable) — they only reveal the caller's own access; revoking would break the policies that use them.
 
-## Bonus (beyond Snippet)
+## Bonus
 
 - PNG "carbon" image export; AI-prompt snippet type with `{{variable}}` parsing;
   code editor with find/replace, line numbers, and code folding.

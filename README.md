@@ -1,4 +1,24 @@
-# Snippeter
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="brand/lockup-dark.svg">
+  <img src="brand/lockup-light.svg" alt="Snippeter" width="340">
+</picture>
+
+<br>
+
+**A fast, local-first manager for code snippets & AI prompts — on all six platforms.**
+
+[![License: FSL-1.1-MIT](https://img.shields.io/badge/license-FSL--1.1--MIT-65EA92)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.44-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Platforms](https://img.shields.io/badge/platforms-Windows%20·%20Linux%20·%20macOS%20·%20iOS%20·%20Android%20·%20Web-0B0C0F)](#running)
+[![Tests](https://img.shields.io/badge/tests-58%20passing-65EA92)](#tests)
+
+<br>
+
+<img src=".github/assets/hero.svg" alt="Animated terminal typing: snippets & AI prompts, everywhere" width="720">
+
+</div>
 
 **Snippeter** is a cross-platform manager for code snippets and AI prompts — **Windows, Linux, macOS, iOS, Android and Web** from one Flutter codebase. Local-first today, designed to add cloud sync later without a rewrite.
 
@@ -31,7 +51,7 @@ Build for web (CanvasKit baseline): `flutter build web`. The matching `web/sqlit
 ## Backend (Supabase)
 
 The app is **offline-first** — local Drift is always the source of truth and Supabase is the optional
-sync / accounts / team backend. You don't need the paid hosted project to develop: run the whole
+sync / accounts / team backend. You don't need a hosted project to develop: run the whole
 Supabase stack locally in Docker, for free.
 
 ```bash
@@ -65,8 +85,8 @@ lib/
     search/     FTS5-backed search & filter bar
     export/     ExportService, carbon PNG card, off-screen capture, share
     settings/   persisted preferences (shared_preferences)
-    sync/       deferred, unwired seam proving cloud sync is additive
-    app_shell/  responsive navigation shell
+    sync/       optional Supabase sync, layered on as an additive repository
+    app_shell/  responsive 3-pane navigation shell
 ```
 
 ## Integrations
@@ -82,6 +102,10 @@ First-party clients that talk to the same Supabase backend (sign in, browse/inse
 
 A one-page landing site lives in [`landing/`](landing/) (Next.js + Tailwind, fully static). Deploy to Vercel with **Root Directory = `landing`**.
 
+<div align="center">
+  <img src="brand/preview-og.png" alt="Snippeter social card — the prompt mark on a dark machined tile" width="640">
+</div>
+
 ## Tech
 
 Flutter 3.44 · Riverpod 3 · go_router · Drift (SQLite + FTS5, native & WASM) · re_highlight / re_editor ·
@@ -95,3 +119,8 @@ flutter test
 
 Covers the repository (CRUD, tags, prompt variables, collections), FTS5 search, export value objects,
 the no-raster-`Image` rule for the export card, and an app smoke test.
+
+## License
+
+[FSL-1.1-MIT](LICENSE) — source-available under the Functional Source License: use, read, modify and
+contribute freely for any non-competing purpose; each release becomes MIT two years after publication.

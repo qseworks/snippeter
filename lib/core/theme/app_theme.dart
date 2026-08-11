@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  static const Color _seed = Color(0xFF16B378); // Snippet green
+  static const Color _seed = Color(0xFF16B378); // legacy seed green (pre-rebrand)
 
   /// UI typeface (bundled, variable weight). See [pubspec.yaml].
   static const String uiFamily = 'Inter';
@@ -121,7 +121,7 @@ class AppTheme {
 
     // A compact, desktop-first type scale. Sizes run roughly 10–15% below the
     // Material defaults and headings carry tight negative tracking — the dense,
-    // high-information feel of Linear/Snippet rather than stock Material.
+    // high-information feel of Linear rather than stock Material.
     final textTheme = baseText.copyWith(
       displaySmall: baseText.displaySmall?.copyWith(
           fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: -0.6),

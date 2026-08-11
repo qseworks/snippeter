@@ -19,7 +19,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: RoutePaths.library,
     routes: [
-      // The persistent Snippet 3-pane shell. Library + Settings render inside it;
+      // The persistent 3-pane shell. Library + Settings render inside it;
       // "Starred"/"Unlabeled" etc. are sidebar filters on the library query.
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -30,7 +30,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // builder wraps them in a MaterialPage, which on macOS/web applies a
           // Cupertino slide-from-right — within the fixed content pane that
           // reads as the panel "sliding"/distorting. NoTransitionPage makes the
-          // swap instant (Snippet/VS Code style).
+          // swap instant (VS Code style).
           GoRoute(
             path: RoutePaths.library,
             pageBuilder: (context, state) =>

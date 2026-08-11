@@ -267,7 +267,7 @@ class SnippetDetailBody extends ConsumerWidget {
             // Meta line: short id + "Updated <date>".
             _MetaLine(snippet: snippet),
             const SizedBox(height: 12),
-            // Labels + language, with a Snippet-style "LABELS ▾" affordance.
+            // Labels + language, with a "LABELS ▾" affordance.
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -612,7 +612,7 @@ String _shortDate(BuildContext context, int epochMs) {
   return DateFormat.yMMMd(locale).format(date);
 }
 
-/// The Snippet-style meta line under the title: a short snippet id + the date
+/// The meta line under the title: a short snippet id + the date
 /// the snippet was last updated.
 class _MetaLine extends StatelessWidget {
   const _MetaLine({required this.snippet});
@@ -645,7 +645,7 @@ class _MetaLine extends StatelessWidget {
 }
 
 /// A non-interactive "LABELS ▾" affordance sitting alongside the label chips,
-/// echoing Snippet's label dropdown trigger.
+/// styled like a dropdown trigger.
 class _LabelsAffordance extends StatelessWidget {
   const _LabelsAffordance({required this.snippetId});
 
@@ -688,7 +688,7 @@ class _LabelsAffordance extends StatelessWidget {
   }
 }
 
-/// Snippet-style share row: a faux copyable link (`snippet/<id>`), a copy
+/// Share row: a faux copyable link (`snippet/<id>`), a copy
 /// button that copies the link, and a "Private" pill with a lock glyph.
 class _ShareRow extends StatelessWidget {
   const _ShareRow({required this.snippet});

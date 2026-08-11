@@ -14,7 +14,7 @@ import 'snippet_editor_modal.dart';
 import 'widgets/snippet_card.dart';
 import 'widgets/snippet_copy.dart';
 
-/// The bare library body rendered inside the Snippet shell (no Scaffold / AppBar
+/// The bare library body rendered inside the app shell (no Scaffold / AppBar
 /// / FAB — the shell owns those). On wide content it's a list+detail two-pane;
 /// on narrow content it's a single list pane that navigates to the detail route.
 class LibraryContent extends ConsumerWidget {

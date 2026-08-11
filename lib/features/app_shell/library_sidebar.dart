@@ -17,7 +17,7 @@ import '../snippets/domain/value_objects.dart';
 import '../snippets/presentation/snippet_editor_modal.dart';
 import '../snippets/presentation/widgets/label_chip.dart';
 
-/// The dark Snippet-style sidebar: header, NEW SNIPPET button, nav items with
+/// The dark library sidebar: header, NEW SNIPPET button, nav items with
 /// counts, and the LABELS / LANGUAGES filter sections. Drives the library query
 /// via [libraryQueryProvider] and highlights the active selection.
 class LibrarySidebar extends ConsumerWidget {
@@ -243,7 +243,7 @@ class LibrarySidebar extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController();
     // Existing labels offered as possible parents. Only top-level labels are
-    // offered so we keep the hierarchy at a single level of nesting (Snippet-like).
+    // offered so we keep the hierarchy at a single level of nesting.
     final labels = ref.read(labelsProvider).value ?? const <Label>[];
     final parentChoices = [
       for (final l in labels)

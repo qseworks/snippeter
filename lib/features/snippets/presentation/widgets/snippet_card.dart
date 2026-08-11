@@ -12,7 +12,7 @@ import '../snippet_editor_modal.dart';
 import 'label_chip.dart';
 import 'snippet_copy.dart';
 
-/// A Snippet-style snippet ROW in the master list: a lock glyph (private), the
+/// A snippet ROW in the master list: a lock glyph (private), the
 /// title, colored label chips + language pill, and a short date on the right.
 /// The selected row shows a 3px green left bar over a subtle background.
 class SnippetCard extends ConsumerWidget {

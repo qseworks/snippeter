@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Snippeter — snippets & AI prompts, everywhere",
   description:
-    "Snippeter is a fast, local-first manager for code snippets and AI prompts. FTS5 full-text search, carbon-style code-to-image export, and end-to-end encrypted sync across Windows, Linux, macOS, iOS, Android and the web.",
+    "Snippeter is a fast, local-first manager for code snippets and AI prompts. FTS5 full-text search, carbon-style code-to-image export, and secure sync across Windows, Linux, macOS, iOS, Android and the web.",
   applicationName: "Snippeter",
   authors: [{ name: "Snippeter" }],
   keywords: [
@@ -46,14 +46,14 @@ export const metadata: Metadata = {
     siteName: "Snippeter",
     title: "Snippeter — snippets & AI prompts, everywhere",
     description:
-      "A fast, local-first manager for code snippets and AI prompts. Full-text search, code-to-image export, and encrypted sync across all six platforms and the web.",
+      "A fast, local-first manager for code snippets and AI prompts. Full-text search, code-to-image export, and secure sync across all six platforms and the web.",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "Snippeter — snippets & AI prompts, everywhere",
     description:
-      "A fast, local-first manager for code snippets and AI prompts. Full-text search, code-to-image export, and encrypted sync everywhere.",
+      "A fast, local-first manager for code snippets and AI prompts. Full-text search, code-to-image export, and secure sync everywhere.",
   },
   robots: {
     index: true,

@@ -12,12 +12,12 @@ const faqs: QA[] = [
   {
     question: "What does “local-first” actually mean for my privacy?",
     answer:
-      "Your snippets are stored on your device in a local SQLite database and the entire app — including FTS5 search and code-to-image export — works with no network connection. Nothing leaves your machine unless you turn on sync, and when you do, that data is end-to-end encrypted so we can’t read it.",
+      "Your snippets are stored on your device in a local SQLite database and the entire app — including FTS5 search and code-to-image export — works with no network connection. Nothing leaves your machine unless you turn on sync, and when you do, your data is encrypted in transit and isolated to your account with row-level security. End-to-end encryption is on our roadmap.",
   },
   {
     question: "How do shared team workspaces work?",
     answer:
-      "Team workspaces are backed by row-level security (RLS), so each member only ever sees the collections, tags and AI-prompt libraries they’ve been granted. Admins manage role-based access and seat billing centrally, with SSO/SAML and an audit log. Billing is per seat from the first user — there’s no 5-seat minimum.",
+      "Team workspaces are backed by row-level security (RLS), so each member only ever sees the collections, tags and AI-prompt libraries they’ve been granted. Admins manage role-based access and seat billing centrally; SSO/SAML and an audit log are on the Team roadmap. Billing is per seat from the first user — there’s no 5-seat minimum.",
   },
   {
     question: "Can I export my data, or am I locked in?",
@@ -27,7 +27,7 @@ const faqs: QA[] = [
   {
     question: "What’s the difference between the Free and Pro plans?",
     answer:
-      "Free is the complete local-first app on every platform, with unlimited local snippets and up to 50 cloud-synced snippets on a single device. Pro unlocks unlimited end-to-end encrypted sync across all your devices, unlimited cloud storage with version history, and the full AI-prompt tooling — variables, metadata and templated fields.",
+      "Free is the complete local-first app on every platform, with unlimited local snippets and up to 50 cloud-synced snippets on a single device. Pro unlocks unlimited sync across all your devices, unlimited cloud storage, snippet version history, and the full AI-prompt tooling — variables, metadata and templated fields.",
   },
   {
     question: "Do the AI-prompt features lock me to one model?",

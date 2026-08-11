@@ -1078,7 +1078,7 @@
     "placeholders": {
       "account": {
         "type": "String",
-        "example": "user@example.com"
+        "example": "teammate@example.com"
       }
     }
   },

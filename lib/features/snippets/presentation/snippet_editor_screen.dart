@@ -595,7 +595,7 @@ class _SnippetEditorScreenState extends ConsumerState<SnippetEditorScreen> {
 
     // ---------- Metadata (everything except the file/code editors) ----------
     final metaChildren = <Widget>[
-      // Big Snippet-style title field.
+      // Big borderless title field.
       TextField(
         controller: _titleController,
         // Fresh snippet: focus is requested in initState (post-frame) so the
@@ -1157,9 +1157,9 @@ class _ModalHeader extends StatelessWidget {
   }
 }
 
-/// A small uppercase, letter-spaced Snippet-style section header with an
+/// A small uppercase, letter-spaced section header with an
 /// optional trailing affordance (e.g. "Markdown supported" or an action).
-/// Snippet-style formatting toolbar that inserts Markdown around the description
+/// Formatting toolbar that inserts Markdown around the description
 /// selection. Each button calls back into the editor's insertion helpers.
 class _MarkdownToolbar extends StatelessWidget {
   const _MarkdownToolbar({

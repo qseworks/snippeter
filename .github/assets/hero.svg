@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="120" viewBox="0 0 720 120" role="img" aria-label="Terminal typing: snippets and AI prompts, everywhere">
+  <title>Snippeter — snippets &amp; AI prompts, everywhere</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#65EA92"/>
+      <stop offset="1" stop-color="#2FBF71"/>
+    </linearGradient>
+    <clipPath id="type">
+      <rect x="56" y="58" height="28" width="0">
+        <animate attributeName="width" calcMode="discrete" begin="0.8s" dur="2.8s" fill="freeze"
+          values="0;11;22;33;44;55;66;77;88;99;110;121;132;143;154;165;176;187;198;209;220;231;242;253;264;275;286;297;308;319;330;341;352;363"/>
+      </rect>
+    </clipPath>
+  </defs>
+
+  <!-- terminal window -->
+  <rect x="0.5" y="0.5" width="719" height="119" rx="16" fill="#0B0C0F" stroke="#23262B"/>
+  <path d="M0.5 32 H719.5" stroke="#191C20" stroke-width="1"/>
+  <circle cx="26" cy="16.5" r="5" fill="#2E3238"/>
+  <circle cx="44" cy="16.5" r="5" fill="#2E3238"/>
+  <circle cx="62" cy="16.5" r="5" fill="#2E3238"/>
+  <text x="82" y="21" font-family="ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#6A7178">~ snippeter</text>
+
+  <!-- prompt line -->
+  <text x="32" y="78" font-family="ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="20" font-weight="700" fill="url(#g)">&gt;</text>
+  <text x="56" y="78" clip-path="url(#type)" font-family="ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#E6E8EB" textLength="363" lengthAdjust="spacing">snippets &amp; AI prompts, everywhere</text>
+
+  <!-- block caret: tracks the typing, then blinks -->
+  <rect y="62" width="10" height="20" rx="1.5" fill="#65EA92" x="56">
+    <animate attributeName="x" calcMode="discrete" begin="0.8s" dur="2.8s" fill="freeze"
+      values="56;67;78;89;100;111;122;133;144;155;166;177;188;199;210;221;232;243;254;265;276;287;298;309;320;331;342;353;364;375;386;397;408;419"/>
+    <animate attributeName="opacity" begin="3.8s" dur="1.2s" values="1;1;0;0;1" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- status line fades in when typing completes -->
+  <text x="56" y="103" font-family="ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8B919A" opacity="0">
+    <tspan fill="#65EA92">✓</tspan> saved — searchable on all 6 platforms
+    <animate attributeName="opacity" begin="3.9s" dur="0.6s" from="0" to="1" fill="freeze"/>
+  </text>
+</svg>
