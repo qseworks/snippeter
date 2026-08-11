@@ -8,24 +8,26 @@
   </defs>
   <style>
     .mono { font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace; }
-    .type {
-      clip-path: inset(-10px 100% -10px 0);
-      animation: typing 2.8s steps(33, end) 0.8s forwards;
+    /* Progressive enhancement: the static (no-animation) state below is the
+       COMPLETED frame — full text, caret parked at the end, status visible.
+       When CSS animations run, fill-mode:both rewinds everything to frame
+       zero during the delay and replays the typing. */
+    .type { animation: typing 2.8s steps(33, end) 0.8s both; }
+    @keyframes typing {
+      from { clip-path: inset(-10px 100% -10px 0); }
+      to   { clip-path: inset(-10px 0 -10px 0); }
     }
-    @keyframes typing { to { clip-path: inset(-10px 0 -10px 0); } }
     .caret {
-      animation: track 2.8s steps(33, end) 0.8s forwards,
+      transform: translateX(363px);
+      animation: track 2.8s steps(33, end) 0.8s both,
                  blink 1.2s step-end 3.8s infinite;
     }
     @keyframes track { from { transform: translateX(0); } to { transform: translateX(363px); } }
     @keyframes blink { from { opacity: 1; } 50% { opacity: 0; } }
-    .status { opacity: 0; animation: fadein 0.6s ease 3.9s forwards; }
-    @keyframes fadein { to { opacity: 1; } }
+    .status { animation: fadein 0.6s ease 3.9s both; }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) {
       .type, .caret, .status { animation: none; }
-      .type { clip-path: none; }
-      .caret { transform: translateX(363px); }
-      .status { opacity: 1; }
     }
   </style>
 
@@ -44,6 +46,6 @@
   <!-- block caret: tracks the typing, then blinks -->
   <rect x="56" y="62" width="10" height="20" rx="1.5" fill="#65EA92" class="caret"/>
 
-  <!-- status line fades in when typing completes -->
+  <!-- status line -->
   <text x="56" y="103" class="mono status" font-size="13" fill="#8B919A"><tspan fill="#65EA92">✓</tspan> saved — searchable on all 6 platforms</text>
 </svg>

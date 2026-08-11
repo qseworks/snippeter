@@ -16,7 +16,7 @@
 
 <br>
 
-<img src=".github/assets/hero.svg" alt="Animated terminal typing: snippets & AI prompts, everywhere" width="720">
+<img src=".github/assets/hero-animated.svg" alt="Animated terminal typing: snippets & AI prompts, everywhere" width="720">
 
 </div>
 
